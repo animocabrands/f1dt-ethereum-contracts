@@ -1,0 +1,10 @@
+/bin/
+/node_modules/
+/build/
+/coverage/
+/types/
+/config/
+coverage.json
+ganache.log
+.openzeppelin
+.DS_Store

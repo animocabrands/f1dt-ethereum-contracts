@@ -1,0 +1,35 @@
+{
+  "name": "@animoca/f1dt-contracts",
+  "version": "2.0.0",
+  "description": "",
+  "scripts": {
+    "compile": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-compile.sh",
+    "test": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-test.sh",
+    "coverage": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/coverage.sh",
+    "migrate": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/migrate.sh"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gitlab.outblaze.net:formula1/f1dt-contracts.git"
+  },
+  "keywords": [
+    "solidity",
+    "ethereum"
+  ],
+  "author": "Animoca Brands",
+  "license": "MIT",
+  "dependencies": {
+    "@truffle/hdwallet-provider": "^1.0.35",
+    "cli-progress": "^3.8.2",
+    "commander": "^5.1.0",
+    "csvtojson": "^2.0.10"
+  },
+  "devDependencies": {
+    "@animoca/ethereum-contracts-assets_inventory": "^3.0.0",
+    "@animoca/ethereum-contracts-core_library": "^3.0.0",
+    "@animoca/ethereum-contracts-erc20_base": "^3.0.0",
+    "@animoca/ethereum-contracts-nft_staking": "^2.0.0",
+    "@animoca/f1dt-core_metadata": "0.1.0",
+    "base32.js": "^0.1.0"
+  }
+}
