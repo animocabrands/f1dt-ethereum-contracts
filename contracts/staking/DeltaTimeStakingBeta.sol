@@ -9,38 +9,35 @@ import "@animoca/ethereum-contracts-assets_inventory/contracts/metadata/CoreMeta
 
 contract DeltaTimeStakingBeta is NftStaking, CoreMetadataDelegator {
 
-    uint32 internal constant _cycleLengthInSeconds = 1 days;
-    uint16 internal constant _periodLengthInCycles = 7; // 1 week
-
-    mapping(uint256 => uint64) public weightByTokenAttribute;
+    mapping(uint256 => uint64) public weightsByRarity;
 
     constructor(
-        address deltaTimeInventory,
-        address dividendToken_
+        uint32 cycleLengthInSeconds_,
+        uint16 periodLengthInCycles_,
+        address inventoryContract,
+        address revvContract,
+        uint256[] memory rarities,
+        uint64[] memory weights
     ) NftStaking(
-        _cycleLengthInSeconds,
-        _periodLengthInCycles,
-        deltaTimeInventory,
-        dividendToken_
-    ) public {
+        cycleLengthInSeconds_,
+        periodLengthInCycles_,
+        inventoryContract,
+        revvContract
+    ) public
+    {
+        require(rarities.length == weights.length, "REVV: wrong arguments");
         require(
-            IERC165(deltaTimeInventory).supportsInterface(type(CoreMetadataDelegator).interfaceId),
+            IERC165(inventoryContract).supportsInterface(type(CoreMetadataDelegator).interfaceId),
             "DeltaTimeStaking: inventory is not a metadata delegator"
         );
 
         _setInventoryMetadataImplementer(
-            ICoreMetadataDelegator(deltaTimeInventory).coreMetadataImplementer()
+            ICoreMetadataDelegator(inventoryContract).coreMetadataImplementer()
         );
-        weightByTokenAttribute[0] = 500;
-        weightByTokenAttribute[1] = 100;
-        weightByTokenAttribute[2] = 50;
-        weightByTokenAttribute[3] = 50;
-        weightByTokenAttribute[4] = 10;
-        weightByTokenAttribute[5] = 10;
-        weightByTokenAttribute[6] = 10;
-        weightByTokenAttribute[7] = 1;
-        weightByTokenAttribute[8] = 1;
-        weightByTokenAttribute[9] = 1;
+
+        for (uint256 i = 0; i < rarities.length; ++i) {
+            weightsByRarity[rarities[i]] = weights[i];
+        }
     }
 
     function _validateAndGetNftWeight(uint256 nftId) internal virtual override view returns (uint64) {
@@ -50,6 +47,6 @@ contract DeltaTimeStakingBeta is NftStaking, CoreMetadataDelegator {
             coreMetadataImplementer
         ).getAttributes(nftId, names);
         require(attributeValues[0] == 1, "DeltaTimeStaking: only cars can be staked");
-        return weightByTokenAttribute[attributeValues[1]];
+        return weightsByRarity[attributeValues[1]];
     }
 }
