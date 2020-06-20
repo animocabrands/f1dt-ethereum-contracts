@@ -1,6 +1,6 @@
 const { toWei } = require('web3-utils');
 const { BN } = require('@openzeppelin/test-helpers');
-const { rewardsPoolFromSchedule } = require('./utils/rewardsPool');
+const { rewardsPoolFromSchedule } = require('@animoca/ethereum-contracts-nft_staking').utils;
 
 const MetaTxPayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 

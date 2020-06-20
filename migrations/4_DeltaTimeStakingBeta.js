@@ -1,6 +1,6 @@
 const { fromWei } = require('web3-utils');
-const { rewardsPoolFromSchedule } = require('../src/utils/rewardsPool');
-const { CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity ,RewardsSchedule } = require('../src/constants');
+const { rewardsPoolFromSchedule } = require('@animoca/ethereum-contracts-nft_staking').utils;
+const { CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSchedule } = require('../src/constants');
 
 const REVV = artifacts.require('REVV');
 const Inventory = artifacts.require("DeltaTimeInventory");

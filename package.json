@@ -23,7 +23,7 @@
     "@animoca/ethereum-contracts-assets_inventory": "^3.0.0",
     "@animoca/ethereum-contracts-core_library": "^3.0.0",
     "@animoca/ethereum-contracts-erc20_base": "^3.0.0",
-    "@animoca/ethereum-contracts-nft_staking": "^2.0.0",
+    "@animoca/ethereum-contracts-nft_staking": "^2.0.1",
     "@animoca/f1dt-core_metadata": "0.1.1",
     "base32.js": "^0.1.0"
   }
