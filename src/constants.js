@@ -1,6 +1,7 @@
 const { toWei } = require('web3-utils');
 const { BN } = require('@openzeppelin/test-helpers');
 const { rewardsPoolFromSchedule } = require('@animoca/ethereum-contracts-nft_staking').utils;
+const { ZeroAddress } = require('@animoca/ethereum-contracts-core_library').constants;
 
 const MetaTxPayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 
@@ -32,6 +33,13 @@ const RewardsSchedule = [
     { startPeriod: 12, endPeriod: 12, payoutPerCycle: toWei('91600') },
 ];
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
+
+const RaceEntrySalePayoutWallet = ZeroAddress; // dummy address
+const RaceEntrySalePayoutToken = ZeroAddress; // dummy address
+
+const RaceEntrySalePrices = [
+    { id: 'race entry', ethPrice: '0.01', revvPrice: '1' }
+];
 
 module.exports = {
     MetaTxPayoutWallet,
