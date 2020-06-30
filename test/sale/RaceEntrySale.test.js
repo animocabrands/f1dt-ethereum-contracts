@@ -4,7 +4,7 @@ const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-cor
 
 const EthAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
-const Sale = contract.fromArtifact('RaceEntrySaleMock');
+const Sale = contract.fromArtifact('RaceEntrySale');
 
 const price = {
     eth: ether('0.01'),
@@ -21,7 +21,7 @@ const [
     purchaser
 ] = accounts;
 
-describe('RaceEntrySale', function () {
+describe.only('RaceEntrySale', function () {
 
     beforeEach(async function () {
         this.contract = await Sale.new(payout, ZeroAddress, { from: owner });
@@ -30,12 +30,15 @@ describe('RaceEntrySale', function () {
 
     context('purchase quantity is 1', function () {
         it('should purchase successfully', async function () {
+            const quantity = One;
+            const paymentToken = EthAddress;
+
             const receipt = await this.contract.purchaseFor(
                 purchaser,
                 sku,
-                One,
-                EthAddress,
-                gameSessionId,
+                quantity,
+                paymentToken,
+                [ gameSessionId ],
                 {
                     from: operator,
                     value: price.eth
@@ -44,16 +47,16 @@ describe('RaceEntrySale', function () {
             expectEvent.inTransaction(
                 receipt.tx,
                 this.contract,
-                'PurchasedMock',
+                'Purchased',
                 {
                     purchaser: purchaser,
                     operator: operator,
                     sku: web3.utils.padRight(sku, 64),
-                    paymentToken: EthAddress,
-                    quantity: One,
-                    totalPrice: price.eth,
-                    unitPrice: price.eth,
-                    gameSessionId: web3.utils.padRight(gameSessionId, 64)
+                    paymentToken: paymentToken,
+                    quantity: quantity,
+                    extData: [
+                        '0x' + price.eth.toString(16, 64),
+                        web3.utils.padRight(gameSessionId, 64)]
                 });
         });
     });
@@ -66,7 +69,7 @@ describe('RaceEntrySale', function () {
                     sku,
                     Two,
                     EthAddress,
-                    gameSessionId,
+                    [ gameSessionId ],
                     {
                         from: operator,
                         value: price.eth
