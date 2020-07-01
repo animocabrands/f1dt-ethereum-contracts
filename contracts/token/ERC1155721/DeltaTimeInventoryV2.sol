@@ -18,7 +18,7 @@ interface MetadataLayoutSetter {
     ) external;
 }
 
-contract DeltaTimeInventory is PausableInventory, ERC20Fees, CoreMetadataDelegator, MinterRole {
+contract DeltaTimeInventoryV2 is PausableInventory, ERC20Fees, CoreMetadataDelegator, MinterRole {
 
     using UInt256ToDecimalString for uint256;
     using Bytes32ToBase32String for bytes32;
