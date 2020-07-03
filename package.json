@@ -1,9 +1,10 @@
 {
   "name": "@animoca/f1dt-ethereum-contracts",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "",
   "scripts": {
     "compile": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-compile.sh",
+    "flatten": "./scripts/flatten.sh",
     "test": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-test.sh",
     "coverage": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/coverage.sh",
     "migrate": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/migrate.sh"
@@ -23,7 +24,8 @@
     "@animoca/ethereum-contracts-assets_inventory": "^3.0.0",
     "@animoca/ethereum-contracts-core_library": "^3.0.0",
     "@animoca/ethereum-contracts-erc20_base": "^3.0.0",
-    "@animoca/ethereum-contracts-nft_staking": "^2.0.1",
+    "@animoca/ethereum-contracts-nft_staking": "^3.0.0",
+    "@animoca/ethereum-contracts-sale_base": "^3.0.0",
     "@animoca/f1dt-core_metadata": "0.1.1",
     "base32.js": "^0.1.0"
   }
