@@ -13,18 +13,18 @@ contract DeltaTimeStakingBetaV2 is NftStaking, CoreMetadataDelegator {
     constructor(
         uint32 cycleLengthInSeconds_,
         uint16 periodLengthInCycles_,
-        address inventoryContract,
-        address revvContract,
+        IWhitelistedNftContract inventoryContract,
+        IERC20 revvContract,
         uint256[] memory rarities,
         uint64[] memory weights
     ) public NftStaking(cycleLengthInSeconds_, periodLengthInCycles_, inventoryContract, revvContract) {
         require(rarities.length == weights.length, "REVV: wrong arguments");
         require(
-            IERC165(inventoryContract).supportsInterface(type(CoreMetadataDelegator).interfaceId),
+            IERC165(address(inventoryContract)).supportsInterface(type(CoreMetadataDelegator).interfaceId),
             "DeltaTimeStaking: inventory is not a metadata delegator"
         );
 
-        _setInventoryMetadataImplementer(ICoreMetadataDelegator(inventoryContract).coreMetadataImplementer());
+        _setInventoryMetadataImplementer(ICoreMetadataDelegator(address(inventoryContract)).coreMetadataImplementer());
 
         for (uint256 i = 0; i < rarities.length; ++i) {
             weightsByRarity[rarities[i]] = weights[i];

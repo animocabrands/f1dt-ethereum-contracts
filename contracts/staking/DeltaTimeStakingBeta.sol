@@ -10,13 +10,12 @@ contract DeltaTimeStakingBeta is NftStaking {
     constructor(
         uint32 cycleLengthInSeconds_,
         uint16 periodLengthInCycles_,
-        address inventoryContract,
-        address revvContract,
+        IWhitelistedNftContract inventoryContract,
+        IERC20 revvContract,
         uint256[] memory rarities,
         uint64[] memory weights
     ) public NftStaking(cycleLengthInSeconds_, periodLengthInCycles_, inventoryContract, revvContract) {
         require(rarities.length == weights.length, "REVV: wrong arguments");
-
         for (uint256 i = 0; i < rarities.length; ++i) {
             weightsByRarity[rarities[i]] = weights[i];
         }
