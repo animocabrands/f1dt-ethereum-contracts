@@ -34,8 +34,8 @@ const RewardsSchedule = [
 ];
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 
-const RaceEntrySalePayoutWallet = ZeroAddress; // dummy address
-const RaceEntrySalePayoutToken = ZeroAddress; // dummy address
+const RaceEntrySalePayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
+const RaceEntrySalePayoutToken = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 
 const RaceEntrySalePrices = [
     { id: 'race entry', ethPrice: '0.01', revvPrice: '1' }
@@ -47,5 +47,8 @@ module.exports = {
     PeriodLengthInCycles,
     WeightsByRarity,
     RewardsSchedule,
-    RewardsPool
+    RewardsPool,
+    RaceEntrySalePrices,
+    RaceEntrySalePayoutWallet,
+    RaceEntrySalePayoutToken
 };
