@@ -21,7 +21,7 @@ const [
     purchaser
 ] = accounts;
 
-describe.only('RaceEntrySale', function () {
+describe('RaceEntrySale', function () {
 
     beforeEach(async function () {
         this.contract = await Sale.new(payout, ZeroAddress, { from: owner });
