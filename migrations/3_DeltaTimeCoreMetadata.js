@@ -1,7 +1,7 @@
 const { toBytes32Attribute } = require('@animoca/ethereum-contracts-assets_inventory').bytes32Attributes;
 const { collections } = require('@animoca/f1dt-core_metadata');
 
-const DeltaTimeInventory = artifacts.require('DeltaTimeInventory');
+const DeltaTimeInventory = artifacts.require('DeltaTimeInventoryV2');
 const DeltaTimeCoreMetadata = artifacts.require('DeltaTimeCoreMetadata');
 
 module.exports = async (deployer, network, accounts) => {
