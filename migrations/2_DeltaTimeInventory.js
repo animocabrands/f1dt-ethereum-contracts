@@ -5,7 +5,7 @@ const Address = artifacts.require('Address.sol');
 const SafeMath = artifacts.require('SafeMath.sol');
 const UInt256ToDecimalString = artifacts.require('UInt256ToDecimalString.sol');
 const Bytes32ToBase32String = artifacts.require('Bytes32ToBase32String.sol');
-const DeltaTimeInventory = artifacts.require('DeltaTimeInventory.sol');
+const DeltaTimeInventory = artifacts.require('DeltaTimeInventoryV2.sol');
 
 module.exports = async (deployer, network, accounts) => {
 
