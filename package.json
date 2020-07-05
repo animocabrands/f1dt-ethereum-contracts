@@ -1,6 +1,6 @@
 {
   "name": "@animoca/f1dt-ethereum-contracts",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "",
   "scripts": {
     "compile": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-compile.sh",

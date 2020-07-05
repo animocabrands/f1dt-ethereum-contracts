@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.1 (06/07/2020)
+ * Improved checks on NFT type for staking.
+
 ## 0.2.0 (03/07/2020)
  * Updated to `@animoca/ethereum-contracts-nft_staking:3.0.0`.
  * Updated to `@animoca/ethereum-contracts-sale_base:3.0.0`.
