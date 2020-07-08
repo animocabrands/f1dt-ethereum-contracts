@@ -1,7 +1,7 @@
 {
   "name": "@animoca/f1dt-ethereum-contracts",
-  "version": "0.2.1",
-  "description": "",
+  "version": "0.2.2",
+  "description": "F1 Delta Time Solidity Contracts",
   "scripts": {
     "compile": "./node_modules/@animoca/ethereum-contracts-core_library/scripts/oz-compile.sh",
     "flatten": "./scripts/flatten.sh",
@@ -22,7 +22,7 @@
   "dependencies": {},
   "devDependencies": {
     "@animoca/ethereum-contracts-assets_inventory": "^3.0.0",
-    "@animoca/ethereum-contracts-core_library": "^3.0.0",
+    "@animoca/ethereum-contracts-core_library": "^3.1.0",
     "@animoca/ethereum-contracts-erc20_base": "^3.0.0",
     "@animoca/ethereum-contracts-nft_staking": "^3.0.0",
     "@animoca/ethereum-contracts-sale_base": "^3.0.0",

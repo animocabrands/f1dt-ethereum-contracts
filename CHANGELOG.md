@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.2.2 (08/07/2020)
+ * Optimise values retrieval in token id for staking.
+
 ## 0.2.1 (06/07/2020)
  * Improved checks on NFT type for staking.
 
