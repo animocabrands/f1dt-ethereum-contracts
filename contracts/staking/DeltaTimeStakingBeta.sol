@@ -44,17 +44,17 @@ contract DeltaTimeStakingBeta is NftStaking {
     function _validateAndGetNftWeight(uint256 nftId) internal virtual override view returns (uint64) {
         // Ids bits layout specification:
         // https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/constants.js
-        uint256 fungible = (nftId & (1 << 255)) >> 255;
-        uint256 tokenType = (nftId & (0xFF << 240)) >> 240;
-        uint256 tokenSeason = (nftId & (0xFF << 224)) >> 224;
-        uint256 tokenRarity = (nftId & (0xFF << 176)) >> 176;
+        uint256 nonFungible = nftId >> 255 & 1;
+        uint256 tokenType = nftId >> 240 & 0xFF;
+        uint256 tokenSeason = nftId >> 224 & 0xFF;
+        uint256 tokenRarity = nftId >> 176 & 0xFF;
 
         // For interpretation of values, refer to: https://github.com/animocabrands/f1dt-core_metadata/tree/v0.1.1/src/mappings
         // Types: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Types/NameById.js
         // Seasons: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Seasons/NameById.js
         // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Rarities/TierByRarity.js
         require(
-            fungible == 1 &&
+            nonFungible == 1 &&
             tokenType == 1 &&
             tokenSeason == 2,
             "NftStaking: wrong token"
