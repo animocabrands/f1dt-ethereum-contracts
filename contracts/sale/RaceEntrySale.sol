@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity = 0.6.8;
+pragma solidity =0.6.8;
 
 import "@animoca/ethereum-contracts-sale_base/contracts/sale/SimpleSale.sol";
 
@@ -8,7 +8,6 @@ import "@animoca/ethereum-contracts-sale_base/contracts/sale/SimpleSale.sol";
  * @title RaceEntrySale
  */
 contract RaceEntrySale is SimpleSale {
-
     /**
      * Constructor.
      * @param payoutWallet_ The wallet address used to receive purchase payments
@@ -16,29 +15,16 @@ contract RaceEntrySale is SimpleSale {
      * @param payoutToken_ The ERC20 token currency accepted by the payout
      *  wallet for purchase payments.
      */
-    constructor(
-        address payable payoutWallet_,
-        IERC20 payoutToken_
-    )
-        SimpleSale(
-            payoutWallet_,
-            payoutToken_
-        )
-        public
-    {}
+    constructor(address payable payoutWallet_, IERC20 payoutToken_) public SimpleSale(payoutWallet_, payoutToken_) {}
 
     /**
      * Validates a purchase.
      * @param purchase Purchase conditions.
      */
-    function _validatePurchase(
-        Purchase memory purchase
-    ) internal override view {
+    function _validatePurchase(Purchase memory purchase) internal override view {
         super._validatePurchase(purchase);
 
-        require(
-            purchase.quantity == 1,
-            "RaceEntrySale: Quantity must be 1");
+        require(purchase.quantity == 1, "RaceEntrySale: Quantity must be 1");
     }
 
     /**
@@ -59,13 +45,12 @@ contract RaceEntrySale is SimpleSale {
     function _getPurchasedEventExtData(
         Purchase memory purchase,
         bytes32[] memory priceInfo,
-        bytes32[] memory /* paymentInfo */,
-        bytes32[] memory /* deliveryInfo */,
+        bytes32[] memory, /* paymentInfo */
+        bytes32[] memory, /* deliveryInfo */
         bytes32[] memory /* finalizeInfo */
     ) internal override view returns (bytes32[] memory extData) {
         extData = new bytes32[](2);
         extData[0] = priceInfo[1];
         extData[1] = purchase.extData[0];
     }
-
 }

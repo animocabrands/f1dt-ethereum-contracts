@@ -4,6 +4,9 @@ pragma solidity 0.6.8;
 
 import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/ERC20WithOperators.sol";
 
+/**
+ * @title REVV
+ */
 contract REVV is ERC20WithOperators {
 
     string public override constant name = "REVV";
