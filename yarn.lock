@@ -9,10 +9,10 @@
   dependencies:
     big-integer "^1.6.48"
 
-"@animoca/ethereum-contracts-assets_inventory@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-assets_inventory/-/ethereum-contracts-assets_inventory-3.0.0.tgz#e2277d88ee5f1eacf82a37aaaa31adf1e1b9ab2a"
-  integrity sha512-3uaeoERANnHXNTiaanqdBXtNRNn7GRpU8vRB3WFRWoF6t9MAwaPgUVcuZj1zuNU4lRbtLDIriFmFXBTE7RqoMw==
+"@animoca/ethereum-contracts-assets_inventory@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-assets_inventory/-/ethereum-contracts-assets_inventory-4.0.0.tgz#2bb4c709d74f99f1712cee500db2d8dbb47e19ef"
+  integrity sha512-5vnKvkTwyWeNp+j0SciSUwbrg0SR13hoSVkU3VInPeX75Hj17de3fnYVzbhR5+fAJ5ynSNuPEKOw77bPkfLNkg==
 
 "@animoca/ethereum-contracts-core_library@^3.1.0":
   version "3.1.0"
@@ -44,10 +44,10 @@
     "@openzeppelin/gsn-helpers" "^0.2.3"
     "@openzeppelin/gsn-provider" "^0.1.10"
 
-"@animoca/ethereum-contracts-nft_staking@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.0.tgz#8151163806c975b3efa180ec6196f2e0d68f6ab3"
-  integrity sha512-soTmwxR1ICGSLmpRkK5H85zlOaUX+0fMuw9doyvWj9JAZy03269v8ptk5pFm1QrYL82j0CbaK7QN06JPbcXt8Q==
+"@animoca/ethereum-contracts-nft_staking@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.1.tgz#7690154256e76a7a076d9b4fa3bb5e5dac50e53d"
+  integrity sha512-v4pzrzqZ6xmgwI2ss5r3LOdmTDxTQcKfD8en91dQvCl5BQLiTZhTuTQYBhEujjPALdq/ghY3vPrNdGfJjUlKDg==
 
 "@animoca/ethereum-contracts-sale_base@^3.0.0":
   version "3.0.0"
@@ -56,10 +56,10 @@
   dependencies:
     ganache-cli "^6.9.1"
 
-"@animoca/f1dt-core_metadata@0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-0.1.1.tgz#81cc201e78408567696cf6507b20199ddfe219ae"
-  integrity sha512-y4v2J9hBNDeM6d3fTiMn2WzFhRJpYz0MQVJiprHKRrDyfLD1Qs3E4W7a4buZcUnxtzriKDQk8vX8ccvwlY3D+g==
+"@animoca/f1dt-core_metadata@0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-0.1.2.tgz#b71bb9eaeb6e1e83a188cd0395d67afba56b5a75"
+  integrity sha512-31HBIgedV9zW81p+L/oNrhc6rehJuRBIzlKDzvbG1eaPKvX8+tCucxSGJO9EbG+jBiY8EtS2HQGTrNLoYL3MHA==
   dependencies:
     "@animoca/blockchain-inventory_metadata" "^0.0.1"
     bits.js "^0.1.1"
@@ -1145,9 +1145,9 @@
   integrity sha512-41qEJgBH/TWgo5NFSvBCJ1qkoi3Q6ONSF2avrHq1LVEZfYpdHmj0y9SuTK+u9ZhG1sYQKBL1AWXKyLWP4RaUoQ==
 
 "@types/underscore@*":
-  version "1.10.9"
-  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.10.9.tgz#ba7a9cfc15873e67821611503a34a7c26bf7264f"
-  integrity sha512-mKzbGzZ02nXKSV2VJdY92KNzwV7x4Zq626/4qR+7nJEceyKGk5gJXCi0mQqp3tEUa3GTc8uiuxqm4QyIaP0I1Q==
+  version "1.10.11"
+  resolved "https://registry.yarnpkg.com/@types/underscore/-/underscore-1.10.11.tgz#f5a1902d461c55b7513ec01b9ebcd81a53335b18"
+  integrity sha512-BXMlP0qTcdR9I8cATvOwocEHbNOkMiWKO0qJAxl0ijRpuGmfZ6Et3AkudPcgjg4OTWk4Z+XcNR1RZRiAkG27gQ==
 
 "@types/web3@1.0.19":
   version "1.0.19"
@@ -8390,9 +8390,9 @@ p-locate@^4.1.0:
     p-limit "^2.2.0"
 
 p-queue@^6.2.0:
-  version "6.5.0"
-  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.5.0.tgz#40d6bafdd3bb0c8eaa03e0649ba6fa3ce7249947"
-  integrity sha512-FLaTTD9Am6TeDfNuN0d+INeyVJoICoBS+OVP5K1S84v4w51LN3nRkCT+WC7xLBepV2s+N4LibM7Ys7xcSc0+1A==
+  version "6.6.0"
+  resolved "https://registry.yarnpkg.com/p-queue/-/p-queue-6.6.0.tgz#263f2b73add4cefca81d8d6b2696ee74b326de2f"
+  integrity sha512-zPHXPNy9jZsiym0PpJjvnHQysx1fSd/QdaNVwiDRLU2KFChD6h9CkCB6b8i3U8lBwJyA+mHgNZCzcy77glUssQ==
   dependencies:
     eventemitter3 "^4.0.4"
     p-timeout "^3.1.0"

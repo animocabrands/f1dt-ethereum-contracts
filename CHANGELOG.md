@@ -1,7 +1,7 @@
 # Changelog
 
 ## 0.2.3 (20/07/2020)
- * Updated to `@animoca-ethereum-nft_staking@3.0.1`.
+ * Updated to `@animoca-ethereum-nft_staking@3.0.1` and `@animoca-ethereum-assets_inventory@4.0.0`.
  * Added documentation for `REVV`.
  * Linting configuration.
  * Migrated to `yarn`.
