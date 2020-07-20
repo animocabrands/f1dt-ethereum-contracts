@@ -9,7 +9,6 @@ import "@animoca/ethereum-contracts-nft_staking/contracts/staking/NftStaking.sol
  * This contract allows owners of Delta Time 2019 Car NFTs to stake them in exchange for REVV rewards.
  */
 contract DeltaTimeStakingBeta is NftStaking {
-
     mapping(uint256 => uint64) public weightsByRarity;
 
     /**
@@ -44,21 +43,16 @@ contract DeltaTimeStakingBeta is NftStaking {
     function _validateAndGetNftWeight(uint256 nftId) internal virtual override view returns (uint64) {
         // Ids bits layout specification:
         // https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/constants.js
-        uint256 nonFungible = nftId >> 255 & 1;
-        uint256 tokenType = nftId >> 240 & 0xFF;
-        uint256 tokenSeason = nftId >> 224 & 0xFF;
-        uint256 tokenRarity = nftId >> 176 & 0xFF;
+        uint256 nonFungible = (nftId >> 255) & 1;
+        uint256 tokenType = (nftId >> 240) & 0xFF;
+        uint256 tokenSeason = (nftId >> 224) & 0xFF;
+        uint256 tokenRarity = (nftId >> 176) & 0xFF;
 
         // For interpretation of values, refer to: https://github.com/animocabrands/f1dt-core_metadata/tree/v0.1.1/src/mappings
         // Types: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Types/NameById.js
         // Seasons: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Seasons/NameById.js
         // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Rarities/TierByRarity.js
-        require(
-            nonFungible == 1 &&
-            tokenType == 1 &&
-            tokenSeason == 2,
-            "NftStaking: wrong token"
-        );
+        require(nonFungible == 1 && tokenType == 1 && tokenSeason == 2, "NftStaking: wrong token");
 
         return weightsByRarity[tokenRarity];
     }
