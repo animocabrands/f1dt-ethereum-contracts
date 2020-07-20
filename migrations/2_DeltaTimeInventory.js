@@ -1,4 +1,4 @@
-const { MetaTxPayoutWallet } = require('../src/constants');
+const {MetaTxPayoutWallet} = require('../src/constants');
 
 const REVV = artifacts.require('REVV');
 const Address = artifacts.require('Address.sol');
@@ -8,7 +8,6 @@ const Bytes32ToBase32String = artifacts.require('Bytes32ToBase32String.sol');
 const DeltaTimeInventory = artifacts.require('DeltaTimeInventoryV2.sol');
 
 module.exports = async (deployer, network, accounts) => {
-
     await deployer.deploy(Address);
     await Address.deployed();
     const address = (await Address.deployed()).address;
@@ -25,16 +24,16 @@ module.exports = async (deployer, network, accounts) => {
     await Bytes32ToBase32String.deployed();
     const bytes32ToBase32String = (await Bytes32ToBase32String.deployed()).address;
 
-    await DeltaTimeInventory.link("Address", address);
-    await DeltaTimeInventory.link("SafeMath", safeMath);
-    await DeltaTimeInventory.link("UInt256ToDecimalString", uInt256ToDecimalString);
-    await DeltaTimeInventory.link("Bytes32ToBase32String", bytes32ToBase32String);
+    await DeltaTimeInventory.link('Address', address);
+    await DeltaTimeInventory.link('SafeMath', safeMath);
+    await DeltaTimeInventory.link('UInt256ToDecimalString', uInt256ToDecimalString);
+    await DeltaTimeInventory.link('Bytes32ToBase32String', bytes32ToBase32String);
 
     const revvContract = await REVV.deployed();
 
-    await deployer.deploy(DeltaTimeInventory, revvContract.address, MetaTxPayoutWallet, { gas: 10000000 });
+    await deployer.deploy(DeltaTimeInventory, revvContract.address, MetaTxPayoutWallet, {gas: 10000000});
     const inventoryContract = await DeltaTimeInventory.deployed();
 
     console.log(`Registering as REVV whitelisted operator`);
     await revvContract.whitelistOperator(inventoryContract.address, true);
-}
+};
