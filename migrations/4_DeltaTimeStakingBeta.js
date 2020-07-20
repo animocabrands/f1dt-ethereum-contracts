@@ -1,25 +1,25 @@
-const { fromWei } = require('web3-utils');
-const { rewardsPoolFromSchedule } = require('@animoca/ethereum-contracts-nft_staking').utils;
-const { CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSchedule } = require('../src/constants');
+const {fromWei} = require('web3-utils');
+const {rewardsPoolFromSchedule} = require('@animoca/ethereum-contracts-nft_staking').utils;
+const {CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSchedule} = require('../src/constants');
 
 const REVV = artifacts.require('REVV');
-const Inventory = artifacts.require("DeltaTimeInventoryV2");
-const Staking = artifacts.require("DeltaTimeStakingBeta");
+const Inventory = artifacts.require('DeltaTimeInventoryV2');
+const Staking = artifacts.require('DeltaTimeStakingBeta');
 
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 
 module.exports = async (deployer, network, accounts) => {
-
     const revvContract = await REVV.deployed();
     const inventoryContract = await Inventory.deployed();
 
-    await deployer.deploy(Staking,
+    await deployer.deploy(
+        Staking,
         CycleLengthInSeconds,
         PeriodLengthInCycles,
         inventoryContract.address,
         revvContract.address,
         Object.keys(WeightsByRarity),
-        Object.values(WeightsByRarity),
+        Object.values(WeightsByRarity)
     );
 
     const stakingContract = await Staking.deployed();
@@ -28,14 +28,14 @@ module.exports = async (deployer, network, accounts) => {
     await revvContract.approve(stakingContract.address, RewardsPool);
 
     for (schedule of RewardsSchedule) {
-        console.log(`Setting schedule: ${fromWei(schedule.payoutPerCycle)} REVVs per-cycle for periods ${schedule.startPeriod} to ${schedule.endPeriod}`);
-        await stakingContract.addRewardsForPeriods(
-            schedule.startPeriod,
-            schedule.endPeriod,
-            schedule.payoutPerCycle
+        console.log(
+            `Setting schedule: ${fromWei(schedule.payoutPerCycle)} REVVs per-cycle for periods ${
+                schedule.startPeriod
+            } to ${schedule.endPeriod}`
         );
+        await stakingContract.addRewardsForPeriods(schedule.startPeriod, schedule.endPeriod, schedule.payoutPerCycle);
     }
 
     console.log('Starting the staking schedule');
     await stakingContract.start();
-}
+};
