@@ -56,6 +56,8 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
         revvCompensation = revvCompensation_;
     }
 
+    /*                                             Public Admin Functions                                             */
+
     /**
      * @notice Adds tokens to the repair list and transfers the necessary amount of REVV for the compensations to the contract.
      * @dev Reverts if not called by the owner.
@@ -137,6 +139,8 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
         _repairTokens(from, ids, values);
         return _ERC1155_BATCH_RECEIVED;
     }
+
+    /*                                             Internal Repair Functions                                             */
 
     function _repairToken(
         address from,
