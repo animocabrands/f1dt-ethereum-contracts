@@ -84,6 +84,7 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
 
     /**
      * @notice ERC1155 single transfer receiver which repairs a single token and removes it from the repair list.
+     * @dev This contract must have been given a minter role for the inventory prior to caslling this function.
      * @dev Reverts if the transfer was not operated through `inventoryContract`.
      * @dev Reverts if `id` is not in the repair list.
      * @dev Reverts if the defunct token transfer to the graveyard fails.
@@ -127,6 +128,7 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
 
     /**
      * @notice ERC1155 batch transfer receiver which repairs a batch of tokens and removes them from the repair list.
+     * @dev This contract must have been given a minter role for the inventory prior to caslling this function.
      * @dev Reverts if `ids` is an empty array.
      * @dev Reverts if the transfer was not operated through `inventoryContract`.
      * @dev Reverts if `ids` contains an id not in the repair list.
