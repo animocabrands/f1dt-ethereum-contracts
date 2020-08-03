@@ -4,7 +4,7 @@ const {ZeroAddress, Zero, One, Two} = require('@animoca/ethereum-contracts-core_
 
 const EthAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
-const Sale = contract.fromArtifact('RaceEntrySale');
+const Sale = contract.fromArtifact('QualifyingGameSale');
 
 const price = ether('0.01');
 const sku = web3.utils.asciiToHex('sku');
@@ -12,7 +12,7 @@ const gameSessionId = web3.utils.asciiToHex('gameSessionId');
 
 const [payout, owner, operator, purchaser] = accounts;
 
-describe('RaceEntrySale', function () {
+describe('QualifyingGameSale', function () {
     beforeEach(async function () {
         this.contract = await Sale.new(payout, ZeroAddress, {from: owner});
         await this.contract.addInventorySkus([sku], {from: owner});
@@ -65,7 +65,7 @@ describe('RaceEntrySale', function () {
                         from: operator,
                         value: price,
                     }),
-                'RaceEntrySale: Quantity must be 1');
+                'QualifyingGameSale: Quantity must be 1');
         });
     });
 });
