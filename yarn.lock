@@ -2,12 +2,12 @@
 # yarn lockfile v1
 
 
-"@animoca/ethereum-contracts-assets_inventory@^4.0.0":
+"@animoca/ethereum-contracts-assets_inventory@=4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-assets_inventory/-/ethereum-contracts-assets_inventory-4.0.0.tgz#2bb4c709d74f99f1712cee500db2d8dbb47e19ef"
   integrity sha512-5vnKvkTwyWeNp+j0SciSUwbrg0SR13hoSVkU3VInPeX75Hj17de3fnYVzbhR5+fAJ5ynSNuPEKOw77bPkfLNkg==
 
-"@animoca/ethereum-contracts-core_library@^3.1.0":
+"@animoca/ethereum-contracts-core_library@=3.1.0":
   version "3.1.0"
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-core_library/-/ethereum-contracts-core_library-3.1.0.tgz#2d968c3a3f61864d05a0f769f9c0f62d426d76f2"
   integrity sha512-FYD6ksdmHhMhU/TA4/jMJ83OdUnIKg7dhcmFugv1Z+iFOLPmfytcYLWGk4wuc+Fk2CXziUk70tPpSxb1b+GJ/g==
@@ -29,7 +29,7 @@
     truffle-security "^1.7.3"
     web3-utils "^1.2.9"
 
-"@animoca/ethereum-contracts-erc20_base@^3.0.0":
+"@animoca/ethereum-contracts-erc20_base@=3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-erc20_base/-/ethereum-contracts-erc20_base-3.0.0.tgz#37dbfe1939ed44f8f15565f38f2b0a210e09f7d4"
   integrity sha512-XgMFSOpwpKu9wHOTIocppDBnougwH00y7fU89hGolyfNBrHNI3w+HimbZIxCNC+JAQcetHlG9uYNQzmq+hGaTg==
@@ -37,12 +37,12 @@
     "@openzeppelin/gsn-helpers" "^0.2.3"
     "@openzeppelin/gsn-provider" "^0.1.10"
 
-"@animoca/ethereum-contracts-nft_staking@^3.0.3":
+"@animoca/ethereum-contracts-nft_staking@=3.0.3":
   version "3.0.3"
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.3.tgz#84c59bfcc8919c7109393a8e73e591102e3e1a9f"
   integrity sha512-FOab7gBRNj1B6RzY6MONs7fpGjLd57anEauARpjeLy3JS2V73R7IWxEbDKZJwzN04O0Is6lEYXVPFH7d6s/cUA==
 
-"@animoca/ethereum-contracts-sale_base@^4.0.0":
+"@animoca/ethereum-contracts-sale_base@=4.0.0":
   version "4.0.0"
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-4.0.0.tgz#744a35c723d5f0026af374e34a8ec04962f419a7"
   integrity sha512-YjOnzJHpTNJABsUDtjMMmHnyXv7rM/qBPq1m+mzkMmxYweK/UAyPThtnajMzlw+XvoaJx5kEJOrh9hKC9cUC+g==
