@@ -5,10 +5,10 @@ pragma solidity =0.6.8;
 import "@animoca/ethereum-contracts-sale_base/contracts/sale/SimpleSale.sol";
 
 /**
- * @title RaceEntrySale
- * A sale contract for the F1 DeltaTime race entry.
+ * @title QualifyingGameSale
+ * A simple sale contract for the F1 DeltaTime qualifying game.
  */
-contract RaceEntrySale is SimpleSale {
+contract QualifyingGameSale is SimpleSale {
 
     /**
      * Constructor.
@@ -39,7 +39,7 @@ contract RaceEntrySale is SimpleSale {
 
         require(
             purchase.quantity == 1,
-            "RaceEntrySale: Quantity must be 1");
+            "QualifyingGameSale: Quantity must be 1");
     }
 
     /**
