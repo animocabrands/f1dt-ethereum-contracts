@@ -1,9 +1,10 @@
 # Changelog
 
-## 0.2.4 (UNRELEASED)
+## 0.3.0 (04/08/2020)
  * Updated to `@animoca/ethereum-contracts-sale_base@4.0.0`.
  * Compatibility changes for `RaceEntrySale.sol` to use `@animoca/ethereum-contracts-sale_base@4.0.0`.
  * Added `QualifyingGameSale.sol` sale contract.
+ * Updated to `@animoca/ethereum-contracts-nft_staking:3.0.3`.
 
 ## 0.2.3 (20/07/2020)
  * Updated to `@animoca-ethereum-nft_staking@3.0.1` and `@animoca-ethereum-assets_inventory@4.0.0`.
