@@ -49,10 +49,10 @@
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.1.tgz#7690154256e76a7a076d9b4fa3bb5e5dac50e53d"
   integrity sha512-v4pzrzqZ6xmgwI2ss5r3LOdmTDxTQcKfD8en91dQvCl5BQLiTZhTuTQYBhEujjPALdq/ghY3vPrNdGfJjUlKDg==
 
-"@animoca/ethereum-contracts-sale_base@^3.0.0":
-  version "3.0.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-3.0.0.tgz#29127e2c4edd2e91207299c4bbdbfc92721bcbfd"
-  integrity sha512-uQc1J6llCy+ZPyEN2+twJaAC72KY1XLIF/PR4VjgFFc+9meSpEYk3hBiI0T7zTDkjYVrNx6eSL8EYSVu55JawA==
+"@animoca/ethereum-contracts-sale_base@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-4.0.0.tgz#744a35c723d5f0026af374e34a8ec04962f419a7"
+  integrity sha512-YjOnzJHpTNJABsUDtjMMmHnyXv7rM/qBPq1m+mzkMmxYweK/UAyPThtnajMzlw+XvoaJx5kEJOrh9hKC9cUC+g==
   dependencies:
     ganache-cli "^6.9.1"
 
