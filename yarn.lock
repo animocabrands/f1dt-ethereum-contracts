@@ -56,14 +56,15 @@
   dependencies:
     ganache-cli "^6.9.1"
 
-"@animoca/f1dt-core_metadata@0.1.2":
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-0.1.2.tgz#b71bb9eaeb6e1e83a188cd0395d67afba56b5a75"
-  integrity sha512-31HBIgedV9zW81p+L/oNrhc6rehJuRBIzlKDzvbG1eaPKvX8+tCucxSGJO9EbG+jBiY8EtS2HQGTrNLoYL3MHA==
+"@animoca/f1dt-core_metadata@^1.0.1":
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-1.0.1.tgz#222bed4785da73792fc6ccf47c8d9ab346ef18ce"
+  integrity sha512-mifXWykeUpTgDbtCLAINJhWO1Q6ZW06VJX9twovjVF8gx15zPw82OKxn2E3og7EhfWizfXUiZDVXpvNJCWc7DA==
   dependencies:
     "@animoca/blockchain-inventory_metadata" "^0.0.1"
+    big-integer "^1.6.48"
     bits.js "^0.1.1"
-    commander "^5.1.0"
+    lodash.isequal "^4.5.0"
 
 "@babel/code-frame@^7.0.0":
   version "7.10.4"
@@ -3071,11 +3072,6 @@ commander@^4.0.1:
   version "4.1.1"
   resolved "https://registry.yarnpkg.com/commander/-/commander-4.1.1.tgz#9fd602bd936294e9e9ef46a3f4d6964044b18068"
   integrity sha512-NOKm8xhkzAjzFx8B2v5OAHT+u5pRQc2UCa2Vq9jYL/31o2wi9mxBA7LIFs3sV5VSC49z6pEhfbMULvShKj26WA==
-
-commander@^5.1.0:
-  version "5.1.0"
-  resolved "https://registry.yarnpkg.com/commander/-/commander-5.1.0.tgz#46abbd1652f8e059bddaef99bbdcb2ad9cf179ae"
-  integrity sha512-P0CysNDQ7rtVw4QIQtm+MRxV66vKFSvlsQvGYXZWR3qFU0jlMKHZZZgw8e+8DSah4UDKMqnknRDQz+xuQXQ/Zg==
 
 commander@~2.8.1:
   version "2.8.1"
@@ -7215,7 +7211,7 @@ lodash.isboolean@^3.0.3:
   resolved "https://registry.yarnpkg.com/lodash.isboolean/-/lodash.isboolean-3.0.3.tgz#6c2e171db2a257cd96802fd43b01b20d5f5870f6"
   integrity sha1-bC4XHbKiV82WgC/UOwGyDV9YcPY=
 
-lodash.isequal@^4.0.0:
+lodash.isequal@^4.0.0, lodash.isequal@^4.5.0:
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/lodash.isequal/-/lodash.isequal-4.5.0.tgz#415c4478f2bcc30120c22ce10ed3226f7d3e18e0"
   integrity sha1-QVxEePK8wwEgwizhDtMib30+GOA=

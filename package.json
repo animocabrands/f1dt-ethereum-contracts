@@ -30,7 +30,7 @@
     "@animoca/ethereum-contracts-erc20_base": "^3.0.0",
     "@animoca/ethereum-contracts-nft_staking": "^3.0.1",
     "@animoca/ethereum-contracts-sale_base": "^4.0.0",
-    "@animoca/f1dt-core_metadata": "0.1.2",
+    "@animoca/f1dt-core_metadata": "^1.0.1",
     "base32.js": "^0.1.0",
     "eslint-config-mocha": "^0.0.0",
     "eslint-config-prettier": "^6.11.0",

@@ -3,6 +3,7 @@
 pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@animoca/ethereum-contracts-assets_inventory/contracts/token/ERC1155/ERC1155TokenReceiver.sol";
 
@@ -18,10 +19,10 @@ import "@animoca/ethereum-contracts-assets_inventory/contracts/token/ERC1155/ERC
  * The owners of defunct tokens who want to use them in these ecosystem contracts will have to repair them first,
  * but will be compensated for their trouble with `revvCompensation` REVVs for each repaired token.
  */
-contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
+contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     using SafeMath for uint256;
 
-    event TokensToRepairAdded(uint256[] brokenIds, uint256[] fixedIds);
+    event TokensToRepairAdded(uint256[] defunctTokens, uint256[] replacementTokens);
     event RepairedSingle(uint256 defunctToken, uint256 replacementToken);
     event RepairedBatch(uint256[] defunctTokens, uint256[] replacementTokens);
 
@@ -80,6 +81,32 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
         emit TokensToRepairAdded(defunctTokens, replacementTokens);
     }
 
+    /**
+     * Removes this contract as minter for the inventory contract
+     * @dev Reverts if the sender is not the contract owner.
+     */
+    function renounceMinter() external onlyOwner {
+        inventoryContract.renounceMinter();
+    }
+
+    /**
+     * Pauses the repair operations.
+     * @dev Reverts if the sender is not the contract owner.
+     * @dev Reverts if the contract is paused already.
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * Unpauses the repair operations.
+     * @dev Reverts if the sender is not the contract owner.
+     * @dev Reverts if the contract is not paused.
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
     /*                                             ERC1155TokenReceiver                                             */
 
     /**
@@ -107,14 +134,14 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
         uint256 defunctToken,
         uint256, /*value*/
         bytes calldata /*data*/
-    ) external virtual override returns (bytes4) {
+    ) external virtual override whenNotPaused returns (bytes4) {
         require(msg.sender == address(inventoryContract), "RepairCentre: wrong inventory");
 
         uint256 replacementToken = repairList[defunctToken];
         require(replacementToken != 0, "RepairCentre: token not defunct");
         delete repairList[defunctToken];
 
-        inventoryContract.safeTransferFrom(from, tokensGraveyard, defunctToken, 1, bytes(""));
+        inventoryContract.safeTransferFrom(address(this), tokensGraveyard, defunctToken, 1, bytes(""));
 
         try inventoryContract.mintNonFungible(from, replacementToken, bytes32(""), true)  {} catch {
             inventoryContract.mintNonFungible(from, replacementToken, bytes32(""), false);
@@ -152,7 +179,7 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
         uint256[] calldata defunctTokens,
         uint256[] calldata values,
         bytes calldata /*data*/
-    ) external virtual override returns (bytes4) {
+    ) external virtual override whenNotPaused returns (bytes4) {
         require(msg.sender == address(inventoryContract), "RepairCentre: wrong inventory");
 
         uint256 length = defunctTokens.length;
@@ -191,7 +218,7 @@ contract NFTRepairCentre is Ownable, ERC1155TokenReceiver {
      * @param tokens an array containing the token ids to verify.
      * @return true if the array contains a defunct token, false otherwise.
      */
-    function hasDefunctToken(uint256[] calldata tokens) external view returns(bool) {
+    function containsDefunctToken(uint256[] calldata tokens) external view returns(bool) {
         for (uint256 i = 0; i < tokens.length; ++i) {
             if (repairList[tokens[i]] != 0) {
                 return true;
@@ -277,6 +304,11 @@ interface IDeltaTimeInventory {
         bytes32 byteUri,
         bool safe
     ) external;
+
+    /**
+     * Removes the minter role for the message sender
+     */
+    function renounceMinter() external;
 }
 
 interface IREVV {
