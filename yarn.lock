@@ -14,10 +14,10 @@
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-assets_inventory/-/ethereum-contracts-assets_inventory-4.0.0.tgz#2bb4c709d74f99f1712cee500db2d8dbb47e19ef"
   integrity sha512-5vnKvkTwyWeNp+j0SciSUwbrg0SR13hoSVkU3VInPeX75Hj17de3fnYVzbhR5+fAJ5ynSNuPEKOw77bPkfLNkg==
 
-"@animoca/ethereum-contracts-core_library@=3.1.0":
-  version "3.1.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-core_library/-/ethereum-contracts-core_library-3.1.0.tgz#2d968c3a3f61864d05a0f769f9c0f62d426d76f2"
-  integrity sha512-FYD6ksdmHhMhU/TA4/jMJ83OdUnIKg7dhcmFugv1Z+iFOLPmfytcYLWGk4wuc+Fk2CXziUk70tPpSxb1b+GJ/g==
+"@animoca/ethereum-contracts-core_library@=3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-core_library/-/ethereum-contracts-core_library-3.1.1.tgz#61d3ef7570e59f9ee597e8262850b4c63661e730"
+  integrity sha512-NHqmEL2PcSIcVYnbLgiv6UFyTTbiYBX8XrrxSf+ZvfyTnfwyRKqQPqQZyoegjh7iJvEO1bi+YzveuQrwOVB97w==
   dependencies:
     "@openzeppelin/cli" "^2.8.2"
     "@openzeppelin/contracts" "^3.1.0"
@@ -49,10 +49,10 @@
   resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.3.tgz#84c59bfcc8919c7109393a8e73e591102e3e1a9f"
   integrity sha512-FOab7gBRNj1B6RzY6MONs7fpGjLd57anEauARpjeLy3JS2V73R7IWxEbDKZJwzN04O0Is6lEYXVPFH7d6s/cUA==
 
-"@animoca/ethereum-contracts-sale_base@=4.0.0":
-  version "4.0.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-4.0.0.tgz#744a35c723d5f0026af374e34a8ec04962f419a7"
-  integrity sha512-YjOnzJHpTNJABsUDtjMMmHnyXv7rM/qBPq1m+mzkMmxYweK/UAyPThtnajMzlw+XvoaJx5kEJOrh9hKC9cUC+g==
+"@animoca/ethereum-contracts-sale_base@=5.0.0":
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-5.0.0.tgz#10f94c1ed719f1d2d03606442ee36645c015fcb9"
+  integrity sha512-Oa6CACnJhvdjGHc6ewk9BHNONt/l5j6a90beOQuXudAgrY1fdamR4D8kYLsj8uVE4uMNnJtUOZNjFnoVNJ32bg==
   dependencies:
     ganache-cli "^6.9.1"
 
