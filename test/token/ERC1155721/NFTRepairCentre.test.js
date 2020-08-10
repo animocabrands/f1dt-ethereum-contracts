@@ -19,9 +19,6 @@ const EthAddress = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 
 const {createTokenId} = require('@animoca/f1dt-core_metadata').utils;
 
-// const TruffleContract = require('@truffle/contract/index');
-// TruffleContract()
-
 const RepairCentre = contract.fromArtifact('NFTRepairCentre');
 const REVV = contract.fromArtifact('REVV');
 contract.artifactsDir = './imports';
@@ -43,29 +40,6 @@ const replacementTokens = [
     createTokenId({counter: 5}, false),
     createTokenId({counter: 6}, false),
 ];
-
-function decodeLogs(logs, emitter, eventName) {
-    let eventABI = emitter.abi.filter((x) => x.type === 'event' && x.name === eventName);
-    if (eventABI.length === 0) {
-        throw new Error(`No ABI entry for event '${eventName}'`);
-    } else if (eventABI.length > 1) {
-        throw new Error(`Multiple ABI entries for event '${eventName}', only uniquely named events are supported`);
-    }
-
-    eventABI = eventABI[0];
-
-    console.log(eventABI);
-
-    // The first topic will equal the hash of the event signature
-    const eventSignature = `${eventName}(${eventABI.inputs.map((input) => input.type).join(',')})`;
-    const eventTopic = web3.utils.sha3(eventSignature);
-
-    // Only decode events of type 'EventName'
-    return logs
-        .filter((log) => log.topics.length > 0 && log.topics[0] === eventTopic)
-        .map((log) => web3.eth.abi.decodeLog(eventABI.inputs, log.data, log.topics.slice(1)))
-        .map((decoded) => ({event: eventName, args: decoded}));
-}
 
 describe('NFTRepairCentre', function () {
     describe('constructor(inventoryContractAddress, graveyardAddress, revvContractAddress, revvCompensation)', function () {
@@ -232,64 +206,67 @@ describe('NFTRepairCentre', function () {
         });
 
         it('should replace the defunct token', async function () {
-            expect(await this.repairCentre.containsDefunctToken([defunctTokens[0]])).to.be.true;
+            for (let i = 0; i < defunctTokens.length; i++) {
+                const defunctToken = defunctTokens[i];
+                const replacementToken = replacementTokens[i];
 
-            const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
-                owner,
-                this.repairCentre.address,
-                defunctTokens[0],
-                1,
-                '0x0',
-                {
-                    from: owner,
-                }
-            );
+                expect(await this.repairCentre.containsDefunctToken([defunctToken])).to.be.true;
 
-            // const fullReceipt = await web3.eth.getTransactionReceipt(receipt.tx);
+                const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+                    owner,
+                    this.repairCentre.address,
+                    defunctToken,
+                    1,
+                    '0x0',
+                    {
+                        from: owner,
+                    }
+                );
 
-            // const logs = decodeLogs(fullReceipt.logs, emitter, eventName);
-            // return inLogs(logs, eventName, eventArgs);
+                await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
+                    _operator: owner,
+                    _from: owner,
+                    _to: this.repairCentre.address,
+                    _id: new BN(defunctToken),
+                    _value: One,
+                });
 
-            // console.log(decodeLogs(fullReceipt.logs, this.revv, 'Transfer'));
-            // console.log(this.revv.abi);
+                await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
+                    _operator: this.repairCentre.address,
+                    _from: this.repairCentre.address,
+                    _to: graveyard,
+                    _id: new BN(defunctToken),
+                    _value: One,
+                });
 
-            await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
-                _operator: owner,
-                _from: owner,
-                _to: this.repairCentre.address,
-                _id: new BN(defunctTokens[0]),
-                _value: One,
-            });
+                await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
+                    _operator: this.repairCentre.address,
+                    _from: ZeroAddress,
+                    _to: owner,
+                    _id: new BN(replacementToken),
+                    _value: One,
+                });
 
-            await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
-                _operator: this.repairCentre.address,
-                _from: this.repairCentre.address,
-                _to: graveyard,
-                _id: new BN(defunctTokens[0]),
-                _value: One,
-            });
+                // Retrieve and decode the log manually to avoid a bug in expectEvent
+                const fullReceipt = await web3.eth.getTransactionReceipt(receipt.tx);
+                const revvTransferLog = fullReceipt.logs.filter((log) => log.address == this.revv.address)[0];
+                const revvTransferEventABI = this.revv.abi.filter((el) => el.name == 'Transfer')[0];
+                const revvTransferEvent = web3.eth.abi.decodeLog(
+                    revvTransferEventABI.inputs,
+                    revvTransferLog.data,
+                    revvTransferLog.topics.slice(1)
+                );
+                expect(revvTransferEvent._from).to.be.equal(this.repairCentre.address);
+                expect(revvTransferEvent._to).to.be.equal(owner);
+                expect(revvTransferEvent._value).to.be.equal('1');
 
-            await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferSingle', {
-                _operator: this.repairCentre.address,
-                _from: ZeroAddress,
-                _to: owner,
-                _id: new BN(replacementTokens[0]),
-                _value: One,
-            });
+                await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'RepairedSingle', {
+                    defunctToken: new BN(defunctToken),
+                    replacementToken: new BN(replacementToken),
+                });
 
-            // TODO: debug ERC20 event
-            // await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
-            //     _from: this.repairCentre.address,
-            //     _to: owner,
-            //     _value: One,
-            // });
-
-            await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'RepairedSingle', {
-                defunctToken: new BN(defunctTokens[0]),
-                replacementToken: new BN(replacementTokens[0]),
-            });
-
-            expect(await this.repairCentre.containsDefunctToken([defunctTokens[0]])).to.be.false;
+                expect(await this.repairCentre.containsDefunctToken([defunctToken])).to.be.false;
+            }
         });
     });
 
@@ -399,28 +376,20 @@ describe('NFTRepairCentre', function () {
                 }
             );
 
-            // const fullReceipt = await web3.eth.getTransactionReceipt(receipt.tx);
-
-            // const logs = decodeLogs(fullReceipt.logs, emitter, eventName);
-            // return inLogs(logs, eventName, eventArgs);
-
-            // console.log(decodeLogs(fullReceipt.logs, this.revv, 'Transfer'));
-            // console.log(this.revv.abi);
-
             await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferBatch', {
                 _operator: owner,
                 _from: owner,
                 _to: this.repairCentre.address,
-                _ids: defunctTokens.map((token) => new BN(token)),
-                _values: defunctTokens.map(() => One),
+                _ids: defunctTokens,
+                _values: defunctTokens.map(() => '1'),
             });
 
             await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferBatch', {
                 _operator: this.repairCentre.address,
                 _from: this.repairCentre.address,
                 _to: graveyard,
-                _ids: defunctTokens.map((token) => new BN(token)),
-                _values: defunctTokens.map(() => One),
+                _ids: defunctTokens,
+                _values: defunctTokens.map(() => '1'),
             });
 
             for (const replacementToken of replacementTokens) {
@@ -433,16 +402,22 @@ describe('NFTRepairCentre', function () {
                 });
             }
 
-            // TODO: debug ERC20 event
-            // await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
-            //     _from: this.repairCentre.address,
-            //     _to: owner,
-            //     _value: One,
-            // });
+            // Retrieve and decode the log manually to avoid a bug in expectEvent
+            const fullReceipt = await web3.eth.getTransactionReceipt(receipt.tx);
+            const revvTransferLog = fullReceipt.logs.filter((log) => log.address == this.revv.address)[0];
+            const revvTransferEventABI = this.revv.abi.filter((el) => el.name == 'Transfer')[0];
+            const revvTransferEvent = web3.eth.abi.decodeLog(
+                revvTransferEventABI.inputs,
+                revvTransferLog.data,
+                revvTransferLog.topics.slice(1)
+            );
+            expect(revvTransferEvent._from).to.be.equal(this.repairCentre.address);
+            expect(revvTransferEvent._to).to.be.equal(owner);
+            expect(revvTransferEvent._value).to.be.equal('3');
 
             await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'RepairedBatch', {
-                defunctTokens: defunctTokens.map((token) => new BN(token)),
-                replacementTokens: replacementTokens.map((token) => new BN(token)),
+                defunctTokens,
+                replacementTokens,
             });
 
             expect(await this.repairCentre.containsDefunctToken(defunctTokens)).to.be.false;

@@ -197,7 +197,7 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
             replacementTokens[i] = replacementToken;
         }
 
-        inventoryContract.safeBatchTransferFrom(from, tokensGraveyard, defunctTokens, values, bytes(""));
+        inventoryContract.safeBatchTransferFrom(address(this), tokensGraveyard, defunctTokens, values, bytes(""));
 
         try inventoryContract.batchMint(recipients, replacementTokens, uris, values, true)  {} catch {
             inventoryContract.batchMint(recipients, replacementTokens, uris, values, false);
