@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.0 (10/08/2020)
+ * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
+
 ## 0.3.0 (04/08/2020)
  * Updated to `@animoca/ethereum-contracts-sale_base@4.0.0`.
  * Compatibility changes for `RaceEntrySale.sol` to use `@animoca/ethereum-contracts-sale_base@4.0.0`.
@@ -12,13 +15,13 @@
  * Linting configuration.
  * Migrated to `yarn`.
 
-## 0.2.2 (08/07/2020)
+## 0.2.2
  * Optimise values retrieval in token id for staking.
 
-## 0.2.1 (06/07/2020)
+## 0.2.1
  * Improved checks on NFT type for staking.
 
-## 0.2.0 (03/07/2020)
+## 0.2.0
  * Updated to `@animoca/ethereum-contracts-nft_staking:3.0.0`.
  * Updated to `@animoca/ethereum-contracts-sale_base:3.0.0`.
 

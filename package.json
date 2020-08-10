@@ -1,6 +1,6 @@
 {
   "name": "@animoca/f1dt-ethereum-contracts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "F1 Delta Time Solidity Contracts",
   "scripts": {
     "npm-test": "echo $npm_package_config_path",
@@ -29,6 +29,7 @@
     "@animoca/ethereum-contracts-erc20_base": "=3.0.0",
     "@animoca/ethereum-contracts-nft_staking": "=3.0.3",
     "@animoca/ethereum-contracts-sale_base": "=4.0.0",
+    "@animoca/f1dt-core_metadata": "^1.0.1",
     "base32.js": "^0.1.0",
     "eslint-config-mocha": "^0.0.0",
     "eslint-config-prettier": "^6.11.0",
