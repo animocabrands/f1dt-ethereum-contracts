@@ -122,7 +122,7 @@ describe('NFTRepairCentre', function () {
             expect(await this.repairCentre.containsDefunctToken([One, Three, Five])).to.be.true;
         });
 
-        it('should return false when the tokens contain a defunct token', async function () {
+        it('should return false when the tokens do not contain a defunct token', async function () {
             expect(await this.repairCentre.containsDefunctToken([Two])).to.be.false;
             expect(await this.repairCentre.containsDefunctToken([Four])).to.be.false;
             expect(await this.repairCentre.containsDefunctToken([Two, Four, Five])).to.be.false;
