@@ -2,6 +2,8 @@
 
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
+ * Updated to `@animoca/ethereum-contracts-core_library:3.1.1`.
+ * Updated to `@animoca/ethereum-contracts-sale_base:5.0.0`.
 
 ## 0.3.0
  * Updated to `@animoca/ethereum-contracts-sale_base@4.0.0`.

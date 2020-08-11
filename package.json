@@ -25,10 +25,10 @@
   "dependencies": {},
   "devDependencies": {
     "@animoca/ethereum-contracts-assets_inventory": "=4.0.0",
-    "@animoca/ethereum-contracts-core_library": "=3.1.0",
+    "@animoca/ethereum-contracts-core_library": "=3.1.1",
     "@animoca/ethereum-contracts-erc20_base": "=3.0.0",
     "@animoca/ethereum-contracts-nft_staking": "=3.0.3",
-    "@animoca/ethereum-contracts-sale_base": "=4.0.0",
+    "@animoca/ethereum-contracts-sale_base": "=5.0.0",
     "@animoca/f1dt-core_metadata": "^1.0.3",
     "base32.js": "^0.1.0",
     "eslint-config-mocha": "^0.0.0",
