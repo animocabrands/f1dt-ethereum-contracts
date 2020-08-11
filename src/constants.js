@@ -38,10 +38,6 @@ const QualifyingGameSalePrices = [{id: 'qualifying game', ethPrice: toWei('0.01'
 const QualifyingGameSalePayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 const QualifyingGameSalePayoutToken = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 
-const RaceEntrySalePrices = [{id: 'race entry', ethPrice: toWei('0.01'), revvPrice: toWei('1')}];
-const RaceEntrySalePayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
-const RaceEntrySalePayoutToken = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
-
 module.exports = {
     MetaTxPayoutWallet,
     CycleLengthInSeconds,
