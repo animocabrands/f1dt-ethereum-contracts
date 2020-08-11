@@ -43,9 +43,8 @@ contract QualifyingGameSale is SimpleSale {
     }
 
     /**
-     * Retrieves implementation-specific extra data passed as the Purchased
-     *  event extData argument.
-     * @param purchase Purchase conditions.
+     * Retrieves implementation-specific derived purchase data passed as the
+     *  Purchased event purchaseData argument.
      * @param priceInfo Implementation-specific calculated purchase price
      *  information.
      * @param *paymentInfo* Implementation-specific accepted purchase payment
@@ -54,22 +53,20 @@ contract QualifyingGameSale is SimpleSale {
      *  information.
      * @param *finalizeInfo* Implementation-specific purchase finalization
      *  information.
-     * @return extData Implementation-specific extra data passed as the Purchased event
-     *  extData argument (0:total price, 1:game session ID).
+     * @return purchaseData Implementation-specific derived purchase data
+     *  passed as the Purchased event purchaseData argument (0:total price).
      */
-    function _getPurchasedEventExtData(
-        Purchase memory purchase,
+    function _getPurchasedEventPurchaseData(
         bytes32[] memory priceInfo,
         bytes32[] memory, /* paymentInfo */
         bytes32[] memory, /* deliveryInfo */
         bytes32[] memory /* finalizeInfo */
     )
         internal override view
-        returns (bytes32[] memory extData)
+        returns (bytes32[] memory purchaseData)
     {
-        extData = new bytes32[](2);
-        extData[0] = priceInfo[0];
-        extData[1] = purchase.extData[0];
+        purchaseData = new bytes32[](1);
+        purchaseData[0] = priceInfo[0];
     }
 
 }
