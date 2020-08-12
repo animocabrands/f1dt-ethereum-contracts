@@ -32,7 +32,7 @@ module.exports = async (deployer, network, [owner]) => {
         tokens,
         { from: owner });
 
-    const skus = QualifyingGameSalePrices.map(item => stringToBytes32(item.id));
+    const skus = QualifyingGameSalePrices.map(item => item.sku);
 
     console.log('Adding inventory skus');
     await sale.addInventorySkus(
@@ -42,7 +42,7 @@ module.exports = async (deployer, network, [owner]) => {
     console.log('Setting sku token prices ');
     for (const qualifyingGameSalePrice of QualifyingGameSalePrices) {
         await sale.setSkuTokenPrices(
-            stringToBytes32(qualifyingGameSalePrice.id),
+            qualifyingGameSalePrice.sku,
             tokens,
             [
                 qualifyingGameSalePrice.revvPrice,
