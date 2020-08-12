@@ -47,8 +47,5 @@ module.exports = {
     RewardsPool,
     QualifyingGameSalePrices,
     QualifyingGameSalePayoutWallet,
-    QualifyingGameSalePayoutToken,
-    RaceEntrySalePrices,
-    RaceEntrySalePayoutWallet,
-    RaceEntrySalePayoutToken,
+    QualifyingGameSalePayoutToken
 };
