@@ -1,4 +1,4 @@
-const {asciiToHex} = require('web3-utils');
+const { stringToBytes32 } = require('../src/utils');
 
 const {
     EthAddress
@@ -32,7 +32,7 @@ module.exports = async (deployer, network, [owner]) => {
         tokens,
         { from: owner });
 
-    const skus = QualifyingGameSalePrices.map(item => asciiToHex(item.id));
+    const skus = QualifyingGameSalePrices.map(item => stringToBytes32(item.id));
 
     console.log('Adding inventory skus');
     await sale.addInventorySkus(
@@ -42,7 +42,7 @@ module.exports = async (deployer, network, [owner]) => {
     console.log('Setting sku token prices ');
     for (const qualifyingGameSalePrice of QualifyingGameSalePrices) {
         await sale.setSkuTokenPrices(
-            asciiToHex(qualifyingGameSalePrice.id),
+            stringToBytes32(qualifyingGameSalePrice.id),
             tokens,
             [
                 qualifyingGameSalePrice.revvPrice,
