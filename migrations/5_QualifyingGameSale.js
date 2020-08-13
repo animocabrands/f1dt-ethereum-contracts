@@ -28,14 +28,14 @@ module.exports = async (deployer, network, [owner]) => {
         EthAddress];
 
     console.log(`Adding supported payment tokens`);
-    await sale.addSupportedPaymentTokens(
+    await sale.addPaymentTokens(
         tokens,
         { from: owner });
 
     const skus = QualifyingGameSalePrices.map(item => item.sku);
 
     console.log('Adding inventory skus');
-    await sale.addInventorySkus(
+    await sale.addSkus(
         skus,
         { from: owner });
 

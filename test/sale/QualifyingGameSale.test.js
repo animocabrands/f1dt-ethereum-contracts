@@ -24,8 +24,8 @@ function bnToBytes32(value) {
 describe('QualifyingGameSale', function () {
     beforeEach(async function () {
         this.contract = await Sale.new(payout, ZeroAddress, {from: owner});
-        await this.contract.addInventorySkus([sku], {from: owner});
-        await this.contract.addSupportedPaymentTokens([EthAddress], {from: owner});
+        await this.contract.addSkus([sku], {from: owner});
+        await this.contract.addPaymentTokens([EthAddress], {from: owner});
         await this.contract.setSkuTokenPrices(sku, [EthAddress], [price], {from: owner});
         await this.contract.start({from: owner});
     });

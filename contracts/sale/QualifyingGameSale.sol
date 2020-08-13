@@ -2,13 +2,13 @@
 
 pragma solidity =0.6.8;
 
-import "@animoca/ethereum-contracts-sale_base/contracts/sale/SimpleSale.sol";
+import "@animoca/ethereum-contracts-sale_base/contracts/sale/DirectSale.sol";
 
 /**
  * @title QualifyingGameSale
- * A simple sale contract for the F1 DeltaTime qualifying game.
+ * A direct sale contract for the F1 DeltaTime qualifying game.
  */
-contract QualifyingGameSale is SimpleSale {
+contract QualifyingGameSale is DirectSale {
 
     /**
      * Constructor.
@@ -21,7 +21,7 @@ contract QualifyingGameSale is SimpleSale {
         address payable payoutWallet_,
         IERC20 payoutToken_
     )
-        SimpleSale(
+        DirectSale(
             payoutWallet_,
             payoutToken_
         )
