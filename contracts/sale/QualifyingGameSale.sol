@@ -2,71 +2,27 @@
 
 pragma solidity =0.6.8;
 
-import "@animoca/ethereum-contracts-sale_base/contracts/sale/DirectSale.sol";
+import "@animoca/ethereum-contracts-sale_base/contracts/sale/FixedPricesSale.sol";
 
 /**
  * @title QualifyingGameSale
  * A direct sale contract for the F1 DeltaTime qualifying game.
  */
-contract QualifyingGameSale is DirectSale {
-
+contract QualifyingGameSale is FixedPricesSale {
     /**
      * Constructor.
-     * @param payoutWallet_ The wallet address used to receive purchase payments
-     *  with.
-     * @param payoutToken_ The ERC20 token currency accepted by the payout
-     *  wallet for purchase payments.
+     * @param payoutWallet_ The wallet address used to receive purchase payments.
      */
-    constructor(
-        address payable payoutWallet_,
-        IERC20 payoutToken_
-    )
-        DirectSale(
-            payoutWallet_,
-            payoutToken_
-        )
-        public
-    {}
+    constructor(address payable payoutWallet_) public FixedPricesSale(payoutWallet_, 64, 32) {}
 
     /**
-     * Validates a purchase.
-     * @param purchase Purchase conditions.
+     * Lifecycle step which validates the purchase pre-conditions.
+     * @dev Responsibilities:
+     *  - Ensure that the purchase pre-conditions are met and revert if not.
+     * @param purchase The purchase conditions.
      */
-    function _validatePurchase(
-        Purchase memory purchase
-    ) internal override view {
-        super._validatePurchase(purchase);
-
-        require(
-            purchase.quantity == 1,
-            "QualifyingGameSale: Quantity must be 1");
+    function _validation(PurchaseData memory purchase) internal override view {
+        super._validation(purchase);
+        require(purchase.quantity == 1, "QualifyingGameSale: Quantity must be 1");
     }
-
-    /**
-     * Retrieves implementation-specific derived purchase data passed as the
-     *  Purchased event purchaseData argument.
-     * @param priceInfo Implementation-specific calculated purchase price
-     *  information.
-     * @param *paymentInfo* Implementation-specific accepted purchase payment
-     *  information.
-     * @param *deliveryInfo* Implementation-specific purchase delivery
-     *  information.
-     * @param *finalizeInfo* Implementation-specific purchase finalization
-     *  information.
-     * @return purchaseData Implementation-specific derived purchase data
-     *  passed as the Purchased event purchaseData argument (0:total price).
-     */
-    function _getPurchasedEventPurchaseData(
-        bytes32[] memory priceInfo,
-        bytes32[] memory, /* paymentInfo */
-        bytes32[] memory, /* deliveryInfo */
-        bytes32[] memory /* finalizeInfo */
-    )
-        internal override view
-        returns (bytes32[] memory purchaseData)
-    {
-        purchaseData = new bytes32[](1);
-        purchaseData[0] = priceInfo[0];
-    }
-
 }
