@@ -2,6 +2,7 @@ const {toWei} = require('web3-utils');
 const {BN} = require('@openzeppelin/test-helpers');
 const {rewardsPoolFromSchedule} = require('@animoca/ethereum-contracts-nft_staking').utils;
 const {ZeroAddress} = require('@animoca/ethereum-contracts-core_library').constants;
+const {stringToBytes32} = require('./utils');
 
 const MetaTxPayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 
@@ -34,7 +35,9 @@ const RewardsSchedule = [
 ];
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 
-const QualifyingGameSalePrices = [{id: 'qualifying game', ethPrice: toWei('0.01'), revvPrice: toWei('1')}];
+const QualifyingGameSalePrices = [
+    {sku: stringToBytes32('qualifying game'), ethPrice: toWei('0.01'), revvPrice: toWei('1')}
+];
 const QualifyingGameSalePayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 const QualifyingGameSalePayoutToken = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 
@@ -47,8 +50,5 @@ module.exports = {
     RewardsPool,
     QualifyingGameSalePrices,
     QualifyingGameSalePayoutWallet,
-    QualifyingGameSalePayoutToken,
-    RaceEntrySalePrices,
-    RaceEntrySalePayoutWallet,
-    RaceEntrySalePayoutToken,
+    QualifyingGameSalePayoutToken
 };
