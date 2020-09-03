@@ -9,22 +9,22 @@ import "@animoca/ethereum-contracts-assets_inventory/contracts/token/ERC1155/ERC
 
 /**
  * @title NFTRepairCentre
- * This contract is used to manage F1 Delta Time defunct tokens. Defunct tokens are NFTs which were created with an incorrect id.
+ * This contract is used to manage F1 Delta Time defective tokens. Defective tokens are NFTs which were created with an incorrect id.
  * As the core metadata attributes are encoded in the token id, tokens with an incorrect id may not be usable some in ecosystem contracts.
  *
  * This contract has two missions:
- * - Publish a public list of defunct tokens (through `repairList`) that ecosystem contracts relying on core metadata attributes can consult as a blacklist,
- * - Let the owners of the defunct tokens swap them for replacement tokens. Defunct tokens are sent to the `tokensGraveyard` when replaced.
+ * - Publish a public list of defective tokens (through `repairList`) that ecosystem contracts relying on core metadata attributes can consult as a blacklist,
+ * - Let the owners of the defective tokens swap them for replacement tokens. Defective tokens are sent to the `tokensGraveyard` when replaced.
  *
- * The owners of defunct tokens who want to use them in these ecosystem contracts will have to repair them first,
+ * The owners of defective tokens who want to use them in these ecosystem contracts will have to repair them first,
  * but will be compensated for their trouble with `revvCompensation` REVVs for each repaired token.
  */
 contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     using SafeMath for uint256;
 
-    event TokensToRepairAdded(uint256[] defunctTokens, uint256[] replacementTokens);
-    event RepairedSingle(uint256 defunctToken, uint256 replacementToken);
-    event RepairedBatch(uint256[] defunctTokens, uint256[] replacementTokens);
+    event TokensToRepairAdded(uint256[] defectiveTokens, uint256[] replacementTokens);
+    event RepairedSingle(uint256 defectiveToken, uint256 replacementToken);
+    event RepairedBatch(uint256[] defectiveTokens, uint256[] replacementTokens);
 
     IDeltaTimeInventory inventoryContract;
     address tokensGraveyard;
@@ -62,23 +62,23 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     /**
      * @notice Adds tokens to the repair list and transfers the necessary amount of REVV for the compensations to the contract.
      * @dev Reverts if not called by the owner.
-     * @dev Reverts if `defunctTokens` and `replacementTokens` have inconsistent lengths.
+     * @dev Reverts if `defectiveTokens` and `replacementTokens` have inconsistent lengths.
      * @dev Reverts if the REVV transfer fails.
      * @dev Emits a TokensToRepairAdded event.
-     * @param defunctTokens the list of defunct tokens.
+     * @param defectiveTokens the list of defective tokens.
      * @param replacementTokens the list of replacement tokens.
      */
-    function addTokensToRepair(uint256[] calldata defunctTokens, uint256[] calldata replacementTokens)
+    function addTokensToRepair(uint256[] calldata defectiveTokens, uint256[] calldata replacementTokens)
         external
         onlyOwner
     {
-        uint256 length = defunctTokens.length;
+        uint256 length = defectiveTokens.length;
         require(length != 0 && length == replacementTokens.length, "RepairCentre: wrong lengths");
         for (uint256 i = 0; i < length; ++i) {
-            repairList[defunctTokens[i]] = replacementTokens[i];
+            repairList[defectiveTokens[i]] = replacementTokens[i];
         }
         revvContract.transferFrom(msg.sender, address(this), revvCompensation.mul(length));
-        emit TokensToRepairAdded(defunctTokens, replacementTokens);
+        emit TokensToRepairAdded(defectiveTokens, replacementTokens);
     }
 
     /**
@@ -114,16 +114,16 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
      * @dev This contract must have been given a minter role for the inventory prior to caslling this function.
      * @dev Reverts if the transfer was not operated through `inventoryContract`.
      * @dev Reverts if `id` is not in the repair list.
-     * @dev Reverts if the defunct token transfer to the graveyard fails.
+     * @dev Reverts if the defective token transfer to the graveyard fails.
      * @dev Reverts if the replacement token minting to the owner fails.
      * @dev Reverts if the REVV compensation transfer fails.
-     * @dev Emits an ERC1155 TransferSingle event for the defunct token transfer to the graveyard.
+     * @dev Emits an ERC1155 TransferSingle event for the defective token transfer to the graveyard.
      * @dev Emits an ERC1155 TransferSingle event for the replacement token minting to the owner.
      * @dev Emits an ERC20 Transfer event for the REVV compensation transfer.
      * @dev Emits a RepairedSingle event.
      * @param /operator the address which initiated the transfer (i.e. msg.sender).
      * @param from the address which previously owned the token.
-     * @param defunctToken the id of the token to repair.
+     * @param defectiveToken the id of the token to repair.
      * @param /value the amount of tokens being transferred.
      * @param /data additional data with no specified format.
      * @return bytes4 `bytes4(keccak256("onERC1155Received(address,address,uint256,uint256,bytes)"))`
@@ -131,24 +131,24 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     function onERC1155Received(
         address, /*operator*/
         address from,
-        uint256 defunctToken,
+        uint256 defectiveToken,
         uint256, /*value*/
         bytes calldata /*data*/
     ) external virtual override whenNotPaused returns (bytes4) {
         require(msg.sender == address(inventoryContract), "RepairCentre: wrong inventory");
 
-        uint256 replacementToken = repairList[defunctToken];
-        require(replacementToken != 0, "RepairCentre: token not defunct");
-        delete repairList[defunctToken];
+        uint256 replacementToken = repairList[defectiveToken];
+        require(replacementToken != 0, "RepairCentre: token not defective");
+        delete repairList[defectiveToken];
 
-        inventoryContract.safeTransferFrom(address(this), tokensGraveyard, defunctToken, 1, bytes(""));
+        inventoryContract.safeTransferFrom(address(this), tokensGraveyard, defectiveToken, 1, bytes(""));
 
         try inventoryContract.mintNonFungible(from, replacementToken, bytes32(""), true)  {} catch {
             inventoryContract.mintNonFungible(from, replacementToken, bytes32(""), false);
         }
         revvContract.transfer(from, revvCompensation);
 
-        emit RepairedSingle(defunctToken, replacementToken);
+        emit RepairedSingle(defectiveToken, replacementToken);
 
         return _ERC1155_RECEIVED;
     }
@@ -159,16 +159,16 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
      * @dev Reverts if `ids` is an empty array.
      * @dev Reverts if the transfer was not operated through `inventoryContract`.
      * @dev Reverts if `ids` contains an id not in the repair list.
-     * @dev Reverts if the defunct tokens transfer to the graveyard fails.
+     * @dev Reverts if the defective tokens transfer to the graveyard fails.
      * @dev Reverts if the replacement tokens minting to the owner fails.
      * @dev Reverts if the REVV compensation transfer fails.
-     * @dev Emits an ERC1155 TransferBatch event for the defunct tokens transfer to the graveyard.
+     * @dev Emits an ERC1155 TransferBatch event for the defective tokens transfer to the graveyard.
      * @dev Emits an ERC1155 TransferBatch event for the replacement tokens minting to the owner.
      * @dev Emits an ERC20 Transfer event for the REVV compensation transfer.
      * @dev Emits a RepairedBatch event.
      * @param /operator the address which initiated the batch transfer (i.e. msg.sender).
      * @param from the address which previously owned the token.
-     * @param defunctTokens an array containing the ids of the defunct tokens to repair.
+     * @param defectiveTokens an array containing the ids of the defective tokens to repair.
      * @param values an array containing amounts of each token being transferred (order and length must match _ids array).
      * @param /data additional data with no specified format.
      * @return `bytes4(keccak256("onERC1155BatchReceived(address,address,uint256[],uint256[],bytes)"))`
@@ -176,28 +176,28 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     function onERC1155BatchReceived(
         address, /*operator*/
         address from,
-        uint256[] calldata defunctTokens,
+        uint256[] calldata defectiveTokens,
         uint256[] calldata values,
         bytes calldata /*data*/
     ) external virtual override whenNotPaused returns (bytes4) {
         require(msg.sender == address(inventoryContract), "RepairCentre: wrong inventory");
 
-        uint256 length = defunctTokens.length;
+        uint256 length = defectiveTokens.length;
         require(length != 0, "RepairCentre: empty array");
 
         address[] memory recipients = new address[](length);
         uint256[] memory replacementTokens = new uint256[](length);
         bytes32[] memory uris = new bytes32[](length);
         for (uint256 i = 0; i < length; ++i) {
-            uint256 defunctToken = defunctTokens[i];
-            uint256 replacementToken = repairList[defunctToken];
-            require(replacementToken != 0, "RepairCentre: token not defunct");
-            delete repairList[defunctToken];
+            uint256 defectiveToken = defectiveTokens[i];
+            uint256 replacementToken = repairList[defectiveToken];
+            require(replacementToken != 0, "RepairCentre: token not defective");
+            delete repairList[defectiveToken];
             recipients[i] = from;
             replacementTokens[i] = replacementToken;
         }
 
-        inventoryContract.safeBatchTransferFrom(address(this), tokensGraveyard, defunctTokens, values, bytes(""));
+        inventoryContract.safeBatchTransferFrom(address(this), tokensGraveyard, defectiveTokens, values, bytes(""));
 
         try inventoryContract.batchMint(recipients, replacementTokens, uris, values, true)  {} catch {
             inventoryContract.batchMint(recipients, replacementTokens, uris, values, false);
@@ -205,7 +205,7 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
 
         revvContract.transfer(from, revvCompensation.mul(length));
 
-        emit RepairedBatch(defunctTokens, replacementTokens);
+        emit RepairedBatch(defectiveTokens, replacementTokens);
 
         return _ERC1155_BATCH_RECEIVED;
     }
@@ -213,12 +213,12 @@ contract NFTRepairCentre is ERC1155TokenReceiver, Ownable, Pausable {
     /*                                             Other Public Functions                                             */
 
     /**
-     * @notice Verifies whether a list of tokens contains a defunct token.
+     * @notice Verifies whether a list of tokens contains a defective token.
      * This function can be used by contracts having logic based on NFTs core attributes, in which case the repair list is a blacklist.
      * @param tokens an array containing the token ids to verify.
-     * @return true if the array contains a defunct token, false otherwise.
+     * @return true if the array contains a defective token, false otherwise.
      */
-    function containsDefunctToken(uint256[] calldata tokens) external view returns(bool) {
+    function containsDefectiveToken(uint256[] calldata tokens) external view returns(bool) {
         for (uint256 i = 0; i < tokens.length; ++i) {
             if (repairList[tokens[i]] != 0) {
                 return true;

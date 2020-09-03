@@ -29,7 +29,7 @@ const [deployer, payout, owner, operator] = accounts;
 
 const graveyard = EthAddress;
 
-const defunctTokens = [
+const defectiveTokens = [
     createTokenId({counter: 1}, false),
     createTokenId({counter: 2}, false),
     createTokenId({counter: 3}, false),
@@ -54,7 +54,7 @@ describe('NFTRepairCentre', function () {
         });
     });
 
-    describe('addTokensToRepair([defunctTokens], [replacementTokens])', function () {
+    describe('addTokensToRepair([defectiveTokens], [replacementTokens])', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([deployer], ['10000000000'], {from: deployer});
             this.repairCentre = await RepairCentre.new(EthAddress, graveyard, this.revv.address, 1, {from: deployer});
@@ -75,26 +75,26 @@ describe('NFTRepairCentre', function () {
         });
 
         it('should revert if the REVV transfer fails', async function () {
-            const defunctTokens = [One, Two];
+            const defectiveTokens = [One, Two];
             const replacementTokens = [Three, Four];
 
             // no REVV approval
             await expectRevert.unspecified(
-                this.repairCentre.addTokensToRepair(defunctTokens, replacementTokens, {from: deployer})
+                this.repairCentre.addTokensToRepair(defectiveTokens, replacementTokens, {from: deployer})
             );
         });
 
         it('should add tokens successfully in correct conditions', async function () {
-            const defunctTokens = [One, Two];
+            const defectiveTokens = [One, Two];
             const replacementTokens = [Three, Four];
 
             await this.revv.approve(this.repairCentre.address, Two, {from: deployer});
-            const receipt = await this.repairCentre.addTokensToRepair(defunctTokens, replacementTokens, {
+            const receipt = await this.repairCentre.addTokensToRepair(defectiveTokens, replacementTokens, {
                 from: deployer,
             });
 
             await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'TokensToRepairAdded', {
-                defunctTokens: defunctTokens.map((bn) => bn.toString()),
+                defectiveTokens: defectiveTokens.map((bn) => bn.toString()),
                 replacementTokens: replacementTokens.map((bn) => bn.toString()),
             });
             await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
@@ -105,7 +105,7 @@ describe('NFTRepairCentre', function () {
         });
     });
 
-    describe('containsDefunctToken([tokens])', function () {
+    describe('containsDefectiveToken([tokens])', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([deployer], ['10000000000'], {from: deployer});
             this.repairCentre = await RepairCentre.new(EthAddress, graveyard, this.revv.address, One, {from: deployer});
@@ -114,18 +114,18 @@ describe('NFTRepairCentre', function () {
             await this.repairCentre.addTokensToRepair([Three], [Four], {from: deployer});
         });
 
-        it('should return true when the tokens contain a defunct token', async function () {
-            expect(await this.repairCentre.containsDefunctToken([One])).to.be.true;
-            expect(await this.repairCentre.containsDefunctToken([Five, One])).to.be.true;
-            expect(await this.repairCentre.containsDefunctToken([Three])).to.be.true;
-            expect(await this.repairCentre.containsDefunctToken([One, Three])).to.be.true;
-            expect(await this.repairCentre.containsDefunctToken([One, Three, Five])).to.be.true;
+        it('should return true when the tokens contain a defective token', async function () {
+            expect(await this.repairCentre.containsDefectiveToken([One])).to.be.true;
+            expect(await this.repairCentre.containsDefectiveToken([Five, One])).to.be.true;
+            expect(await this.repairCentre.containsDefectiveToken([Three])).to.be.true;
+            expect(await this.repairCentre.containsDefectiveToken([One, Three])).to.be.true;
+            expect(await this.repairCentre.containsDefectiveToken([One, Three, Five])).to.be.true;
         });
 
-        it('should return false when the tokens do not contain a defunct token', async function () {
-            expect(await this.repairCentre.containsDefunctToken([Two])).to.be.false;
-            expect(await this.repairCentre.containsDefunctToken([Four])).to.be.false;
-            expect(await this.repairCentre.containsDefunctToken([Two, Four, Five])).to.be.false;
+        it('should return false when the tokens do not contain a defective token', async function () {
+            expect(await this.repairCentre.containsDefectiveToken([Two])).to.be.false;
+            expect(await this.repairCentre.containsDefectiveToken([Four])).to.be.false;
+            expect(await this.repairCentre.containsDefectiveToken([Two, Four, Five])).to.be.false;
         });
     });
 
@@ -141,10 +141,10 @@ describe('NFTRepairCentre', function () {
             });
             await this.inventory.addMinter(this.repairCentre.address, {from: deployer});
             await this.revv.approve(this.repairCentre.address, Three, {from: deployer});
-            await this.repairCentre.addTokensToRepair(defunctTokens, replacementTokens, {from: deployer});
+            await this.repairCentre.addTokensToRepair(defectiveTokens, replacementTokens, {from: deployer});
             await this.inventory.batchMint(
                 [owner, owner, owner],
-                defunctTokens,
+                defectiveTokens,
                 [ZeroBytes32, ZeroBytes32, ZeroBytes32],
                 [1, 1, 1],
                 true,
@@ -162,7 +162,7 @@ describe('NFTRepairCentre', function () {
             const inventory = await InventoryClone.new(this.revv.address, graveyard, {from: deployer});
             await inventory.batchMint(
                 [owner, owner, owner],
-                defunctTokens,
+                defectiveTokens,
                 [ZeroBytes32, ZeroBytes32, ZeroBytes32],
                 [1, 1, 1],
                 true,
@@ -175,7 +175,7 @@ describe('NFTRepairCentre', function () {
                 inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     owner,
                     this.repairCentre.address,
-                    defunctTokens[0],
+                    defectiveTokens[0],
                     1,
                     '0x0',
                     {
@@ -186,7 +186,7 @@ describe('NFTRepairCentre', function () {
             );
         });
 
-        it('should revert if the token is not defunct', async function () {
+        it('should revert if the token is not defective', async function () {
             const validToken = createTokenId({counter: 100}, false);
             await this.inventory.mintNonFungible(owner, validToken, ZeroBytes32, true, {from: deployer});
 
@@ -201,21 +201,21 @@ describe('NFTRepairCentre', function () {
                         from: owner,
                     }
                 ),
-                'RepairCentre: token not defunct'
+                'RepairCentre: token not defective'
             );
         });
 
-        it('should replace the defunct token', async function () {
-            for (let i = 0; i < defunctTokens.length; i++) {
-                const defunctToken = defunctTokens[i];
+        it('should replace the defective token', async function () {
+            for (let i = 0; i < defectiveTokens.length; i++) {
+                const defectiveToken = defectiveTokens[i];
                 const replacementToken = replacementTokens[i];
 
-                expect(await this.repairCentre.containsDefunctToken([defunctToken])).to.be.true;
+                expect(await this.repairCentre.containsDefectiveToken([defectiveToken])).to.be.true;
 
                 const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     owner,
                     this.repairCentre.address,
-                    defunctToken,
+                    defectiveToken,
                     1,
                     '0x0',
                     {
@@ -227,7 +227,7 @@ describe('NFTRepairCentre', function () {
                     _operator: owner,
                     _from: owner,
                     _to: this.repairCentre.address,
-                    _id: new BN(defunctToken),
+                    _id: new BN(defectiveToken),
                     _value: One,
                 });
 
@@ -235,7 +235,7 @@ describe('NFTRepairCentre', function () {
                     _operator: this.repairCentre.address,
                     _from: this.repairCentre.address,
                     _to: graveyard,
-                    _id: new BN(defunctToken),
+                    _id: new BN(defectiveToken),
                     _value: One,
                 });
 
@@ -261,11 +261,11 @@ describe('NFTRepairCentre', function () {
                 expect(revvTransferEvent._value).to.be.equal('1');
 
                 await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'RepairedSingle', {
-                    defunctToken: new BN(defunctToken),
+                    defectiveToken: new BN(defectiveToken),
                     replacementToken: new BN(replacementToken),
                 });
 
-                expect(await this.repairCentre.containsDefunctToken([defunctToken])).to.be.false;
+                expect(await this.repairCentre.containsDefectiveToken([defectiveToken])).to.be.false;
             }
         });
     });
@@ -282,12 +282,12 @@ describe('NFTRepairCentre', function () {
             });
             await this.inventory.addMinter(this.repairCentre.address, {from: deployer});
             await this.revv.approve(this.repairCentre.address, Three, {from: deployer});
-            await this.repairCentre.addTokensToRepair(defunctTokens, replacementTokens, {from: deployer});
+            await this.repairCentre.addTokensToRepair(defectiveTokens, replacementTokens, {from: deployer});
             await this.inventory.batchMint(
-                defunctTokens.map(() => owner),
-                defunctTokens,
-                defunctTokens.map(() => ZeroBytes32),
-                defunctTokens.map(() => 1),
+                defectiveTokens.map(() => owner),
+                defectiveTokens,
+                defectiveTokens.map(() => ZeroBytes32),
+                defectiveTokens.map(() => 1),
                 true,
                 {
                     from: deployer,
@@ -302,10 +302,10 @@ describe('NFTRepairCentre', function () {
             await InventoryClone.link('Bytes', bytes.address);
             const inventory = await InventoryClone.new(this.revv.address, graveyard, {from: deployer});
             await inventory.batchMint(
-                defunctTokens.map(() => owner),
-                defunctTokens,
-                defunctTokens.map(() => ZeroBytes32),
-                defunctTokens.map(() => 1),
+                defectiveTokens.map(() => owner),
+                defectiveTokens,
+                defectiveTokens.map(() => ZeroBytes32),
+                defectiveTokens.map(() => 1),
                 true,
                 {
                     from: deployer,
@@ -316,7 +316,7 @@ describe('NFTRepairCentre', function () {
                 inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
                     owner,
                     this.repairCentre.address,
-                    [defunctTokens[0]],
+                    [defectiveTokens[0]],
                     [1],
                     '0x0',
                     {
@@ -327,7 +327,7 @@ describe('NFTRepairCentre', function () {
             );
         });
 
-        it('should revert if one of the tokens is not defunct', async function () {
+        it('should revert if one of the tokens is not defective', async function () {
             const validToken = createTokenId({counter: 100}, false);
             await this.inventory.mintNonFungible(owner, validToken, ZeroBytes32, true, {from: deployer});
 
@@ -342,34 +342,34 @@ describe('NFTRepairCentre', function () {
                         from: owner,
                     }
                 ),
-                'RepairCentre: token not defunct'
+                'RepairCentre: token not defective'
             );
 
             await expectRevert(
                 this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
                     owner,
                     this.repairCentre.address,
-                    [defunctTokens[0], validToken],
+                    [defectiveTokens[0], validToken],
                     [1, 1],
                     '0x0',
                     {
                         from: owner,
                     }
                 ),
-                'RepairCentre: token not defunct'
+                'RepairCentre: token not defective'
             );
         });
 
-        it('should replace the defunct tokens', async function () {
-            expect(await this.repairCentre.containsDefunctToken(defunctTokens)).to.be.true;
+        it('should replace the defective tokens', async function () {
+            expect(await this.repairCentre.containsDefectiveToken(defectiveTokens)).to.be.true;
 
             const receipt = await this.inventory.methods[
                 'safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'
             ](
                 owner,
                 this.repairCentre.address,
-                defunctTokens,
-                defunctTokens.map(() => 1),
+                defectiveTokens,
+                defectiveTokens.map(() => 1),
                 EmptyByte,
                 {
                     from: owner,
@@ -380,16 +380,16 @@ describe('NFTRepairCentre', function () {
                 _operator: owner,
                 _from: owner,
                 _to: this.repairCentre.address,
-                _ids: defunctTokens,
-                _values: defunctTokens.map(() => '1'),
+                _ids: defectiveTokens,
+                _values: defectiveTokens.map(() => '1'),
             });
 
             await expectEvent.inTransaction(receipt.tx, this.inventory, 'TransferBatch', {
                 _operator: this.repairCentre.address,
                 _from: this.repairCentre.address,
                 _to: graveyard,
-                _ids: defunctTokens,
-                _values: defunctTokens.map(() => '1'),
+                _ids: defectiveTokens,
+                _values: defectiveTokens.map(() => '1'),
             });
 
             for (const replacementToken of replacementTokens) {
@@ -416,11 +416,11 @@ describe('NFTRepairCentre', function () {
             expect(revvTransferEvent._value).to.be.equal('3');
 
             await expectEvent.inTransaction(receipt.tx, this.repairCentre, 'RepairedBatch', {
-                defunctTokens,
+                defectiveTokens,
                 replacementTokens,
             });
 
-            expect(await this.repairCentre.containsDefunctToken(defunctTokens)).to.be.false;
+            expect(await this.repairCentre.containsDefectiveToken(defectiveTokens)).to.be.false;
         });
     });
 });
