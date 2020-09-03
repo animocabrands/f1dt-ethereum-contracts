@@ -36,7 +36,7 @@ const RewardsSchedule = [
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 
 const QualifyingGameSalePrices = [
-    {sku: stringToBytes32('qualifying game'), ethPrice: toWei('0.01'), revvPrice: toWei('1')}
+    {sku: stringToBytes32('qualifying game'), ethPrice: toWei('0.01'), revvPrice: toWei('1')},
 ];
 const QualifyingGameSalePayoutWallet = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
 const QualifyingGameSalePayoutToken = '0x925C5d704193c8ED414bB0973a198185ad19AD8E'; // dummy address
@@ -50,5 +50,5 @@ module.exports = {
     RewardsPool,
     QualifyingGameSalePrices,
     QualifyingGameSalePayoutWallet,
-    QualifyingGameSalePayoutToken
+    QualifyingGameSalePayoutToken,
 };
