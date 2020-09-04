@@ -11,23 +11,22 @@ import "@animoca/ethereum-contracts-sale_base/contracts/sale/FixedPricesSale.sol
  * A sale contract for the initial REVV distribution to F1 NFT owners.
  */
 contract REVVSale is FixedPricesSale {
-    IERC20 internal immutable _revv;
-    IERC721 internal immutable _deltaTimeInventory;
+    IERC20 public immutable revv;
+    IERC721 public immutable deltaTimeInventory;
 
     /**
      * Constructor.
      * @param payoutWallet_ The wallet address used to receive purchase payments.
      */
     constructor(
-        address revv,
-        address deltaTimeInventory,
-        address payable payoutWallet_,
-        address inventoryContract
+        address revv_,
+        address deltaTimeInventory_,
+        address payable payoutWallet_
     ) public FixedPricesSale(payoutWallet_, 64, 32) {
-        require(revv != address(0), "REVVSale: zero address REVV ");
-        require(inventoryContract != address(0), "REVVSale: zero address inventory ");
-        _revv = IERC20(revv);
-        _deltaTimeInventory = IERC721(deltaTimeInventory);
+        require(revv_ != address(0), "REVVSale: zero address REVV ");
+        require(deltaTimeInventory_ != address(0), "REVVSale: zero address inventory ");
+        revv = IERC20(revv_);
+        deltaTimeInventory = IERC721(deltaTimeInventory_);
     }
 
     /**
@@ -52,7 +51,14 @@ contract REVVSale is FixedPricesSale {
         address notificationsReceiver
     ) public virtual override {
         super.createSku(sku, totalSupply, maxQuantityPerPurchase, notificationsReceiver);
-        require(_revv.transferFrom(_msgSender(), address(this), totalSupply), "REVVSale: REVV transfer failed");
+        require(
+            revv.transferFrom(
+                _msgSender(),
+                address(this),
+                totalSupply.mul(1000000000000000000)
+            ),
+            "REVVSale: REVV transfer failed"
+        );
     }
 
     /**
@@ -63,12 +69,13 @@ contract REVVSale is FixedPricesSale {
      */
     function _validation(PurchaseData memory purchase) internal override view {
         super._validation(purchase);
-        require(_deltaTimeInventory.balanceOf(_msgSender()) != 0, "REVVSale: must be a NFT owner");
+        require(deltaTimeInventory.balanceOf(_msgSender()) != 0, "REVVSale: must be a NFT owner");
     }
 
     function _delivery(PurchaseData memory purchase) internal override {
+        super._delivery(purchase);
         require(
-            _revv.transferFrom(address(this), purchase.recipient, purchase.quantity),
+            revv.transfer(purchase.recipient, purchase.quantity.mul(1000000000000000000)),
             "REVVSale:  REVV transfer failed"
         );
     }
