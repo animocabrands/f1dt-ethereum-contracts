@@ -1,14 +1,12 @@
 # Changelog
 
-## 0.4.1
- * Added `REVVSale`.
-
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
  * Updated to `@animoca/ethereum-contracts-core_library:3.1.1`.
  * Updated to `@animoca/ethereum-contracts-sale_base:6.0.0`.
  * Removed `RaceEntrySale.sol` sale contract, tests, and sample migration script.
  * Updated `QualifyingGameSale.sol` with `@animoca/ethereum-contracts-sale_base:6.0.0` compatibility changes.
+ * Added `REVVSale`.
 
 ## 0.3.0
  * Updated to `@animoca/ethereum-contracts-sale_base@4.0.0`.
