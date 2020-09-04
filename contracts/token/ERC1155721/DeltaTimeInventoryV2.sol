@@ -18,6 +18,8 @@ interface MetadataLayoutSetter {
     ) external;
 }
 
+// This is an experimental implementation of the F1 Delta Time Inventory, and NOT the currently deployed version.
+// The currently deployed version is in `contracts_solc-0.5/token/ERC1155721`
 contract DeltaTimeInventoryV2 is PausableInventory, ERC20Fees, CoreMetadataDelegator, MinterRole {
 
     using UInt256ToDecimalString for uint256;
