@@ -1,5 +1,8 @@
 # Changelog
 
+## 0.4.1
+ * Added `REVVSale`.
+
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
  * Updated to `@animoca/ethereum-contracts-core_library:3.1.1`.
