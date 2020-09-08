@@ -10,28 +10,33 @@ import "@animoca/ethereum-contracts-nft_staking/contracts/staking/NftStaking.sol
  */
 contract DeltaTimeStakingBeta is NftStaking {
     mapping(uint256 => uint64) public weightsByRarity;
+    uint256 public immutable revvEscrowingWeightCoefficient;
 
     /**
      * Constructor.
      * @param cycleLengthInSeconds_ The length of a cycle, in seconds.
      * @param periodLengthInCycles_ The length of a period, in cycles.
-     * @param inventoryContract IWhitelistedNftContract the DeltaTimeInventory contract.
+     * @param inventoryContract IERC1155721Transferrable the DeltaTimeInventory contract.
      * @param revvContract IERC20 the REVV contract.
      * @param rarities uint256[] the supported DeltaTimeInventory NFT rarities.
      * @param weights uint64[] the staking weights associated to the NFT rarities.
+     * @param revvEscrowingWeightCoefficient_ uint256 the amount of REVV to escrow for staking one unit of weight, in wei.
      */
     constructor(
         uint32 cycleLengthInSeconds_,
         uint16 periodLengthInCycles_,
-        IWhitelistedNftContract inventoryContract,
+        IERC1155721Transferrable inventoryContract,
         IERC20 revvContract,
         uint256[] memory rarities,
-        uint64[] memory weights
+        uint64[] memory weights,
+        uint256 revvEscrowingWeightCoefficient_
     ) public NftStaking(cycleLengthInSeconds_, periodLengthInCycles_, inventoryContract, revvContract) {
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
+        require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: wrong coefficient");
         for (uint256 i = 0; i < rarities.length; ++i) {
             weightsByRarity[rarities[i]] = weights[i];
         }
+        revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
     }
 
     /**
@@ -55,5 +60,35 @@ contract DeltaTimeStakingBeta is NftStaking {
         require(nonFungible == 1 && tokenType == 1 && tokenSeason == 2, "NftStaking: wrong token");
 
         return weightsByRarity[tokenRarity];
+    }
+
+    /**
+     * Hook called on NFT(s) staking.
+     * @param owner uint256 the NFT(s) owner.
+     * @param totalWeight uint256 the total weight of the staked NFT(s).
+     */
+    function _onStake(
+        address owner,
+        uint256 totalWeight
+    ) internal override {
+        require(
+            rewardsTokenContract.transferFrom(owner, address(this), totalWeight.mul(revvEscrowingWeightCoefficient)),
+            "NFTStaking: REVV transfer failed"
+        );
+    }
+
+    /**
+     * Hook called on NFT(s) unstaking.
+     * @param owner uint256 the NFT(s) owner.
+     * @param totalWeight uint256 the total weight of the unstaked NFT(s).
+     */
+    function _onUnstake(
+        address owner,
+        uint256 totalWeight
+    ) internal override {
+        require(
+            rewardsTokenContract.transfer(owner, totalWeight.mul(revvEscrowingWeightCoefficient)),
+            "NFTStaking: REVV transfer failed"
+        );
     }
 }

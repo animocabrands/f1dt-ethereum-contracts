@@ -22,6 +22,8 @@ const WeightsByRarity = {
     9: 1, // Common,
 };
 
+const REVVEscrowingWeightCoefficient = new BN(10);
+
 const RewardsSchedule = [
     {startPeriod: 1, endPeriod: 4, payoutPerCycle: toWei('150000')},
     {startPeriod: 5, endPeriod: 5, payoutPerCycle: toWei('120000')},
@@ -51,4 +53,5 @@ module.exports = {
     QualifyingGameSalePrices,
     QualifyingGameSalePayoutWallet,
     QualifyingGameSalePayoutToken,
+    REVVEscrowingWeightCoefficient,
 };
