@@ -14,6 +14,8 @@ contract DeltaTimeStakingBeta is NftStaking {
 
     /**
      * Constructor.
+     * @dev Reverts `rarities` and `weights` have different lengths.
+     * @dev Reverts if `revvEscrowingWeightCoefficient_` is zero.
      * @param cycleLengthInSeconds_ The length of a cycle, in seconds.
      * @param periodLengthInCycles_ The length of a period, in cycles.
      * @param inventoryContract IERC1155721Transferrable the DeltaTimeInventory contract.
@@ -32,7 +34,7 @@ contract DeltaTimeStakingBeta is NftStaking {
         uint256 revvEscrowingWeightCoefficient_
     ) public NftStaking(cycleLengthInSeconds_, periodLengthInCycles_, inventoryContract, revvContract) {
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
-        require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: wrong coefficient");
+        require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: invalid coefficient");
         for (uint256 i = 0; i < rarities.length; ++i) {
             weightsByRarity[rarities[i]] = weights[i];
         }
@@ -41,7 +43,7 @@ contract DeltaTimeStakingBeta is NftStaking {
 
     /**
      * Verifes that the token is eligible and returns its associated weight.
-     * Throws if the token is not a 2019 Car NFT.
+     * @dev Reverts if the token is not a 2019 Car NFT.
      * @param nftId uint256 token identifier of the NFT.
      * @return uint64 the weight of the NFT.
      */
@@ -53,10 +55,10 @@ contract DeltaTimeStakingBeta is NftStaking {
         uint256 tokenSeason = (nftId >> 224) & 0xFF;
         uint256 tokenRarity = (nftId >> 176) & 0xFF;
 
-        // For interpretation of values, refer to: https://github.com/animocabrands/f1dt-core_metadata/tree/v0.1.1/src/mappings
-        // Types: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Types/NameById.js
-        // Seasons: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Seasons/NameById.js
-        // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/mappings/Common/Rarities/TierByRarity.js
+        // For interpretation of values, refer to https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/
+        // Types: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Type/Types.js
+        // Seasons: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Season/Seasons.js
+        // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Rarity/Rarities.js
         require(nonFungible == 1 && tokenType == 1 && tokenSeason == 2, "NftStaking: wrong token");
 
         return weightsByRarity[tokenRarity];
@@ -64,6 +66,7 @@ contract DeltaTimeStakingBeta is NftStaking {
 
     /**
      * Hook called on NFT(s) staking.
+     * @dev Reverts if the REVV escrow transfer fails.
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the staked NFT(s).
      */
@@ -79,6 +82,7 @@ contract DeltaTimeStakingBeta is NftStaking {
 
     /**
      * Hook called on NFT(s) unstaking.
+     * @dev Reverts if the REVV transfer fails.
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the unstaked NFT(s).
      */
