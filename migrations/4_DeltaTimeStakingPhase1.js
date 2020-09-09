@@ -3,8 +3,8 @@ const {rewardsPoolFromSchedule} = require('@animoca/ethereum-contracts-nft_staki
 const {CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSchedule} = require('../src/constants');
 
 const REVV = artifacts.require('REVV');
-const Inventory = artifacts.require('DeltaTimeInventoryV2');
-const Staking = artifacts.require('DeltaTimeStakingBeta');
+const Inventory = artifacts.require('DeltaTimeInventory');
+const Staking = artifacts.require('DeltaTimeStakingPhase1');
 
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 
@@ -27,7 +27,7 @@ module.exports = async (deployer, network, accounts) => {
     console.log(`Approving ${fromWei(RewardsPool)} REVVs to the staking contract for the reward pool before starting`);
     await revvContract.approve(stakingContract.address, RewardsPool);
 
-    for (schedule of RewardsSchedule) {
+    for (const schedule of RewardsSchedule) {
         console.log(
             `Setting schedule: ${fromWei(schedule.payoutPerCycle)} REVVs per-cycle for periods ${
                 schedule.startPeriod

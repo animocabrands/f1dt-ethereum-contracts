@@ -2,14 +2,14 @@
 
 pragma solidity 0.6.8;
 
-import "@animoca/ethereum-contracts-nft_staking/contracts/staking/NftStaking.sol";
+import "./DeltaTimeStakingPhase1.sol";
 
 /**
- * @title Delta Time Staking Beta
+ * @title Delta Time Staking Phase 2
  * This contract allows owners of Delta Time 2019 Car NFTs to stake them in exchange for REVV rewards.
+ * Staking requires escrowing of REVV in proportion of the staked weight.
  */
-contract DeltaTimeStakingBeta is NftStaking {
-    mapping(uint256 => uint64) public weightsByRarity;
+contract DeltaTimeStakingPhase2 is DeltaTimeStakingPhase1 {
     uint256 public immutable revvEscrowingWeightCoefficient;
 
     /**
@@ -32,36 +32,19 @@ contract DeltaTimeStakingBeta is NftStaking {
         uint256[] memory rarities,
         uint64[] memory weights,
         uint256 revvEscrowingWeightCoefficient_
-    ) public NftStaking(cycleLengthInSeconds_, periodLengthInCycles_, inventoryContract, revvContract) {
-        require(rarities.length == weights.length, "NftStaking: wrong arguments");
+    )
+        public
+        DeltaTimeStakingPhase1(
+            cycleLengthInSeconds_,
+            periodLengthInCycles_,
+            inventoryContract,
+            revvContract,
+            rarities,
+            weights
+        )
+    {
         require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: invalid coefficient");
-        for (uint256 i = 0; i < rarities.length; ++i) {
-            weightsByRarity[rarities[i]] = weights[i];
-        }
         revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
-    }
-
-    /**
-     * Verifes that the token is eligible and returns its associated weight.
-     * @dev Reverts if the token is not a 2019 Car NFT.
-     * @param nftId uint256 token identifier of the NFT.
-     * @return uint64 the weight of the NFT.
-     */
-    function _validateAndGetNftWeight(uint256 nftId) internal virtual override view returns (uint64) {
-        // Ids bits layout specification:
-        // https://github.com/animocabrands/f1dt-core_metadata/blob/v0.1.1/src/constants.js
-        uint256 nonFungible = (nftId >> 255) & 1;
-        uint256 tokenType = (nftId >> 240) & 0xFF;
-        uint256 tokenSeason = (nftId >> 224) & 0xFF;
-        uint256 tokenRarity = (nftId >> 176) & 0xFF;
-
-        // For interpretation of values, refer to https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/
-        // Types: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Type/Types.js
-        // Seasons: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Season/Seasons.js
-        // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Rarity/Rarities.js
-        require(nonFungible == 1 && tokenType == 1 && tokenSeason == 2, "NftStaking: wrong token");
-
-        return weightsByRarity[tokenRarity];
     }
 
     /**
@@ -70,10 +53,7 @@ contract DeltaTimeStakingBeta is NftStaking {
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the staked NFT(s).
      */
-    function _onStake(
-        address owner,
-        uint256 totalWeight
-    ) internal override {
+    function _onStake(address owner, uint256 totalWeight) internal override {
         require(
             rewardsTokenContract.transferFrom(owner, address(this), totalWeight.mul(revvEscrowingWeightCoefficient)),
             "NFTStaking: REVV transfer failed"
@@ -86,10 +66,7 @@ contract DeltaTimeStakingBeta is NftStaking {
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the unstaked NFT(s).
      */
-    function _onUnstake(
-        address owner,
-        uint256 totalWeight
-    ) internal override {
+    function _onUnstake(address owner, uint256 totalWeight) internal override {
         require(
             rewardsTokenContract.transfer(owner, totalWeight.mul(revvEscrowingWeightCoefficient)),
             "NFTStaking: REVV transfer failed"
