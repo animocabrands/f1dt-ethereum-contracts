@@ -2,7 +2,8 @@
 
 ## 1.0.0
  * Updated to `@animoca/ethereum-contracts-nft_staking:4.0.0`.
- * Added a REVV escrowing based on staked weight for the staking.
+ * Staking is separated in phase 1 and phase 2.
+ * Phase 2 requires ecsrowing of REVV for staking.
 
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
