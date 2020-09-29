@@ -44,15 +44,15 @@
     "@openzeppelin/gsn-helpers" "^0.2.3"
     "@openzeppelin/gsn-provider" "^0.1.10"
 
-"@animoca/ethereum-contracts-nft_staking@=3.0.3":
-  version "3.0.3"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.3.tgz#84c59bfcc8919c7109393a8e73e591102e3e1a9f"
-  integrity sha512-FOab7gBRNj1B6RzY6MONs7fpGjLd57anEauARpjeLy3JS2V73R7IWxEbDKZJwzN04O0Is6lEYXVPFH7d6s/cUA==
+"@animoca/ethereum-contracts-nft_staking@=4.0.0":
+  version "3.0.4"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.4.tgz#28e7d151c953fde649a3ebe75d98388870105ef7"
+  integrity sha512-m2vgcxdux/6Ez5aoSu/WD3ncOKt24+xCdRt8zmIt4T4JG5bNgre1eJ4g30aqEPwCXKQL7HnNR3k7jgnh4pOLmQ==
 
-"@animoca/ethereum-contracts-sale_base@=5.0.0":
-  version "5.0.0"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-5.0.0.tgz#10f94c1ed719f1d2d03606442ee36645c015fcb9"
-  integrity sha512-Oa6CACnJhvdjGHc6ewk9BHNONt/l5j6a90beOQuXudAgrY1fdamR4D8kYLsj8uVE4uMNnJtUOZNjFnoVNJ32bg==
+"@animoca/ethereum-contracts-sale_base@=6.0.0":
+  version "6.0.0"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-sale_base/-/ethereum-contracts-sale_base-6.0.0.tgz#0b1550a0b44d72f74ba7c54f486eaf11eaa4abf1"
+  integrity sha512-WeDBbz2xs6sic3OVNscMHEzJxwk/g3d/vmZO4xu3eCpD9aRLlQgMBu6D6wL01yw/7u8VoYs9yJ8V8icGy3lBUQ==
   dependencies:
     ganache-cli "^6.9.1"
 

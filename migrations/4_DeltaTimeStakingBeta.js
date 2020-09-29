@@ -3,7 +3,7 @@ const {rewardsPoolFromSchedule} = require('@animoca/ethereum-contracts-nft_staki
 const {CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSchedule} = require('../src/constants');
 
 const REVV = artifacts.require('REVV');
-const Inventory = artifacts.require('DeltaTimeInventoryV2');
+const Inventory = artifacts.require('DeltaTimeInventory');
 const Staking = artifacts.require('DeltaTimeStakingBeta');
 
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);

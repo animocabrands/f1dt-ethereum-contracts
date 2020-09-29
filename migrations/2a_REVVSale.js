@@ -2,7 +2,7 @@ const BN = require('web3-utils').BN;
 const {toWei} = require('web3-utils');
 const {RaceEntrySalePayoutWallet, RaceEntrySalePayoutToken, RaceEntrySalePrices} = require('../src/constants');
 
-const RaceEntrySale = artifacts.require('RaceEntrySale.sol');
+// const RaceEntrySale = artifacts.require('RaceEntrySale.sol');
 const REVV = artifacts.require('REVV.sol');
 
 module.exports = async (deployer, network, [owner]) => {
