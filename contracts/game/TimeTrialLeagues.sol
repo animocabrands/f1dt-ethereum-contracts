@@ -25,10 +25,10 @@ struct ParticipantData {
 contract TimeTrialLeagues is Context {
     using SafeMath for uint256;
     /**
-     * Event emitted when ...
-     * @param participant Address of participant
-     * @param leagueId leageId identifier
-     * @param amount Amount staked in league. 0 means non participant
+     * Event emitted when a player's particiation in a league is updated.
+     * @param participant The address of the participant.
+     * @param leagueId The league identifier.
+     * @param amount Amount escrowed in league. 0 means non participant.
      */
     event ParticipationUpdated(address participant, bytes32 leagueId, uint256 amount);
 
