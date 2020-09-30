@@ -10,7 +10,7 @@ const LeagueAmountsMap = {
     'C':1000,
 }
 
-const LockingPeriod = 604800; // 7 Days
+const LockingPeriod = 1209600; // 14 Days
 
 module.exports = async (deployer, network, accounts) => {
     const revvContract = await REVV.deployed();
