@@ -4,6 +4,8 @@ pragma solidity 0.6.8;
 
 import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Pausable.sol";
 
 /// Minimal transfers-only ERC20 interface
 interface IERC20Transfers {
@@ -22,7 +24,7 @@ struct ParticipantData {
  * Entering a league requires the participant to escrow some ERC20 gaming token, which
  * is given back to the participant when they leave the league.
  */
-contract TimeTrialLeagues is Context {
+contract TimeTrialLeagues is Context, Pausable, Ownable {
     using SafeMath for uint256;
     /**
      * Event emitted when a player's particiation in a league is updated.
@@ -74,7 +76,7 @@ contract TimeTrialLeagues is Context {
      * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
      * @param leagueId The identifier of the league to enter.
      */
-    function increaseStake(bytes32 leagueId, uint256 transferAmount) public {
+    function increaseStake(bytes32 leagueId, uint256 transferAmount) whenNotPaused public {
         address sender = _msgSender();
         require(leagues[leagueId] != 0, "Leagues: league not found");
         ParticipantData memory pd = participants[sender][leagueId];
@@ -97,7 +99,7 @@ contract TimeTrialLeagues is Context {
      * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
      * @param leagueId The identifier of the league to enter.
      */
-    function enterLeague(bytes32 leagueId, uint256 transferAmount) public {
+    function enterLeague(bytes32 leagueId, uint256 transferAmount) whenNotPaused public {
         address sender = _msgSender();
         uint256 amount = leagues[leagueId];
         require(amount != 0, "Leagues: league not found");
@@ -150,6 +152,25 @@ contract TimeTrialLeagues is Context {
             timestamps[i] = participants[participant][leagueIds[i]].timestamp;
         }
     }
+
+     /**
+     * Pauses the deposit operations.
+     * @dev Reverts if the sender is not the contract owner.
+     * @dev Reverts if the contract is paused already.
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * Unpauses the deposit operations.
+     * @dev Reverts if the sender is not the contract owner.
+     * @dev Reverts if the contract is not paused.
+     */
+    function unpause() external onlyOwner {
+        _unpause();
+    }
+
 }
 
 
