@@ -3,6 +3,7 @@
 pragma solidity 0.6.8;
 
 import "@openzeppelin/contracts/GSN/Context.sol";
+import "@openzeppelin/contracts/math/SafeMath.sol";
 
 /// Minimal transfers-only ERC20 interface
 interface IERC20Transfers {
@@ -22,6 +23,7 @@ struct ParticipantData {
  * is given back to the participant when they leave the league.
  */
 contract TimeTrialLeagues is Context {
+    using SafeMath for uint256;
     /**
      * Event emitted when ...
      * @param participant Address of participant
@@ -72,18 +74,18 @@ contract TimeTrialLeagues is Context {
      * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
      * @param leagueId The identifier of the league to enter.
      */
-    function updateStake(bytes32 leagueId, uint256 transferAmount) public {
+    function increaseStake(bytes32 leagueId, uint256 transferAmount) public {
         address sender = _msgSender();
-        uint256 amount = leagues[leagueId];
-        require(amount != 0, "Leagues: league not found");
+        require(leagues[leagueId] != 0, "Leagues: league not found");
         ParticipantData memory pd = participants[sender][leagueId];
         require(pd.timestamp != 0, "Leagues: non participant");
-        participants[sender][leagueId] = ParticipantData(block.timestamp,transferAmount+pd.amount);
+        uint256 newAmount = transferAmount.add(pd.amount);
+        participants[sender][leagueId] = ParticipantData(block.timestamp,newAmount);
         require(
             gamingToken.transferFrom(sender, address(this), transferAmount),
             "Leagues: transfer in failed"
         );
-        emit ParticipationUpdated(sender, leagueId, participants[sender][leagueId].amount);
+        emit ParticipationUpdated(sender, leagueId, newAmount);
     }
 
     /**
