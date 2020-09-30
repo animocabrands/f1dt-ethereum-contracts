@@ -26,9 +26,9 @@ contract TimeTrialLeagues is Context {
      * Event emitted when ...
      * @param participant Address of participant
      * @param leagueId leageId identifier
-     * @param enabled left or entered league, false/true
+     * @param amount Amount staked in league. 0 means non participant
      */
-    event ParticipationUpdated(address participant, bytes32 leagueId, bool enabled);
+    event ParticipationUpdated(address participant, bytes32 leagueId, uint256 amount);
 
     IERC20Transfers public immutable gamingToken;
     uint256 public immutable lockingPeriod;
@@ -65,6 +65,28 @@ contract TimeTrialLeagues is Context {
     }
 
     /**
+     * Updates amount staked for participant in league
+     * @dev Reverts if `leagueId` does not exist.  
+     * @dev Reverts if user is not in league.     
+     * @dev Emits a ParticipationUpdated event.
+     * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
+     * @param leagueId The identifier of the league to enter.
+     */
+    function updateStake(bytes32 leagueId, uint256 transferAmount) public {
+        address sender = _msgSender();
+        uint256 amount = leagues[leagueId];
+        require(amount != 0, "Leagues: league not found");
+        ParticipantData memory pd = participants[sender][leagueId];
+        require(pd.timestamp != 0, "Leagues: non participant");
+        participants[sender][leagueId] = ParticipantData(block.timestamp,transferAmount+pd.amount);
+        require(
+            gamingToken.transferFrom(sender, address(this), transferAmount),
+            "Leagues: transfer in failed"
+        );
+        emit ParticipationUpdated(sender, leagueId, participants[sender][leagueId].amount);
+    }
+
+    /**
      * Enables the participation of a player in a league. Requires the escrowing of an amount of gaming token.
      * @dev Reverts if `leagueId` does not exist.
      * @dev Reverts if 'transferAmount' is less than minimumAmountToEscrow
@@ -84,7 +106,7 @@ contract TimeTrialLeagues is Context {
             gamingToken.transferFrom(sender, address(this), transferAmount),
             "Leagues: transfer in failed"
         );
-        emit ParticipationUpdated(sender, leagueId, true);
+        emit ParticipationUpdated(sender, leagueId, transferAmount);
     }
 
     /**
@@ -102,7 +124,7 @@ contract TimeTrialLeagues is Context {
         
         require(block.timestamp - pd.timestamp <= lockingPeriod, "Leagues: time-locked");
         participants[sender][leagueId] = ParticipantData(0,0);
-        emit ParticipationUpdated(sender, leagueId, false);
+        emit ParticipationUpdated(sender, leagueId, 0);
         require(
             gamingToken.transfer(sender, pd.amount),
             "Leagues: transfer out failed"
