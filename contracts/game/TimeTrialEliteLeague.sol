@@ -128,7 +128,7 @@ contract TimeTrialEliteLeague is Context, Pausable, Ownable {
         ParticipantData memory pd = participants[sender][tierId];
         require(pd.timestamp != 0, "Leagues: non-participant");
         
-        require(block.timestamp - pd.timestamp <= lockingPeriod, "Leagues: time-locked");
+        require(block.timestamp - pd.timestamp > lockingPeriod, "Leagues: time-locked");
         participants[sender][tierId] = ParticipantData(0,0);
         emit ParticipationUpdated(sender, tierId, 0);
         require(
