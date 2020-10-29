@@ -75,7 +75,7 @@ describe.only('ContentGenerator', function () {
         });
 
         it('racing stats', async function () {
-            const stats = await this.generator.generateRacingStats(1, 1, new BN('987875655632534253698768795847'));
+            const stats = await this.generator.generateRacingStats(new BN('987875655632534253698768795847'), 1, 1);
             console.log(stats.map((bn) => bn.toString()));
         });
 
