@@ -10,10 +10,6 @@ contract ContentGenerator {
     using SafeMath for uint256;
     using SafeCast for uint256;
 
-    uint256 constant PERCENT_DIV = 10000;
-
-    uint256 internal _nonce;
-
     struct Metadata {
         uint8 tokenType;
         uint8 tokenSubType;
@@ -54,6 +50,43 @@ contract ContentGenerator {
         for (uint256 i = 0; i < 5; ++i) {
             uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
             Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == commonTokenIndex);
+            tokens[i] = makeTokenId(metadata);
+        }
+        // counter = counter_;
+    }
+
+    // Uses seed bits [0;4[
+    function generateRareTokens() external view returns (uint256[] memory tokens) {
+        uint256 crateTier = 2;
+        tokens = new uint256[](5);
+        uint256 mainSeed = generateSeed();
+
+        uint256 rareTokenIndex1 = mainSeed % 5;
+        uint256 rareTokenIndex2 = (1 + rareTokenIndex1 + ((mainSeed >> 4) % 4)) % 5;
+
+        require(rareTokenIndex1 != rareTokenIndex2, "index error"); // for test
+
+        uint48 counter_ = counter;
+        for (uint256 i = 0; i < 5; ++i) {
+            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
+            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == rareTokenIndex1 || i == rareTokenIndex2);
+            tokens[i] = makeTokenId(metadata);
+        }
+        // counter = counter_;
+    }
+
+    // Uses seed bits [0;4[
+    function generateEpicTokens() external view returns (uint256[] memory tokens) {
+        uint256 crateTier = 1;
+        tokens = new uint256[](5);
+        uint256 mainSeed = generateSeed();
+
+        uint256 epicTokenIndex = mainSeed % 5;
+
+        uint48 counter_ = counter;
+        for (uint256 i = 0; i < 5; ++i) {
+            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
+            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == epicTokenIndex);
             tokens[i] = makeTokenId(metadata);
         }
         // counter = counter_;
@@ -110,14 +143,11 @@ contract ContentGenerator {
                 tokenRarity = 1;
             } else {
                 uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-                if (seedling < 15000) {
-                    // Legendary, 15%
+                if (seedling < 15000) { // Legendary, 15%
                     tokenRarity = 1;
-                } else if (seedling < 55000) {
-                    // Epic, 40%
+                } else if (seedling < 55000) { // Epic, 40%
                     tokenRarity = uint8(3 - (seedling % 2)); // Rarity [2-3]
-                } else {
-                    // Rare, 35%
+                } else { // Rare, 45%
                     tokenRarity = uint8(6 - (seedling % 3)); // Rarity [4-6]
                 }
             }
