@@ -1,3 +1,5 @@
+// see https://docs.google.com/spreadsheets/d/146kqi8xS1fLb8IhJO1wx6qZIVMQSvDacTXcTtUtSO3Y/edit?usp=sharing
+
 const {accounts, contract} = require('@openzeppelin/test-environment');
 const {expect} = require('chai');
 const {expectEvent, expectRevert, time} = require('@openzeppelin/test-helpers');
@@ -68,7 +70,7 @@ function computeSupply(tokens) {
     return result;
 }
 
-describe.only('ContentGenerator', function () {
+describe('ContentGenerator', function () {
     describe('enterTier(tierId, deposit)', function () {
         beforeEach(async function () {
             this.generator = await ContentGenerator.new(0, {from: deployer});
