@@ -47,7 +47,7 @@ contract DeltaTimeStaking is NftStakingV2 {
         require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: invalid coefficient");
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
 
-        //TODO Check how to apply escrow
+        //TODO Check how to apply escrow (only in events below?)
         revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
 
         for (uint256 i = 0; i < rarities.length; ++i) {
@@ -82,29 +82,29 @@ contract DeltaTimeStaking is NftStakingV2 {
         return weightsByRarity[tokenRarity];
     }
 
-//     /**
-//      * Hook called on NFT(s) staking.
-//      * @dev Reverts if the REVV escrow transfer fails.
-//      * @param owner uint256 the NFT(s) owner.
-//      * @param totalWeight uint256 the total weight of the staked NFT(s).
-//      */
-//     function _onStake(address owner, uint256 totalWeight) internal override {
-//         require(
-//             rewardsTokenContract.transferFrom(owner, address(this), totalWeight.mul(revvEscrowingWeightCoefficient)),
-//             "NFTStaking: REVV transfer failed"
-//         );
-//     }
+    /**
+     * Hook called on NFT(s) staking.
+     * @dev Reverts if the REVV escrow transfer fails.
+     * @param owner uint256 the NFT(s) owner.
+     * @param totalWeight uint256 the total weight of the staked NFT(s).
+     */
+    function _onStake(address owner, uint256 totalWeight) internal override {
+        require(
+            rewardsTokenContract.transferFrom(owner, address(this), totalWeight.mul(revvEscrowingWeightCoefficient)),
+            "NFTStaking: REVV transfer failed"
+        );
+    }
 
-//     /**
-//      * Hook called on NFT(s) unstaking.
-//      * @dev Reverts if the REVV transfer fails.
-//      * @param owner uint256 the NFT(s) owner.
-//      * @param totalWeight uint256 the total weight of the unstaked NFT(s).
-//      */
-//     function _onUnstake(address owner, uint256 totalWeight) internal override {
-//         require(
-//             rewardsTokenContract.transfer(owner, totalWeight.mul(revvEscrowingWeightCoefficient)),
-//             "NFTStaking: REVV transfer failed"
-//         );
-//     }
+    /**
+     * Hook called on NFT(s) unstaking.
+     * @dev Reverts if the REVV transfer fails.
+     * @param owner uint256 the NFT(s) owner.
+     * @param totalWeight uint256 the total weight of the unstaked NFT(s).
+     */
+    function _onUnstake(address owner, uint256 totalWeight) internal override {
+        require(
+            rewardsTokenContract.transfer(owner, totalWeight.mul(revvEscrowingWeightCoefficient)),
+            "NFTStaking: REVV transfer failed"
+        );
+    }
 }
