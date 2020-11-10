@@ -77,7 +77,7 @@ contract DeltaTimeStaking is NftStakingV2 {
 
         // Drivers(2) will be normal weight as defined in the mapping, for Cars(1) it will be double
         if (tokenType == 1) {
-            return weightsByRarity[tokenRarity] * 2;
+            return uint256(weightsByRarity[tokenRarity]).mul(2).toUint64();
         }
         return weightsByRarity[tokenRarity];
     }
