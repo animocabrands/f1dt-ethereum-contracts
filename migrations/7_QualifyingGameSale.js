@@ -2,7 +2,11 @@ const BN = require('web3-utils').BN;
 const {toWei} = require('web3-utils');
 const {QualifyingGameSalePayoutWallet, QualifyingGameSalePayoutToken, QualifyingGameSalePrices} = require('../src/constants');
 
+<<<<<<< HEAD:migrations/7_QualifyingGameSale.js
 const QualifyingGameSale = artifacts.require('QualifyingGameSale.sol');
+=======
+// const RaceEntrySale = artifacts.require('RaceEntrySale.sol');
+>>>>>>> current-staking:migrations/2a_REVVSale.js
 const REVV = artifacts.require('REVV.sol');
 
 module.exports = async (deployer, network, [owner]) => {

@@ -24,7 +24,7 @@ const {
 
 const {createTokenId, getCoreMetadata} = require('@animoca/f1dt-core_metadata').utils;
 
-const DeltaTimeStaking = contract.fromArtifact('DeltaTimeStakingPhase1');
+const DeltaTimeStaking = contract.fromArtifact('DeltaTimeStakingBeta');
 const REVV = contract.fromArtifact('REVV');
 const artifactsDir = contract.artifactsDir.toString();
 contract.artifactsDir = './imports';

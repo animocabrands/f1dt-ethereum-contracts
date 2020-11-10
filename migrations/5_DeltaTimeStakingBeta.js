@@ -4,7 +4,7 @@ const {CycleLengthInSeconds, PeriodLengthInCycles, WeightsByRarity, RewardsSched
 
 const REVV = artifacts.require('REVV');
 const Inventory = artifacts.require('DeltaTimeInventory');
-const Staking = artifacts.require('DeltaTimeStakingPhase1');
+const Staking = artifacts.require('DeltaTimeStakingBeta');
 
 const RewardsPool = rewardsPoolFromSchedule(RewardsSchedule, PeriodLengthInCycles);
 

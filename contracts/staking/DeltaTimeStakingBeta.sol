@@ -5,10 +5,10 @@ pragma solidity 0.6.8;
 import "@animoca/ethereum-contracts-nft_staking/contracts/staking/NftStaking.sol";
 
 /**
- * @title Delta Time Staking Phase 1
+ * @title Delta Time Staking Beta
  * This contract allows owners of Delta Time 2019 Car NFTs to stake them in exchange for REVV rewards.
  */
-contract DeltaTimeStakingPhase1 is NftStaking {
+contract DeltaTimeStakingBeta is NftStaking {
     mapping(uint256 => uint64) public weightsByRarity;
 
     /**
@@ -17,7 +17,7 @@ contract DeltaTimeStakingPhase1 is NftStaking {
      * @dev Reverts if `revvEscrowingWeightCoefficient_` is zero.
      * @param cycleLengthInSeconds_ The length of a cycle, in seconds.
      * @param periodLengthInCycles_ The length of a period, in cycles.
-     * @param inventoryContract IERC1155721Transferrable the DeltaTimeInventory contract.
+     * @param inventoryContract IWhitelistedNftContract the DeltaTimeInventory contract.
      * @param revvContract IERC20 the REVV contract.
      * @param rarities uint256[] the supported DeltaTimeInventory NFT rarities.
      * @param weights uint64[] the staking weights associated to the NFT rarities.
@@ -25,7 +25,7 @@ contract DeltaTimeStakingPhase1 is NftStaking {
     constructor(
         uint32 cycleLengthInSeconds_,
         uint16 periodLengthInCycles_,
-        IERC1155721Transferrable inventoryContract,
+        IWhitelistedNftContract inventoryContract,
         IERC20 revvContract,
         uint256[] memory rarities,
         uint64[] memory weights
