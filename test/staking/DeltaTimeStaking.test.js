@@ -85,157 +85,161 @@ const revvForEscrowing = revvEscrowValues
     .reduce((prev, curr) => prev.add(curr), new BN(0));
 
 describe('DeltaTimeStaking', function () {
-    describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
-        it('should revert with a zero weight coefficient', async function () {
-            this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
+    // describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
+    //     beforeEach(async function () {
+    //         this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
+    //     });
+    //     it('should revert with a zero weight coefficient', async function () {
+    //         await expectRevert(
+    //             DeltaTimeStaking.new(
+    //                 CycleLengthInSeconds,
+    //                 PeriodLengthInCycles,
+    //                 this.revv.address,
+    //                 this.revv.address,
+    //                 RarityWeights.map((x) => x.rarity),
+    //                 RarityWeights.map((x) => x.weight),
+    //                 Zero,
+    //                 {from: deployer}
+    //             ),
+    //             'NftStaking: invalid coefficient'
+    //         );
+    //     });
+    //     it('should deploy with correct parameters', async function () {
+    //         await DeltaTimeStaking.new(
+    //             CycleLengthInSeconds,
+    //             PeriodLengthInCycles,
+    //             this.revv.address,
+    //             this.revv.address,
+    //             RarityWeights.map((x) => x.rarity),
+    //             RarityWeights.map((x) => x.weight),
+    //             revvForEscrowing,
+    //             {from: deployer});
+    //     });
+    // });
 
-            await expectRevert(
-                DeltaTimeStaking.new(
-                    CycleLengthInSeconds,
-                    PeriodLengthInCycles,
-                    this.revv.address,
-                    this.revv.address,
-                    RarityWeights.map((x) => x.rarity),
-                    RarityWeights.map((x) => x.weight),
-                    Zero,
-                    {from: deployer}
-                ),
-                'NftStaking: invalid coefficient'
+    describe('escrowing', function () {
+        beforeEach(async function () {
+            this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
+            this.bytes = await Bytes.new({from: deployer});
+
+            DeltaTimeInventory.network_id = 1337;
+            await DeltaTimeInventory.link('Bytes', this.bytes.address);
+
+            this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
+            await this.inventory.batchMint(
+                tokenIds.map(() => staker),
+                tokenIds,
+                tokenIds.map(() => ZeroBytes32),
+                tokenIds.map(() => 1),
+                true,
+                {from: deployer}
             );
-        });
-
-        it('should deploy with correct parameters', async function () {
-            this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
-
-            await DeltaTimeStaking.new(
+            this.staking = await DeltaTimeStaking.new(
                 CycleLengthInSeconds,
                 PeriodLengthInCycles,
-                this.revv.address,
+                this.inventory.address,
                 this.revv.address,
                 RarityWeights.map((x) => x.rarity),
                 RarityWeights.map((x) => x.weight),
-                revvForEscrowing,
-                {from: deployer});
+                toWei(REVVEscrowingWeightCoefficient),
+                {from: deployer}
+            );
+            await this.revv.whitelistOperator(this.staking.address, true, {from: deployer});
+            await this.staking.start({from: deployer});
         });
 
+        describe('staking', function () {
+            it('should execute single stake and escrow REVV', async function () {
+
+                console.log("=========================");
+                console.log(revvEscrowValues[0]);
+                console.log("=========================");
+
+                await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+                    staker,
+                    this.staking.address,
+                    tokenIds[0],
+                    1,
+                    '0x0',
+                    {
+                        from: staker,
+                    }
+                );
+                const contractBalance = await this.revv.balanceOf(this.staking.address);
+                contractBalance.should.be.bignumber.equal(revvEscrowValues[0]);
+            });
+
+            // it('should execute batch stake and escrow REVV', async function () {
+            //     await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+            //         staker,
+            //         this.staking.address,
+            //         [tokenIds[0], tokenIds[1], tokenIds[3]],
+            //         [1, 1, 1],
+            //         '0x0',
+            //         {
+            //             from: staker,
+            //         }
+            //     );
+            //     const contractBalance = await this.revv.balanceOf(this.staking.address);
+            //     contractBalance.should.be.bignumber.equal(
+            //         revvEscrowValues[0].add(revvEscrowValues[1]).add(revvEscrowValues[2])
+            //     );
+            // });
+
+            // it('should fail if not enough REVV to escrow', async function () {
+            //     await expectRevert(
+            //         this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+            //             staker,
+            //             this.staking.address,
+            //             tokenIds,
+            //             tokenIds.map(() => 1),
+            //             '0x0',
+            //             {
+            //                 from: staker,
+            //             }
+            //         ),
+            //         'ERC20: transfer amount exceeds balance'
+            //     );
+            // });
+        });
+        // describe('unstaking', function () {
+        //     it('should execute single unstake and unescrow REVV', async function () {
+        //         await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+        //             staker,
+        //             this.staking.address,
+        //             tokenIds[0],
+        //             1,
+        //             '0x0',
+        //             {
+        //                 from: staker,
+        //             }
+        //         );
+        //         time.increase(CycleLengthInSeconds.mul(Two));
+        //         await this.staking.unstakeNft(tokenIds[0], {from: staker});
+        //         const contractBalance = await this.revv.balanceOf(this.staking.address);
+        //         contractBalance.should.be.bignumber.equal(Zero);
+        //         const stakerBalance = await this.revv.balanceOf(staker);
+        //         stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+        //     });
+
+        //     it('should execute batch unstake and unescrow REVV', async function () {
+        //         await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+        //             staker,
+        //             this.staking.address,
+        //             [tokenIds[0], tokenIds[1], tokenIds[3]],
+        //             [1, 1, 1],
+        //             '0x0',
+        //             {
+        //                 from: staker,
+        //             }
+        //         );
+        //         time.increase(CycleLengthInSeconds.mul(Two));
+        //         await this.staking.batchUnstakeNfts([tokenIds[0], tokenIds[1], tokenIds[3]], {from: staker});
+        //         const contractBalance = await this.revv.balanceOf(this.staking.address);
+        //         contractBalance.should.be.bignumber.equal(Zero);
+        //         const stakerBalance = await this.revv.balanceOf(staker);
+        //         stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+        //     });
+        // });
     });
-
-    // describe('escrowing', function () {
-    //     beforeEach(async function () {
-    //         this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
-    //         this.bytes = await Bytes.new({from: deployer});
-    //         DeltaTimeInventory.network_id = 1337;
-    //         await DeltaTimeInventory.link('Bytes', this.bytes.address);
-    //         this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
-    //         await this.inventory.batchMint(
-    //             tokenIds.map(() => staker),
-    //             tokenIds,
-    //             tokenIds.map(() => ZeroBytes32),
-    //             tokenIds.map(() => 1),
-    //             true,
-    //             {from: deployer}
-    //         );
-    //         this.staking = await DeltaTimeStaking.new(
-    //             CycleLengthInSeconds,
-    //             PeriodLengthInCycles,
-    //             this.inventory.address,
-    //             this.revv.address,
-    //             Object.keys(WeightsByRarity),
-    //             Object.values(WeightsByRarity),
-    //             toWei(REVVEscrowingWeightCoefficient),
-    //             {from: deployer}
-    //         );
-    //         await this.revv.whitelistOperator(this.staking.address, true, {from: deployer});
-    //         await this.staking.start({from: deployer});
-    //     });
-
-    //     describe('staking', function () {
-    //         it('should execute single stake and escrow REVV', async function () {
-    //             await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
-    //                 staker,
-    //                 this.staking.address,
-    //                 tokenIds[0],
-    //                 1,
-    //                 '0x0',
-    //                 {
-    //                     from: staker,
-    //                 }
-    //             );
-    //             const contractBalance = await this.revv.balanceOf(this.staking.address);
-    //             contractBalance.should.be.bignumber.equal(revvEscrowValues[0]);
-    //         });
-
-    //         it('should execute batch stake and escrow REVV', async function () {
-    //             await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
-    //                 staker,
-    //                 this.staking.address,
-    //                 [tokenIds[0], tokenIds[1], tokenIds[3]],
-    //                 [1, 1, 1],
-    //                 '0x0',
-    //                 {
-    //                     from: staker,
-    //                 }
-    //             );
-    //             const contractBalance = await this.revv.balanceOf(this.staking.address);
-    //             contractBalance.should.be.bignumber.equal(
-    //                 revvEscrowValues[0].add(revvEscrowValues[1]).add(revvEscrowValues[2])
-    //             );
-    //         });
-
-    //         it('should fail if not enough REVV to escrow', async function () {
-    //             await expectRevert(
-    //                 this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
-    //                     staker,
-    //                     this.staking.address,
-    //                     tokenIds,
-    //                     tokenIds.map(() => 1),
-    //                     '0x0',
-    //                     {
-    //                         from: staker,
-    //                     }
-    //                 ),
-    //                 'ERC20: transfer amount exceeds balance'
-    //             );
-    //         });
-    //     });
-    //     describe('unstaking', function () {
-    //         it('should execute single unstake and unescrow REVV', async function () {
-    //             await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
-    //                 staker,
-    //                 this.staking.address,
-    //                 tokenIds[0],
-    //                 1,
-    //                 '0x0',
-    //                 {
-    //                     from: staker,
-    //                 }
-    //             );
-    //             time.increase(CycleLengthInSeconds.mul(Two));
-    //             await this.staking.unstakeNft(tokenIds[0], {from: staker});
-    //             const contractBalance = await this.revv.balanceOf(this.staking.address);
-    //             contractBalance.should.be.bignumber.equal(Zero);
-    //             const stakerBalance = await this.revv.balanceOf(staker);
-    //             stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
-    //         });
-
-    //         it('should execute batch unstake and unescrow REVV', async function () {
-    //             await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
-    //                 staker,
-    //                 this.staking.address,
-    //                 [tokenIds[0], tokenIds[1], tokenIds[3]],
-    //                 [1, 1, 1],
-    //                 '0x0',
-    //                 {
-    //                     from: staker,
-    //                 }
-    //             );
-    //             time.increase(CycleLengthInSeconds.mul(Two));
-    //             await this.staking.batchUnstakeNfts([tokenIds[0], tokenIds[1], tokenIds[3]], {from: staker});
-    //             const contractBalance = await this.revv.balanceOf(this.staking.address);
-    //             contractBalance.should.be.bignumber.equal(Zero);
-    //             const stakerBalance = await this.revv.balanceOf(staker);
-    //             stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
-    //         });
-    //     });
-    // });
 });
