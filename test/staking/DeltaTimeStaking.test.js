@@ -62,16 +62,16 @@ const RarityWeights = [
 
 const cars = [
     {rarity: Rarities.Common, type: 'Car', season: '2019', model: 'Carbon', counter: '1'},
-    {rarity: Rarities.Epic, type: 'Car', season: '2019', model: 'Carbon', counter: '2'},
-    {rarity: Rarities.Legendary, type: 'Car', season: '2019', model: 'Carbon', counter: '3'},
-    {rarity: Rarities.Apex, type: 'Car', season: '2019', model: 'Carbon', counter: '4'},
+    //{rarity: Rarities.Epic, type: 'Car', season: '2019', model: 'Carbon', counter: '2'},
+    //{rarity: Rarities.Legendary, type: 'Car', season: '2019', model: 'Carbon', counter: '3'},
+    //{rarity: Rarities.Apex, type: 'Car', season: '2019', model: 'Carbon', counter: '4'},
 ];
 
 const drivers = [
     {rarity: Rarities.Common, type: 'Driver', season: '2019', model: 'Jet', counter: '1'},
-    {rarity: Rarities.Epic, type: 'Driver', season: '2019', model: 'Jet', counter: '2'},
-    {rarity: Rarities.Legendary, type: 'Driver', season: '2019', model: 'Jet', counter: '3'},
-    {rarity: Rarities.Apex, type: 'Driver', season: '2019', model: 'Jet', counter: '4'},
+    // {rarity: Rarities.Epic, type: 'Driver', season: '2019', model: 'Jet', counter: '2'},
+    // {rarity: Rarities.Legendary, type: 'Driver', season: '2019', model: 'Jet', counter: '3'},
+    // {rarity: Rarities.Apex, type: 'Driver', season: '2019', model: 'Jet', counter: '4'},
 ];
 
 const tokens = cars.concat(drivers);
@@ -80,21 +80,37 @@ const tokenIds = tokens.map((item) => createTokenId(item, true));
 const weights = tokens.map((item) => new BN(WeightsByRarity[item.rarity]));
 const revvEscrowValues = weights.map((weight) => toWei(weight.mul(REVVEscrowingWeightCoefficient)));
 
+console.log("===========================###");
+const info1 = revvEscrowValues;//.slice(0, -1);
+console.log(info1.map(x => x.toString()));
+console.log("===========================###");
+
 const revvForEscrowing = revvEscrowValues
-    .slice(0, -1) // not enough to stake the last car
+    //.slice(0, -1) // not enough to stake the last car
     .reduce((prev, curr) => prev.add(curr), new BN(0));
+
+console.log("###############################");
+console.log(revvEscrowValues.map((x) => x.toString(10)));
+console.log("=========================");
+console.log(revvForEscrowing.toString(10));
+console.log("###############################");
+
 
 describe('DeltaTimeStaking', function () {
     describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
+            this.bytes = await Bytes.new({from: deployer});
+            DeltaTimeInventory.network_id = 1337;
+            await DeltaTimeInventory.link('Bytes', this.bytes.address);
+            this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
         });
         it('should revert with a zero weight coefficient', async function () {
             await expectRevert(
                 DeltaTimeStaking.new(
                     CycleLengthInSeconds,
                     PeriodLengthInCycles,
-                    this.revv.address,
+                    this.inventory.address,
                     this.revv.address,
                     RarityWeights.map((x) => x.rarity),
                     RarityWeights.map((x) => x.weight),
@@ -109,7 +125,7 @@ describe('DeltaTimeStaking', function () {
                 DeltaTimeStaking.new(
                     CycleLengthInSeconds,
                     PeriodLengthInCycles,
-                    this.revv.address,
+                    this.inventory.address,
                     this.revv.address,
                     RarityWeights.map((x) => x.rarity),
                     [1, 2, 3],
@@ -124,7 +140,7 @@ describe('DeltaTimeStaking', function () {
                 DeltaTimeStaking.new(
                     CycleLengthInSeconds,
                     PeriodLengthInCycles,
-                    this.revv.address,
+                    this.inventory.address,
                     this.revv.address,
                     RarityWeights.map((x) => x.rarity),
                     RarityWeights.map((x) => 0),
@@ -138,7 +154,7 @@ describe('DeltaTimeStaking', function () {
             await DeltaTimeStaking.new(
                 CycleLengthInSeconds,
                 PeriodLengthInCycles,
-                this.revv.address,
+                this.inventory.address,
                 this.revv.address,
                 RarityWeights.map((x) => x.rarity),
                 RarityWeights.map((x) => x.weight),
@@ -152,10 +168,19 @@ describe('DeltaTimeStaking', function () {
             this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
             this.bytes = await Bytes.new({from: deployer});
 
+            console.log("############################### BEFORE ");
+            const stakerBalance = await this.revv.balanceOf(staker);
+            console.log(staker);
+            console.log("stakerBalance: " + stakerBalance.toString());
+            console.log("revvForEscrowing: " + revvForEscrowing.toString());
+            console.log("revvEscrowValues[0]: " + revvEscrowValues[0].toString());
+            console.log("###############################");
+
             DeltaTimeInventory.network_id = 1337;
             await DeltaTimeInventory.link('Bytes', this.bytes.address);
 
             this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
+
             await this.inventory.batchMint(
                 tokenIds.map(() => staker),
                 tokenIds,
@@ -164,6 +189,7 @@ describe('DeltaTimeStaking', function () {
                 true,
                 {from: deployer}
             );
+
             this.staking = await DeltaTimeStaking.new(
                 CycleLengthInSeconds,
                 PeriodLengthInCycles,
@@ -174,6 +200,7 @@ describe('DeltaTimeStaking', function () {
                 toWei(REVVEscrowingWeightCoefficient),
                 {from: deployer}
             );
+
             await this.revv.whitelistOperator(this.staking.address, true, {from: deployer});
             await this.staking.start({from: deployer});
         });
@@ -181,9 +208,14 @@ describe('DeltaTimeStaking', function () {
         describe('staking', function () {
             // it('should execute single stake and escrow REVV', async function () {
 
-            //     console.log("=========================");
-            //     console.log(revvEscrowValues[0]);
-            //     console.log("=========================");
+
+            //     console.log("############################### AFTER ");
+            //     const stakerBalance2 = await this.revv.balanceOf(staker);
+            //     console.log(staker);
+            //     console.log("stakerBalance revv: " + stakerBalance2.toString());
+            //     console.log("revvForEscrowing: " + revvForEscrowing.toString());
+            //     console.log("revvEscrowValues[0]: " + revvEscrowValues[0].toString());
+            //     console.log("###############################");
 
             //     await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
             //         staker,
@@ -195,7 +227,27 @@ describe('DeltaTimeStaking', function () {
             //             from: staker,
             //         }
             //     );
+                
+            //     console.log("###############################");
+            //     console.log("tokenIds[0]:  " + tokenIds[0]);
+
+            //     const stakerBalance = await this.revv.balanceOf(staker);
             //     const contractBalance = await this.revv.balanceOf(this.staking.address);
+
+            //     console.log("stakerBalance revv:  " + stakerBalance.toString());
+            //     console.log("contractBalance revv: " + contractBalance.toString());
+
+            //     const assetBalance = await this.inventory.balanceOf(staker);
+            //     console.log("assetBalance: " + assetBalance.toString());
+
+            //     console.log("###############################");
+
+            //     // console.log("###############################");
+            //     // console.log(contractBalance.toString());
+            //     // console.log("=========================");
+            //     // console.log(revvEscrowValues[0].toString());
+            //     // console.log("###############################");
+
             //     contractBalance.should.be.bignumber.equal(revvEscrowValues[0]);
             // });
 
