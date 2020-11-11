@@ -85,37 +85,67 @@ const revvForEscrowing = revvEscrowValues
     .reduce((prev, curr) => prev.add(curr), new BN(0));
 
 describe('DeltaTimeStaking', function () {
-    // describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
-    //     beforeEach(async function () {
-    //         this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
-    //     });
-    //     it('should revert with a zero weight coefficient', async function () {
-    //         await expectRevert(
-    //             DeltaTimeStaking.new(
-    //                 CycleLengthInSeconds,
-    //                 PeriodLengthInCycles,
-    //                 this.revv.address,
-    //                 this.revv.address,
-    //                 RarityWeights.map((x) => x.rarity),
-    //                 RarityWeights.map((x) => x.weight),
-    //                 Zero,
-    //                 {from: deployer}
-    //             ),
-    //             'NftStaking: invalid coefficient'
-    //         );
-    //     });
-    //     it('should deploy with correct parameters', async function () {
-    //         await DeltaTimeStaking.new(
-    //             CycleLengthInSeconds,
-    //             PeriodLengthInCycles,
-    //             this.revv.address,
-    //             this.revv.address,
-    //             RarityWeights.map((x) => x.rarity),
-    //             RarityWeights.map((x) => x.weight),
-    //             revvForEscrowing,
-    //             {from: deployer});
-    //     });
-    // });
+    describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
+        beforeEach(async function () {
+            this.revv = await REVV.new([deployer], [revvForEscrowing], {from: deployer});
+        });
+        it('should revert with a zero weight coefficient', async function () {
+            await expectRevert(
+                DeltaTimeStaking.new(
+                    CycleLengthInSeconds,
+                    PeriodLengthInCycles,
+                    this.revv.address,
+                    this.revv.address,
+                    RarityWeights.map((x) => x.rarity),
+                    RarityWeights.map((x) => x.weight),
+                    Zero,
+                    {from: deployer}
+                ),
+                'NftStaking: invalid coefficient'
+            );
+        });
+        it('should revert with a different size of rarities and weights', async function () {
+            await expectRevert(
+                DeltaTimeStaking.new(
+                    CycleLengthInSeconds,
+                    PeriodLengthInCycles,
+                    this.revv.address,
+                    this.revv.address,
+                    RarityWeights.map((x) => x.rarity),
+                    [1, 2, 3],
+                    revvForEscrowing,
+                    {from: deployer}
+                ),
+                'NftStaking: wrong arguments'
+            );
+        });
+        it('should revert with a zero item into weights', async function () {
+            await expectRevert(
+                DeltaTimeStaking.new(
+                    CycleLengthInSeconds,
+                    PeriodLengthInCycles,
+                    this.revv.address,
+                    this.revv.address,
+                    RarityWeights.map((x) => x.rarity),
+                    RarityWeights.map((x) => 0),
+                    revvForEscrowing,
+                    {from: deployer}
+                ),
+                'NftStaking: invalid weight value'
+            );
+        });
+        it('should deploy with correct parameters', async function () {
+            await DeltaTimeStaking.new(
+                CycleLengthInSeconds,
+                PeriodLengthInCycles,
+                this.revv.address,
+                this.revv.address,
+                RarityWeights.map((x) => x.rarity),
+                RarityWeights.map((x) => x.weight),
+                revvForEscrowing,
+                {from: deployer});
+        });
+    });
 
     describe('escrowing', function () {
         beforeEach(async function () {
@@ -149,25 +179,25 @@ describe('DeltaTimeStaking', function () {
         });
 
         describe('staking', function () {
-            it('should execute single stake and escrow REVV', async function () {
+            // it('should execute single stake and escrow REVV', async function () {
 
-                console.log("=========================");
-                console.log(revvEscrowValues[0]);
-                console.log("=========================");
+            //     console.log("=========================");
+            //     console.log(revvEscrowValues[0]);
+            //     console.log("=========================");
 
-                await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
-                    staker,
-                    this.staking.address,
-                    tokenIds[0],
-                    1,
-                    '0x0',
-                    {
-                        from: staker,
-                    }
-                );
-                const contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(revvEscrowValues[0]);
-            });
+            //     await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+            //         staker,
+            //         this.staking.address,
+            //         tokenIds[0],
+            //         1,
+            //         '0x0',
+            //         {
+            //             from: staker,
+            //         }
+            //     );
+            //     const contractBalance = await this.revv.balanceOf(this.staking.address);
+            //     contractBalance.should.be.bignumber.equal(revvEscrowValues[0]);
+            // });
 
             // it('should execute batch stake and escrow REVV', async function () {
             //     await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](

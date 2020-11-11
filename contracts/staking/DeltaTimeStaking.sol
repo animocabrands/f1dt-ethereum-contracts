@@ -47,12 +47,11 @@ contract DeltaTimeStaking is NftStakingV2 {
         require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: invalid coefficient");
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
 
-        //TODO Check how to apply escrow (only in events below?)
-        revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
-
         for (uint256 i = 0; i < rarities.length; ++i) {
+            require(weights[i] != 0, "NftStaking: invalid weight value");
             weightsByRarity[rarities[i]] = weights[i];
         }
+        revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
     }
 
     /**
