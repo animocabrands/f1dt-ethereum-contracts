@@ -361,8 +361,6 @@ describe('DeltaTimeStaking', function () {
         });
         describe('unstaking', function () {
 
-            //TODO check minting..
-
             it('should execute single unstake and unescrow REVV', async function () {
                 await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     staker,
@@ -375,9 +373,13 @@ describe('DeltaTimeStaking', function () {
                     }
                 );
                 time.increase(CycleLengthInSeconds.mul(Two));
-                await this.staking.unstakeNft(tokens[0].id, {from: staker});
+
+                let contractBalance = await this.revv.balanceOf(this.staking.address);
+                contractBalance.should.be.bignumber.equal(tokens[0].escrow);
                 
-                const contractBalance = await this.revv.balanceOf(this.staking.address);
+                await this.staking.unstakeNft(tokens[0].id, {from: staker});
+                contractBalance = await this.revv.balanceOf(this.staking.address);
+                
                 contractBalance.should.be.bignumber.equal(Zero);
 
                 const stakerBalance = await this.revv.balanceOf(staker);
@@ -398,9 +400,14 @@ describe('DeltaTimeStaking', function () {
                     }
                 );
                 time.increase(CycleLengthInSeconds.mul(Two));
+                
+                let contractBalance = await this.revv.balanceOf(this.staking.address);
+                contractBalance.should.be.bignumber.equal(
+                    params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0)));
+                
                 await this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker});
                 
-                const contractBalance = await this.revv.balanceOf(this.staking.address);
+                contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(Zero);
 
                 const stakerBalance = await this.revv.balanceOf(staker);
