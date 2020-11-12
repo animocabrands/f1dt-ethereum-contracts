@@ -4,8 +4,6 @@ const {ether, expectEvent, expectRevert, time} = require('@openzeppelin/test-hel
 const {BN, toAscii, toWei, fromWei} = require('web3-utils');
 const {
     ZeroAddress,
-    // EthAddress,
-    EmptyByte,
     Zero,
     One,
     Two,
@@ -52,24 +50,40 @@ const drivers = [
     {rarity: '8', type: 'Driver', season: '2019', model: 'Jet', counter: '6'},
 ];
 
+const tyres = [
+    {rarity: '0', type: 'Gear', subType: 'Suit', season: '2019', team: 'None', counter: '1'},
+    {rarity: '1', type: 'Gear', subType: 'Suit', season: '2019', team: 'None', counter: '2'},
+];
+
 const tokens = cars
-        .concat(drivers)
-        .map(token => {
-            token.id = createTokenId(token, true);
+    .concat(drivers)
+    .map(token => {
+        token.id = createTokenId(token, true);
 
-            const rarity = token.type === 'Car' ? (WeightsByRarity[token.rarity] * 2) : WeightsByRarity[token.rarity];
-            token.weight = new BN(rarity);
-            token.escrow = toWei(token.weight.mul(REVVEscrowingWeightCoefficient));
-            return token;
-        });
+        const weight = token.type === 'Car' ? (WeightsByRarity[token.rarity] * 2) : WeightsByRarity[token.rarity];
+        token.weight = new BN(weight);
+        token.escrow = toWei(token.weight.mul(REVVEscrowingWeightCoefficient));
+        return token;
+    });
 
-// console.log("=====================================");
-// console.log(tokens);
-// console.log("=====================================");
+const invalidTokens = tyres
+    .map(token => {
+        token.id = createTokenId(token, true);
+        token.weight = new BN(WeightsByRarity[token.rarity]);
+        token.escrow = toWei(token.weight.mul(REVVEscrowingWeightCoefficient));
+        return token;
+    });
 
-const revvForEscrowing = tokens.map(token => token.escrow)
-    //.slice(0, -1) // not enough to stake the last car
+const revvForEscrowing = tokens
+    .map(token => token.escrow)
+    .slice(0, 3) // not enough to stake the last item
     .reduce((prev, curr) => prev.add(curr), new BN(0));
+
+// console.log("========================================");
+// console.log(tokens);
+// console.log("========================================");
+// console.log(invalidTokens);
+// console.log("========================================");
 
 describe('DeltaTimeStaking', function () {
     describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
@@ -270,26 +284,67 @@ describe('DeltaTimeStaking', function () {
                 
                 contractBalance.should.be.bignumber.equal(revvEscrowValues);
             });
+            
+            // TODO Check events(*address) for success operation - should being emitted from 
+            //             expectEvent.inTransaction(
+            //                 receipt.tx,
 
             // TODO - Not reverting
 
-            // it('should fail if not enough REVV to escrow', async function () {
-            //     await expectRevert(
-            //         this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
-            //             staker,
-            //             this.staking.address,
-            //             tokens.map(token => token.id),
-            //             tokens.map(() => 1),
-            //             '0x0',
-            //             {
-            //                 from: staker,
-            //             }
-            //         ),
-            //         'ERC20: transfer amount exceeds balance'
-            //     );
-            // });
+            it('should fail if not enough REVV to escrow', async function () {
+                await expectRevert(
+                    this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+                        staker,
+                        this.staking.address,
+                        tokens.map(token => token.id),
+                        tokens.map(() => 1),
+                        '0x0',
+                        {
+                            from: staker,
+                        }
+                    ),
+                    'ERC20: transfer amount exceeds balance'
+                );
+            });
+
+            it('should fail due to invalid token type', async function () {
+                await expectRevert(
+                    this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+                        staker,
+                        this.staking.address,
+                        invalidTokens[0].id,
+                        1,
+                        '0x0',
+                        {
+                            from: staker,
+                        }
+                    ), 
+                    'revert'
+                    //'NftStaking: wrong token'
+                );
+            });
+
+            it('should fail to execute batch due to invalid token type', async function () {
+                await expectRevert(
+                    this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+                        staker,
+                        this.staking.address,
+                        invalidTokens.map(token => token.id),
+                        invalidTokens.map(() => 1),
+                        '0x0',
+                        {
+                            from: staker,
+                        }
+                    ), 
+                    'revert'
+                    //'NftStaking: wrong token'
+                );
+            });
         });
         describe('unstaking', function () {
+
+            //TODO check minting..
+
             it('should execute single unstake and unescrow REVV', async function () {
                 await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     staker,
