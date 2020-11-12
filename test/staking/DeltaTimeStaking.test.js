@@ -79,12 +79,6 @@ const revvForEscrowing = tokens
     .slice(0, 3) // not enough to stake the last item
     .reduce((prev, curr) => prev.add(curr), new BN(0));
 
-// console.log("========================================");
-// console.log(tokens);
-// console.log("========================================");
-// console.log(invalidTokens);
-// console.log("========================================");
-
 describe('DeltaTimeStaking', function () {
     describe('constructor(CycleLengthInSeconds, PeriodLengthInCycles, inventoryContract, revvContract, weights, rarities, revvEscrowingWeightCoefficient)', function () {
         beforeEach(async function () {
@@ -285,11 +279,35 @@ describe('DeltaTimeStaking', function () {
                 contractBalance.should.be.bignumber.equal(revvEscrowValues);
             });
             
-            // TODO Check events(*address) for success operation - should being emitted from 
-            //             expectEvent.inTransaction(
-            //                 receipt.tx,
+            it('should execute single stake and check for emitted events', async function () {
+                    const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+                        staker,
+                        this.staking.address,
+                        tokens[0].id,
+                        1,
+                        '0x0',
+                        {
+                            from: staker,
+                        }
+                    );
 
-            // TODO - Not reverting
+                    // console.log("========================================");
+                    // console.log(receipt);
+                    // console.log("========================================");
+
+                    expectEvent(receipt, 'Transfer');
+
+                    expectEvent.inTransaction(
+                        receipt.tx,
+                        this.inventory,
+                        'TransferSingle', {
+                            _from: staker,
+                            _to: this.staking.address,
+                            _id: tokens[0].id,
+                            _value: '1'
+                        }
+                    );
+            });
 
             it('should fail if not enough REVV to escrow', async function () {
                 await expectRevert(
@@ -320,7 +338,7 @@ describe('DeltaTimeStaking', function () {
                         }
                     ), 
                     'revert'
-                    //'NftStaking: wrong token'
+                    //'NftStaking: wrong token'  - TODO <<
                 );
             });
 
@@ -337,7 +355,7 @@ describe('DeltaTimeStaking', function () {
                         }
                     ), 
                     'revert'
-                    //'NftStaking: wrong token'
+                    //'NftStaking: wrong token' - TODO <<
                 );
             });
         });
