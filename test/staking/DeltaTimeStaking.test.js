@@ -133,6 +133,22 @@ describe('DeltaTimeStaking', function () {
                 'NftStaking: invalid weight value'
             );
         });
+        it('should revert with a weight value out of the allowed range', async function () {
+            //Max weight value allowed: uint64 / 2 -> 9223372036854775807
+            await expectRevert(
+                DeltaTimeStaking.new(
+                    CycleLengthInSeconds,
+                    PeriodLengthInCycles,
+                    this.inventory.address,
+                    this.revv.address,
+                    [1],
+                    ["9223372036854775808"], 
+                    revvForEscrowing,
+                    {from: deployer}
+                ),
+                'NftStaking: invalid weight value'
+            );
+        });
         it('should deploy with correct parameters', async function () {
             await DeltaTimeStaking.new(
                 CycleLengthInSeconds,
@@ -145,7 +161,6 @@ describe('DeltaTimeStaking', function () {
                 {from: deployer});
         });
     });
-
     describe('escrowing', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
@@ -156,23 +171,11 @@ describe('DeltaTimeStaking', function () {
 
             this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
 
-            // ========================================================================
-            // console.log("===================== BEFORE =====================");
-            // console.log("[ Staker ]");
-            // console.log("address: " + staker);
-            // const stakerBalanceBefore = await this.revv.balanceOf(staker);
-            // console.log("balance revv: " + stakerBalanceBefore.toString());
-
-            // console.log("[ Escrow Param ]");
-            // console.log("revvForEscrowing: " + revvForEscrowing.toString());
-            // console.log(" ");
-            // ========================================================================
-
             await this.inventory.batchMint(
-                tokens.map(() => staker),
-                tokens.map(token => token.id),
-                tokens.map(() => ZeroBytes32),
-                tokens.map(() => 1),
+                invalidTokens.concat(tokens).map(() => staker),
+                invalidTokens.concat(tokens).map(token => token.id),
+                invalidTokens.concat(tokens).map(() => ZeroBytes32),
+                invalidTokens.concat(tokens).map(() => 1),
                 true,
                 {from: deployer}
             );
@@ -190,29 +193,6 @@ describe('DeltaTimeStaking', function () {
 
             await this.revv.whitelistOperator(this.staking.address, true, {from: deployer});
             await this.staking.start({from: deployer});
-
-            // ========================================================================
-            // console.log("===================== AFTER =====================");
-            // console.log("[ Staker ]");
-            // console.log("address: " + staker);
-            // const stakerBalanceAfter = await this.revv.balanceOf(staker);
-            // console.log("balance revv: " + stakerBalanceAfter.toString());
-
-            // console.log("[ DeltaTimeStaking ]");
-            // const contractBalanceAfter = await this.revv.balanceOf(this.staking.address);
-            // console.log("balance revv: " + contractBalanceAfter.toString());
-
-            // console.log("[ DeltaTimeInventory ]");
-            // const assetBalanceStakerAfter = await this.inventory.balanceOf(staker);
-            // console.log("assetBalance staker: " + assetBalanceStakerAfter.toString());
-
-            // const assetBalanceStakingAfter = await this.inventory.balanceOf(this.staking.address);
-            // console.log("assetBalance staking: " + assetBalanceStakingAfter.toString());
-
-            // console.log("[ Escrow Param ]");
-            // console.log("revvForEscrowing: " + revvForEscrowing.toString());
-            // console.log(" ");
-            // ========================================================================
         });
 
         describe('staking', function () {
@@ -228,33 +208,6 @@ describe('DeltaTimeStaking', function () {
                         from: staker,
                     }
                 );
-
-                // ========================================================================
-                // console.log("===================== AFTER STAKING =====================");
-                // console.log("[ Staker ]");
-                // console.log("address: " + staker);
-                // const stakerBalanceAfter = await this.revv.balanceOf(staker);
-                // console.log("balance revv: " + stakerBalanceAfter.toString());
-
-                // console.log("[ DeltaTimeStaking ]");
-                // const contractBalanceAfter = await this.revv.balanceOf(this.staking.address);
-                // console.log("balance revv: " + contractBalanceAfter.toString());
-
-                // console.log("[ DeltaTimeInventory ]");
-                // const assetBalanceStakerAfter = await this.inventory.balanceOf(staker);
-                // console.log("assetBalance staker: " + assetBalanceStakerAfter.toString());
-
-                // const assetBalanceStakingAfter = await this.inventory.balanceOf(this.staking.address);
-                // console.log("assetBalance staking: " + assetBalanceStakingAfter.toString());
-
-                // console.log("[ Escrow Param ]");
-                // console.log("revvForEscrowing: " + revvForEscrowing.toString());
-
-                // console.log("[ Token Param ]");
-                // console.log("revvEscrowValuesCheck: " + tokens[0].escrow);
-
-                // console.log(" ");
-                // ========================================================================
 
                 const contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(tokens[0].escrow);
@@ -295,11 +248,18 @@ describe('DeltaTimeStaking', function () {
                     // console.log(receipt);
                     // console.log("========================================");
 
-                    expectEvent(receipt, 'Transfer');
+                    // expectEvent.inTransaction(
+                    //     receipt.tx,
+                    //     this.revv,
+                    //     'Transfer', {
+                    //         _from: staker,
+                    //         _to: this.staking.address,
+                    //         _amount: TODO ...
+                    //     }
+                    // );
 
-                    expectEvent.inTransaction(
-                        receipt.tx,
-                        this.inventory,
+                    expectEvent(
+                        receipt,
                         'TransferSingle', {
                             _from: staker,
                             _to: this.staking.address,
@@ -337,8 +297,7 @@ describe('DeltaTimeStaking', function () {
                             from: staker,
                         }
                     ), 
-                    'revert'
-                    //'NftStaking: wrong token'  - TODO <<
+                    'NftStaking: wrong token'
                 );
             });
 
@@ -354,8 +313,7 @@ describe('DeltaTimeStaking', function () {
                             from: staker,
                         }
                     ), 
-                    'revert'
-                    //'NftStaking: wrong token' - TODO <<
+                    'NftStaking: wrong token'
                 );
             });
         });

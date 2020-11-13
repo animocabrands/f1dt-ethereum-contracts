@@ -48,8 +48,9 @@ contract DeltaTimeStaking is NftStakingV2 {
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
 
         for (uint256 i = 0; i < rarities.length; ++i) {
-            require(weights[i] > 0 && weights[i] < ~uint64(0), "NftStaking: invalid weight value");
-            weightsByRarity[rarities[i]] = weights[i];
+            uint64 weight = weights[i];
+            require(weight > 0 && (weight <= (type(uint64).max >> 1)) , "NftStaking: invalid weight value");
+            weightsByRarity[rarities[i]] = weight;
         }
         revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
     }
@@ -76,9 +77,8 @@ contract DeltaTimeStaking is NftStakingV2 {
 
         // Drivers(2) will be normal weight as defined in the mapping, for Cars(1) it will be double
         if (tokenType == 1) {
-            //This is safe because it was previously checked in constructor
-            //return weightsByRarity[tokenRarity] * 2;
-            return uint256(weightsByRarity[tokenRarity]).mul(2).toUint64();
+            //Safe calculation because the weight range was checked on constructor
+            return weightsByRarity[tokenRarity] * 2;
         }
         return weightsByRarity[tokenRarity];
     }
