@@ -161,6 +161,7 @@ describe('DeltaTimeStaking', function () {
                 {from: deployer});
         });
     });
+
     describe('escrowing', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
@@ -216,7 +217,7 @@ describe('DeltaTimeStaking', function () {
             it('should execute batch stake and escrow REVV', async function () {
                 const params = [tokens[0], tokens[1], tokens[3]];
 
-                await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+                const receipt = await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
                     staker,
                     this.staking.address,
                     params.map(token => token.id),
@@ -226,12 +227,29 @@ describe('DeltaTimeStaking', function () {
                         from: staker,
                     }
                 );
+
                 const contractBalance = await this.revv.balanceOf(this.staking.address);
                 const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
-                
                 contractBalance.should.be.bignumber.equal(revvEscrowValues);
+
+                // console.log("==================================");    
+                // console.log(receipt);
+                // console.log("==================================");
+
+                // Event not available on this TX using this ABI
+
+                // await expectEvent.inTransaction(
+                //     receipt.tx,
+                //     this.revv,
+                //     'Transfer', 
+                //     {
+                //         _from: staker,
+                //         _to: this.staking.address,
+                //         _value: tokens[0].escrow
+                //     }
+                // );
             });
-            
+
             it('should execute single stake and check for emitted events', async function () {
                     const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                         staker,
@@ -244,23 +262,28 @@ describe('DeltaTimeStaking', function () {
                         }
                     );
 
-                    // console.log("========================================");
+                    // console.log("==================================");    
                     // console.log(receipt);
-                    // console.log("========================================");
+                    // console.log("==================================");
 
-                    // expectEvent.inTransaction(
-                    //     receipt.tx,
-                    //     this.revv,
-                    //     'Transfer', {
-                    //         _from: staker,
-                    //         _to: this.staking.address,
-                    //         _amount: TODO ...
-                    //     }
-                    // );
+                    //safeTransferFrom -> _transferFrom (AssetInventory) -> emit Transfer / TransferSingle
+                    //emit Transfer(from, to, tokenId);
+                    //emit TransferSingle(sender, from, to, tokenId, 1);
 
-                    expectEvent(
+                    await expectEvent(
                         receipt,
-                        'TransferSingle', {
+                        'Transfer', 
+                        {
+                            _from: staker,
+                            _to: this.staking.address,
+                            _tokenId: tokens[0].id
+                        }
+                    );
+
+                    await expectEvent(
+                        receipt,
+                        'TransferSingle', 
+                        {
                             _from: staker,
                             _to: this.staking.address,
                             _id: tokens[0].id,
