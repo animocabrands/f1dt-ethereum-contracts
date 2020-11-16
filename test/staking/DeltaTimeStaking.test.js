@@ -76,7 +76,7 @@ const invalidTokens = tyres
 
 const revvForEscrowing = tokens
     .map(token => token.escrow)
-    .slice(0, 3) // not enough to stake the last item
+    .slice(0, 3) // Reducing the array in order to avoid having enough balance to stake all tokens
     .reduce((prev, curr) => prev.add(curr), new BN(0));
 
 describe('DeltaTimeStaking', function () {
@@ -166,17 +166,16 @@ describe('DeltaTimeStaking', function () {
         beforeEach(async function () {
             this.revv = await REVV.new([staker], [revvForEscrowing], {from: deployer});
             this.bytes = await Bytes.new({from: deployer});
-
             DeltaTimeInventory.network_id = 1337;
             await DeltaTimeInventory.link('Bytes', this.bytes.address);
-
             this.inventory = await DeltaTimeInventory.new(this.revv.address, ZeroAddress, {from: deployer});
 
+            const allTokens = invalidTokens.concat(tokens);
             await this.inventory.batchMint(
-                invalidTokens.concat(tokens).map(() => staker),
-                invalidTokens.concat(tokens).map(token => token.id),
-                invalidTokens.concat(tokens).map(() => ZeroBytes32),
-                invalidTokens.concat(tokens).map(() => 1),
+                allTokens.map(() => staker),
+                allTokens.map(token => token.id),
+                allTokens.map(() => ZeroBytes32),
+                allTokens.map(() => 1),
                 true,
                 {from: deployer}
             );
@@ -198,7 +197,6 @@ describe('DeltaTimeStaking', function () {
 
         describe('staking', function () {
             it('should execute single stake and escrow REVV', async function () {
-
                 await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     staker,
                     this.staking.address,
@@ -217,7 +215,7 @@ describe('DeltaTimeStaking', function () {
             it('should execute batch stake and escrow REVV', async function () {
                 const params = [tokens[0], tokens[1], tokens[3]];
 
-                const receipt = await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+                await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
                     staker,
                     this.staking.address,
                     params.map(token => token.id),
@@ -231,65 +229,6 @@ describe('DeltaTimeStaking', function () {
                 const contractBalance = await this.revv.balanceOf(this.staking.address);
                 const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
                 contractBalance.should.be.bignumber.equal(revvEscrowValues);
-
-                // console.log("==================================");    
-                // console.log(receipt);
-                // console.log("==================================");
-
-                // Event not available on this TX using this ABI
-
-                // await expectEvent.inTransaction(
-                //     receipt.tx,
-                //     this.revv,
-                //     'Transfer', 
-                //     {
-                //         _from: staker,
-                //         _to: this.staking.address,
-                //         _value: tokens[0].escrow
-                //     }
-                // );
-            });
-
-            it('should execute single stake and check for emitted events', async function () {
-                    const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
-                        staker,
-                        this.staking.address,
-                        tokens[0].id,
-                        1,
-                        '0x0',
-                        {
-                            from: staker,
-                        }
-                    );
-
-                    // console.log("==================================");    
-                    // console.log(receipt);
-                    // console.log("==================================");
-
-                    //safeTransferFrom -> _transferFrom (AssetInventory) -> emit Transfer / TransferSingle
-                    //emit Transfer(from, to, tokenId);
-                    //emit TransferSingle(sender, from, to, tokenId, 1);
-
-                    await expectEvent(
-                        receipt,
-                        'Transfer', 
-                        {
-                            _from: staker,
-                            _to: this.staking.address,
-                            _tokenId: tokens[0].id
-                        }
-                    );
-
-                    await expectEvent(
-                        receipt,
-                        'TransferSingle', 
-                        {
-                            _from: staker,
-                            _to: this.staking.address,
-                            _id: tokens[0].id,
-                            _value: '1'
-                        }
-                    );
             });
 
             it('should fail if not enough REVV to escrow', async function () {
@@ -340,8 +279,8 @@ describe('DeltaTimeStaking', function () {
                 );
             });
         });
-        describe('unstaking', function () {
 
+        describe('unstaking', function () {
             it('should execute single unstake and unescrow REVV', async function () {
                 await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     staker,
@@ -357,14 +296,20 @@ describe('DeltaTimeStaking', function () {
 
                 let contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(tokens[0].escrow);
-                
+
                 await this.staking.unstakeNft(tokens[0].id, {from: staker});
                 contractBalance = await this.revv.balanceOf(this.staking.address);
-                
                 contractBalance.should.be.bignumber.equal(Zero);
 
                 const stakerBalance = await this.revv.balanceOf(staker);
                 stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+            });
+
+            it('should fail due to lack of proper stake in place', async function () {
+                await expectRevert(
+                        this.staking.unstakeNft(tokens[0].id, {from: staker}),
+                        'NftStaking: not staked for owner'
+                    );
             });
 
             it('should execute batch unstake and unescrow REVV', async function () {
@@ -383,8 +328,8 @@ describe('DeltaTimeStaking', function () {
                 time.increase(CycleLengthInSeconds.mul(Two));
                 
                 let contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(
-                    params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0)));
+                const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
+                contractBalance.should.be.bignumber.equal(revvEscrowValues);
                 
                 await this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker});
                 
@@ -393,6 +338,15 @@ describe('DeltaTimeStaking', function () {
 
                 const stakerBalance = await this.revv.balanceOf(staker);
                 stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+            });
+
+            it('should fail to execute batch due to lack of proper stake in place', async function () {
+                const params = [tokens[0], tokens[1], tokens[3]];
+
+                await expectRevert(
+                        this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker}),
+                        'NftStaking: not staked for owner'
+                    );
             });
         });
     });
