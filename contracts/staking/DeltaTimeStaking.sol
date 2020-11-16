@@ -17,8 +17,9 @@ contract DeltaTimeStaking is NftStakingV2 {
 
     /**
      * Constructor.
-     * @dev Reverts `rarities` and `weights` have different lengths.
+     * @dev Reverts if `rarities` and `weights` have different lengths.
      * @dev Reverts if `revvEscrowingWeightCoefficient_` is zero.
+     * @dev Reverts if `weights` contains at least one item that value is higher than half uint64
      * @param cycleLengthInSeconds_ The length of a cycle, in seconds.
      * @param periodLengthInCycles_ The length of a period, in cycles.
      * @param inventoryContract IERC1155721Transferrable the DeltaTimeInventory contract.
@@ -47,9 +48,11 @@ contract DeltaTimeStaking is NftStakingV2 {
         require(revvEscrowingWeightCoefficient_ != 0, "NftStaking: invalid coefficient");
         require(rarities.length == weights.length, "NftStaking: wrong arguments");
 
+        // Max value will be a half of uint64 due to the condition that it can be multiplied by 2 according to token type
+        uint64 weightMaxValue = type(uint64).max >> 1;
         for (uint256 i = 0; i < rarities.length; ++i) {
             uint64 weight = weights[i];
-            require(weight > 0 && (weight <= (type(uint64).max >> 1)) , "NftStaking: invalid weight value");
+            require(weight > 0 && weight <= weightMaxValue, "NftStaking: invalid weight value");
             weightsByRarity[rarities[i]] = weight;
         }
         revvEscrowingWeightCoefficient = revvEscrowingWeightCoefficient_;
@@ -57,7 +60,7 @@ contract DeltaTimeStaking is NftStakingV2 {
 
     /**
      * Verifies that the token is eligible and returns its associated weight.
-     * @dev Reverts if the token is not a 2019 Car NFT.
+     * @dev Reverts if the token is not a 2019 Car or Driver NFT.
      * @param nftId uint256 token identifier of the NFT.
      * @return uint64 the weight of the NFT.
      */
@@ -75,16 +78,17 @@ contract DeltaTimeStaking is NftStakingV2 {
         // Rarities: https://github.com/animocabrands/f1dt-core_metadata/blob/version-1.0.3/src/mappings/CommonAttributes/Rarity/Rarities.js
         require(nonFungible == 1 && (tokenType == 1 || tokenType == 2) && tokenSeason == 2, "NftStaking: wrong token");
 
-        // Drivers(2) will be normal weight as defined in the mapping, for Cars(1) it will be double
+        // Drivers(2) will have a regular weight as defined in the mapping, but for Cars(1) it will be the double
         if (tokenType == 1) {
-            //Safe calculation because the weight range was checked on constructor
+            //Safe calculation due to the validation done on the constructor
             return weightsByRarity[tokenRarity] * 2;
         }
         return weightsByRarity[tokenRarity];
     }
 
     /**
-     * Hook called on NFT(s) staking.
+     * Staking REVV tokens according to the total token weight multiplied by weight coefficient
+     * Hook called on NFT(s) staking
      * @dev Reverts if the REVV escrow transfer fails.
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the staked NFT(s).
@@ -97,7 +101,8 @@ contract DeltaTimeStaking is NftStakingV2 {
     }
 
     /**
-     * Hook called on NFT(s) unstaking.
+     * Returns REVV tokens to the staker
+     * Hook called on NFT(s) unstaking 
      * @dev Reverts if the REVV transfer fails.
      * @param owner uint256 the NFT(s) owner.
      * @param totalWeight uint256 the total weight of the unstaked NFT(s).
