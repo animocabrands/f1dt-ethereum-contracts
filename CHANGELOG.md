@@ -2,7 +2,7 @@
 
 ## 1.0.0
  * Updated to `@animoca/ethereum-contracts-nft_staking:4.0.0`.
- * New version of `NftStakingV2` used as a parent for `DeltaTimeStaking` that requires escrow for cars and drivers tokens.
+ * New version of `NftStakingV2` used as a parent for `DeltaTimeStaking` that requires escrow of REVV. Drivers become stakeable with a weight half on the cars weight
 
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
