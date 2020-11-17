@@ -19,7 +19,7 @@ contract DeltaTimeStaking is NftStakingV2 {
      * Constructor.
      * @dev Reverts if `rarities` and `weights` have different lengths.
      * @dev Reverts if `revvEscrowingWeightCoefficient_` is zero.
-     * @dev Reverts if `weights` contains at least one item that value is higher than half uint64
+     * @dev Reverts if `weights` contains at least one item that value is either zero or higher than half uint64
      * @param cycleLengthInSeconds_ The length of a cycle, in seconds.
      * @param periodLengthInCycles_ The length of a period, in cycles.
      * @param inventoryContract IERC1155721Transferrable the DeltaTimeInventory contract.
