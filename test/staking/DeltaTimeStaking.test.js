@@ -218,7 +218,7 @@ describe('DeltaTimeStaking', function () {
             it('should execute batch stake and escrow REVV', async function () {
                 const params = [tokens[0], tokens[1], tokens[3]];
 
-                await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
+                const receipt = await this.inventory.methods['safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)'](
                     staker,
                     this.staking.address,
                     params.map(token => token.id),
@@ -229,9 +229,12 @@ describe('DeltaTimeStaking', function () {
                     }
                 );
 
-                const contractBalance = await this.revv.balanceOf(this.staking.address);
                 const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
-                contractBalance.should.be.bignumber.equal(revvEscrowValues);
+                await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
+                    _from: staker,
+                    _to: this.staking.address,
+                    _value: revvEscrowValues,
+                });
             });
 
             it('should fail if not enough REVV to escrow', async function () {
@@ -300,12 +303,16 @@ describe('DeltaTimeStaking', function () {
                 let contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(tokens[0].escrow);
 
-                await this.staking.unstakeNft(tokens[0].id, {from: staker});
+                const receipt = await this.staking.unstakeNft(tokens[0].id, {from: staker});
+                
                 contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(Zero);
 
-                const stakerBalance = await this.revv.balanceOf(staker);
-                stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+                await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
+                    _from: this.staking.address,
+                    _to: staker,
+                    _value: tokens[0].escrow,
+                });
             });
 
             it('should fail due to lack of proper stake in place', async function () {
@@ -334,13 +341,16 @@ describe('DeltaTimeStaking', function () {
                 const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
                 contractBalance.should.be.bignumber.equal(revvEscrowValues);
                 
-                await this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker});
+                const receipt = await this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker});
                 
                 contractBalance = await this.revv.balanceOf(this.staking.address);
                 contractBalance.should.be.bignumber.equal(Zero);
 
-                const stakerBalance = await this.revv.balanceOf(staker);
-                stakerBalance.should.be.bignumber.equal(revvForEscrowing); // full balance
+                await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
+                    _from: this.staking.address,
+                    _to: staker,
+                    _value: revvEscrowValues,
+                });
             });
 
             it('should fail to execute batch due to lack of proper stake in place', async function () {
