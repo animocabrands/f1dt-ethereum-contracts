@@ -300,13 +300,7 @@ describe('DeltaTimeStaking', function () {
                 );
                 time.increase(CycleLengthInSeconds.mul(Two));
 
-                let contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(tokens[0].escrow);
-
                 const receipt = await this.staking.unstakeNft(tokens[0].id, {from: staker});
-                
-                contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(Zero);
 
                 await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
                     _from: this.staking.address,
@@ -337,15 +331,9 @@ describe('DeltaTimeStaking', function () {
                 );
                 time.increase(CycleLengthInSeconds.mul(Two));
                 
-                let contractBalance = await this.revv.balanceOf(this.staking.address);
-                const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
-                contractBalance.should.be.bignumber.equal(revvEscrowValues);
-                
                 const receipt = await this.staking.batchUnstakeNfts(params.map(token => token.id), {from: staker});
                 
-                contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(Zero);
-
+                const revvEscrowValues = params.map(token => token.escrow).reduce((prev, cur) => prev.add(cur), new BN(0));
                 await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
                     _from: this.staking.address,
                     _to: staker,
