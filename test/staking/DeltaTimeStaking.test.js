@@ -197,7 +197,7 @@ describe('DeltaTimeStaking', function () {
 
         describe('staking', function () {
             it('should execute single stake and escrow REVV', async function () {
-                await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
+                const receipt = await this.inventory.methods['safeTransferFrom(address,address,uint256,uint256,bytes)'](
                     staker,
                     this.staking.address,
                     tokens[0].id,
@@ -208,8 +208,11 @@ describe('DeltaTimeStaking', function () {
                     }
                 );
 
-                const contractBalance = await this.revv.balanceOf(this.staking.address);
-                contractBalance.should.be.bignumber.equal(tokens[0].escrow);
+                await expectEvent.inTransaction(receipt.tx, this.revv, 'Transfer', {
+                    _from: staker,
+                    _to: this.staking.address,
+                    _value: tokens[0].escrow,
+                });
             });
 
             it('should execute batch stake and escrow REVV', async function () {
