@@ -18,8 +18,7 @@ interface IERC20Transfers {
 /**
  * @title PrePayContract.
  * Contract which manages the deposits made by wallets for pre sale
- * Participants are allowed to deposit REVV into the contract during the deposit period
- * is given back to the participant when they leave the tier.
+ * Participants are allowed to make deopsits and withdraw before sale starts
  */
 contract PrePaid is Context, Pausable, WhitelistedOperators {
     using SafeMath for uint256;
@@ -44,6 +43,16 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     event OnWithdrawRevenue(address wallet, uint256 amount);
 
+    /**
+     * Event emitted on sale start
+     */
+    event OnSaleStart();
+
+    /**
+     * Event emitted on sale end
+     */
+    event OnSaleEnd();
+
     IERC20Transfers public immutable gamingToken;
     bool public saleStarted = false;
     bool public saleEnded = false;
@@ -54,8 +63,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if `gamingToken_` is the zero address.
      * @dev Reverts if any element of `amounts` is zero.
      * @param gamingToken_ An ERC20-compliant contract address.
-     * @param tierIds The identifiers of each supported tier.
-     * @param amounts The amounts of gaming token to escrow for participation, for each one of the `tierIds`.
      */
     constructor(
         IERC20Transfers gamingToken_
@@ -171,7 +178,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         require(saleStarted == true, "PrePay: sale not started");
         require(saleEnded == false, "PrePay: already ended");
         saleEnded = true;
-        emit OnSaleEnded();
+        emit OnSaleEnd();
     }
 
 
