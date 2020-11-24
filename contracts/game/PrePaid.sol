@@ -37,13 +37,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     event OnWithdraw(address wallet, uint256 amount);
 
     /**
-     * Event emitted on withdraw revenue
-     * @param wallet The address of the user.
-     * @param amount Amount deducted from user's escorw
-     */
-    event OnWithdrawRevenue(address wallet, uint256 amount);
-
-    /**
      * Event emitted on sale start
      */
     event OnSaleStart();
@@ -117,7 +110,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the wallet has no amount escrowed
      * @dev Reverts if amount is greater than revv escrowed
      * @dev Reverts if sale has not ended
-     * @dev Emits a ParticipationUpdated event.
      * @dev An amount of ERC20 `gamingToken` is transferred from this contract to the sender.
      */
     function withdrawRevenue(address wallet, uint256 amount) public onlyOwner{
@@ -133,7 +125,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             "PrePaid: transfer out failed"
         );
         balanceOf[wallet] = balance.sub(amount);
-        emit OnWithdrawRevenue(sender, amount);
     }
 
     /**
