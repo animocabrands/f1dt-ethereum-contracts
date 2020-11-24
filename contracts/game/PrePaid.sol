@@ -141,7 +141,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @param wallet The participant to check the status of.
      * @return amount escrowed for wallet
      */
-    function getBalance(address wallet)
+    function getBalance(address wallet) 
         external
         view
         returns (uint256 memory amount)
@@ -168,13 +168,13 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
     }
     
-    function startSale() external onlyOwner {
+    function startSale() whenNotPaused external onlyOwner {
         require*(saleStarted == false, "PrePay: already started");
         saleStarted = true;
         emit OnSaleStarted();
     }
 
-    function endSale() external onlyOwner {
+    function endSale() whenNotPaused external onlyOwner {
         require(saleStarted == true, "PrePay: sale not started");
         require(saleEnded == false, "PrePay: already ended");
         saleEnded = true;
