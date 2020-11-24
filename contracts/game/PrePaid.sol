@@ -16,7 +16,7 @@ interface IERC20Transfers {
 }
 
 /**
- * @title PrePayContract.
+ * @title PrePaidContract.
  * Contract which manages the deposits made by wallets for pre sale
  * Participants are allowed to make deopsits and withdraw before sale starts
  */
@@ -67,7 +67,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     constructor(
         IERC20Transfers gamingToken_
     ) public {
-        require(gamingToken_ != IERC20Transfers(0), "PrePay: zero address");
+        require(gamingToken_ != IERC20Transfers(0), "PrePaid: zero address");
         gamingToken = gamingToken_;
         _pause(); // pause on start
     }
@@ -81,12 +81,12 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     function deposit(uint256 amount) whenNotPaused public {
         address sender = _msgSender();
-        require(saleStarted == false, "PrePay: sale started");
+        require(saleStarted == false, "PrePaid: sale started");
         uint256 newAmount = balanceOf[sender].add(amount);
         balanceOf[sender] = newAmount;
         require(
             gamingToken.transferFrom(sender, address(this), amount),
-            "PrePay: transfer in failed"
+            "PrePaid: transfer in failed"
         );
         globalPool = globalPool.add(amount);
         emit OnDeposit(sender, newAmount);
@@ -101,13 +101,13 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     function withdraw(uint256 amount) whenNotPaused public {
         address sender = _msgSender();
-        require(saleStarted == false, "PrePay: sale started");
-        require(balanceOf[sender] >= amount, "PrePay: insufficient funds");
+        require(saleStarted == false, "PrePaid: sale started");
+        require(balanceOf[sender] >= amount, "PrePaid: insufficient funds");
         uint256 newAmount = balanceOf[sender].sub(amount);
         balanceOf[sender] = newAmount;
         require(
             gamingToken.transferFrom(address(this), sender, amount),
-            "PrePay: transfer out failed"
+            "PrePaid: transfer out failed"
         );
         emit OnWithdraw(sender, newAmount);
     }
@@ -122,15 +122,15 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     function withdrawRevenue(address wallet, uint256 amount) public onlyOwner{
         address sender = _msgSender();
-        require(saleEnded == true, "PrePay: sale not ended");
+        require(saleEnded == true, "PrePaid: sale not ended");
 
         uint256 balance = balanceOf[wallet];
-        require(balance != 0, "PrePay: no balance");
-        require(balance <= amount, "PrePay: insufficient funds");
+        require(balance != 0, "PrePaid: no balance");
+        require(balance <= amount, "PrePaid: insufficient funds");
         
         require(
             gamingToken.transfer(sender, amount),
-            "PrePay: transfer out failed"
+            "PrePaid: transfer out failed"
         );
         balanceOf[wallet] = balance.sub(amount);
         emit OnWithdrawRevenue(sender, amount);
@@ -156,27 +156,28 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     function getDiscount()
         external
         view
-        returns (uint256 memory amount)
+        returns (uint256 memory discount)
     {
-        if(globalDeposit >= 40000000)
+        if(globalDeposit >= 40000000000000000000000000)
             return 50;
-        else if(globalDeposit >= 30000000)
+        else if(globalDeposit >= 30000000000000000000000000)
             return 25;
-        else if(globalDeposit >= 20000000)
+        else if(globalDeposit >= 20000000000000000000000000)
             return 10;
-        else return 0;
+        else
+            return 0;
 
     }
     
     function startSale() whenNotPaused external onlyOwner {
-        require*(saleStarted == false, "PrePay: already started");
+        require(saleStarted == false, "PrePaid: already started");
         saleStarted = true;
         emit OnSaleStarted();
     }
 
     function endSale() whenNotPaused external onlyOwner {
-        require(saleStarted == true, "PrePay: sale not started");
-        require(saleEnded == false, "PrePay: already ended");
+        require(saleStarted == true, "PrePaid: sale not started");
+        require(saleEnded == false, "PrePaid: already ended");
         saleEnded = true;
         emit OnSaleEnd();
     }
