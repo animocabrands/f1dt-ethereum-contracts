@@ -99,7 +99,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint256 newAmount = balanceOf[sender].sub(amount);
         balanceOf[sender] = newAmount;
         require(
-            gamingToken.transferFrom(address(this), sender, amount),
+            gamingToken.transfer(sender, amount),
             "PrePaid: transfer out failed"
         );
         emit OnWithdraw(sender, newAmount);
@@ -129,7 +129,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
     /**
      * Gets the amount escrowed for wallet
-     * @param wallet The participant to check the status of.
+     * @param wallet The address of the wallet
      * @return amount escrowed for wallet
      */
     function getBalance(address wallet) 
