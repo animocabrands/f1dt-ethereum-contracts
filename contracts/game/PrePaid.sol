@@ -49,7 +49,8 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     IERC20Transfers public immutable gamingToken;
     bool public saleStarted = false;
     bool public saleEnded = false;
-    uint256 public globalPool = 0;
+    uint256 public globalDeposit = 0;
+    uint256 public globalEarnings = 0;
     mapping(address => uint256) public balanceOf; // wallet => escrowed amount
 
     /**
@@ -66,7 +67,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     }
 
     /**
-     * Add amount to user's deposit and globalPool
+     * Add amount to user's deposit and globalDeposit
      * @dev Reverts if sale has started
      * @dev Emits a OnDeposit event.
      * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
@@ -75,14 +76,35 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     function deposit(uint256 amount) whenNotPaused public {
         address sender = _msgSender();
         require(saleStarted == false, "PrePaid: sale started");
+        require(amount != 0, "PrePaid: zero deposit");
         uint256 newAmount = balanceOf[sender].add(amount);
         balanceOf[sender] = newAmount;
         require(
             gamingToken.transferFrom(sender, address(this), amount),
             "PrePaid: transfer in failed"
         );
-        globalPool = globalPool.add(amount);
+        globalDeposit = globalDeposit.add(amount);
         emit OnDeposit(sender, newAmount);
+    }
+
+    /**
+     * Withdraw amount to user's deposit
+     * @dev Reverts if sale has started
+     * @dev Emits a OnWithdraw event.
+     * @dev An amount of ERC20 `gamingToken` is transferred from the contract to sender.
+     * @param amount The amount to withdraw.
+     */
+    function withdrawAll() whenNotPaused public {
+        address sender = _msgSender();
+        require(saleEnded == true, "PrePaid: sale not ended");
+        uint256 balance = balanceOf[sender];
+        require(balance != 0, "PrePaid: no balance");
+        require(
+            gamingToken.transfer(sender, balance),
+            "PrePaid: transfer out failed"
+        );
+        balanceOf[sender] = 0;
+        emit OnWithdraw(sender, balance);
     }
 
     /**
@@ -105,6 +127,27 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         emit OnWithdraw(sender, newAmount);
     }
 
+     /**
+     * consume prepay
+     * @dev Reverts if sale has started
+     * @dev Emits a OnWithdraw event.
+     * @dev An amount of ERC20 `gamingToken` is transferred from the contract to sender.
+     * @param amount The amount to withdraw.
+     */
+    function consume(address wallet, uint256 amount) whenNotPaused public {
+        address sender = _msgSender();
+        require(isOperator(sender), "PrePaid: only operator");
+        require(saleStarted == false, "PrePaid: sale started");
+        require(balanceOf[wallet] >= amount, "PrePaid: insufficient funds");
+        uint256 newAmount = balanceOf[wallet].sub(amount);
+        balanceOf[wallet] = newAmount;
+        require(
+            gamingToken.transfer(sender, amount),
+            "PrePaid: transfer out failed"
+        );
+        globalEarnings = globalEarnings.add(amount);
+    }
+
     /**
      * Deducts revv escrowed by wallet and deposits to operator
      * @dev Reverts if the wallet has no amount escrowed
@@ -112,19 +155,17 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if sale has not ended
      * @dev An amount of ERC20 `gamingToken` is transferred from this contract to the sender.
      */
-    function withdrawRevenue(address wallet, uint256 amount) public onlyOwner{
+    function collectRevenue() public onlyOwner{
         address sender = _msgSender();
         require(saleEnded == true, "PrePaid: sale not ended");
-
-        uint256 balance = balanceOf[wallet];
-        require(balance != 0, "PrePaid: no balance");
-        require(balance <= amount, "PrePaid: insufficient funds");
+        require(globalEarnings > 0, "PrePaid: no earnings");
         
         require(
-            gamingToken.transfer(sender, amount),
+            gamingToken.transfer(sender, globalEarnings),
             "PrePaid: transfer out failed"
         );
-        balanceOf[wallet] = balance.sub(amount);
+        
+        globalEarnings = 0;
     }
 
     /**
