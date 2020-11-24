@@ -46,7 +46,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     event OnSaleEnd();
 
-    IERC20Transfers public immutable gamingToken;
+    IERC20Transfers public immutable revv;
     bool public saleStarted = false;
     bool public saleEnded = false;
     uint256 public globalDeposit = 0;
@@ -54,15 +54,15 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     mapping(address => uint256) public balanceOf; // wallet => escrowed amount
 
     /**
-     * @dev Reverts if `gamingToken_` is the zero address.
+     * @dev Reverts if `revv_` is the zero address.
      * @dev Reverts if any element of `amounts` is zero.
-     * @param gamingToken_ An ERC20-compliant contract address.
+     * @param revv_ An ERC20-compliant contract address.
      */
     constructor(
-        IERC20Transfers gamingToken_
+        IERC20Transfers revv_
     ) public {
-        require(gamingToken_ != IERC20Transfers(0), "PrePaid: zero address");
-        gamingToken = gamingToken_;
+        require(revv_ != IERC20Transfers(0), "PrePaid: zero address");
+        revv = revv_;
         _pause(); // pause on start
     }
 
@@ -70,7 +70,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * Add amount to user's deposit and globalDeposit
      * @dev Reverts if sale has started
      * @dev Emits a OnDeposit event.
-     * @dev An amount of ERC20 `gamingToken` is transferred from the sender to this contract.
+     * @dev An amount of ERC20 `revv` is transferred from the sender to this contract.
      * @param amount The amount to deposit.
      */
     function deposit(uint256 amount) whenNotPaused public {
@@ -80,7 +80,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint256 newAmount = balanceOf[sender].add(amount);
         balanceOf[sender] = newAmount;
         require(
-            gamingToken.transferFrom(sender, address(this), amount),
+            revv.transferFrom(sender, address(this), amount),
             "PrePaid: transfer in failed"
         );
         globalDeposit = globalDeposit.add(amount);
@@ -91,7 +91,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * Withdraw amount to user's deposit
      * @dev Reverts if sale has started
      * @dev Emits a OnWithdraw event.
-     * @dev An amount of ERC20 `gamingToken` is transferred from the contract to sender.
+     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      * @param amount The amount to withdraw.
      */
     function withdrawAll() whenNotPaused public {
@@ -100,7 +100,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint256 balance = balanceOf[sender];
         require(balance != 0, "PrePaid: no balance");
         require(
-            gamingToken.transfer(sender, balance),
+            revv.transfer(sender, balance),
             "PrePaid: transfer out failed"
         );
         balanceOf[sender] = 0;
@@ -111,7 +111,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * Withdraw amount to user's deposit
      * @dev Reverts if sale has started
      * @dev Emits a OnWithdraw event.
-     * @dev An amount of ERC20 `gamingToken` is transferred from the contract to sender.
+     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      * @param amount The amount to withdraw.
      */
     function withdraw(uint256 amount) whenNotPaused public {
@@ -121,7 +121,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint256 newAmount = balanceOf[sender].sub(amount);
         balanceOf[sender] = newAmount;
         require(
-            gamingToken.transfer(sender, amount),
+            revv.transfer(sender, amount),
             "PrePaid: transfer out failed"
         );
         emit OnWithdraw(sender, newAmount);
@@ -131,7 +131,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * consume prepay
      * @dev Reverts if sale has started
      * @dev Emits a OnWithdraw event.
-     * @dev An amount of ERC20 `gamingToken` is transferred from the contract to sender.
+     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      * @param amount The amount to withdraw.
      */
     function consume(address wallet, uint256 amount) whenNotPaused public {
@@ -142,7 +142,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint256 newAmount = balanceOf[wallet].sub(amount);
         balanceOf[wallet] = newAmount;
         require(
-            gamingToken.transfer(sender, amount),
+            revv.transfer(sender, amount),
             "PrePaid: transfer out failed"
         );
         globalEarnings = globalEarnings.add(amount);
@@ -153,7 +153,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the wallet has no amount escrowed
      * @dev Reverts if amount is greater than revv escrowed
      * @dev Reverts if sale has not ended
-     * @dev An amount of ERC20 `gamingToken` is transferred from this contract to the sender.
+     * @dev An amount of ERC20 `revv` is transferred from this contract to the sender.
      */
     function collectRevenue() public onlyOwner{
         address sender = _msgSender();
@@ -161,10 +161,10 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         require(globalEarnings > 0, "PrePaid: no earnings");
         
         require(
-            gamingToken.transfer(sender, globalEarnings),
+            revv.transfer(sender, globalEarnings),
             "PrePaid: transfer out failed"
         );
-        
+
         globalEarnings = 0;
     }
 
