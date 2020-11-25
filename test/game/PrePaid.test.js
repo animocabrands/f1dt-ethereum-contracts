@@ -160,30 +160,6 @@ describe('PrePaid', function () {
                 expectRevert(revert, "PrePaid: state locked");
             });
 
-        })
-
-    })
-
-    describe("deposit(amount)", function() {
-
-        it.skip("should revert when paused", async function(){
-            await this.prepaid.pause({from: deployer});
-            const promiseResult = this.prepaid.deposit(toWei('1'), {from: participant});
-            await expectRevert(promiseResult,'Pausable: paused');
-        })
-
-        it.skip("should revert if the salesStart", async function() {
-            const startState = await this.prepaid.SALE_START_STATE.call();
-            await this.prepaid.setSaleState(startState,{from: deployer});
-            const promiseResult = this.prepaid.deposit(toWei('1'), {from: participant});
-            await expectRevert(promiseResult,'PrePaid: state locked');
-        });
-
-        it.skip("should revert if the salesEnd", async function() {
-            const endState = await this.prepaid.SALE_END_STATE.call();
-            await this.prepaid.setSaleState(endState,{from: deployer});
-            const promiseResult = this.prepaid.deposit(toWei('1'), {from: participant});
-            await expectRevert(promiseResult,'PrePaid: state locked');
         });
 
     });
