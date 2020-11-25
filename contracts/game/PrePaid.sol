@@ -203,9 +203,11 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     
     /**
     * Sets the sale state.
-    * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+    * @dev Reverts if `_state` is not one of BEFORE_SALE_STATE, SALE_START_STATE or
+    *   SALE_END_STATE.
     * @dev Reverts if the current state is already set to `state_`.
-    * @param state_ The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+    * @param state_ The state to set. Should be one of BEFORE_SALE_STATE,
+    *   SALE_START_STATE or SALE_END_STATE.
     * @dev Emits the StateChanged event.
     */
     function _setSaleState(uint8 state_) internal {
@@ -218,8 +220,11 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     /**
      * Sets the sale state.
      * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts if `_state` is not one of BEFORE_SALE_STATE, SALE_START_STATE or 
+     *  SALE_END_STATE.
      * @dev Reverts if the current state is already set to `state_`.
-     * @param state_ The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+     * @param state_ The state to set. Should be one of BEFORE_SALE_STATE,
+     *  SALE_START_STATE or SALE_END_STATE.
      */
     function setSaleState(uint8 state_) external onlyOwner {
         _setSaleState(state_);
@@ -227,7 +232,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
      /**
      * Sets the sale start state.
-     * @dev Reverts if called by any other than the operator.
+     * @dev Reverts if called by any other than a whitelisted operator.
      * @dev Reverts if the current state is already set to SALE_START_STATE.
      */
     function setSaleStart() external onlyWhitelistedOperator {
@@ -236,7 +241,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
      /**
      * Sets the sale end state.
-     * @dev Reverts if called by any other than the operator.
+     * @dev Reverts if called by any other than a whitelisted operator.
      * @dev Reverts if the current state is already set to SALE_END_STATE.
      */
     function setSaleEnd() external onlyWhitelistedOperator {
