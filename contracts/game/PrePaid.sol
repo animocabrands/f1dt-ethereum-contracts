@@ -50,9 +50,10 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         uint8 state
     );
 
-    uint8 public constant BEFORE_SALE_STATE = 0;
-    uint8 public constant SALE_START_STATE = 1;
-    uint8 public constant SALE_END_STATE = 2;
+    uint8 public constant BEFORE_SALE_STATE = 1;
+    uint8 public constant SALE_START_STATE = 2;
+    uint8 public constant SALE_END_STATE = 3;
+
     uint8 public state = BEFORE_SALE_STATE;
     IERC20Transfers public immutable revv;
     uint256 public globalDeposit = 0;
@@ -207,9 +208,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     * @dev Emits the StateChanged event.
     */
     function _setSaleState(uint8 _state) internal {
-        require(_state == BEFORE_SALE_STATE ||
-                _state == SALE_START_STATE ||
-                _state == SALE_END_STATE,"PrePaid: invalid state");
+        require(_state & 0x3 != 0, "PrePaid: invalid state");
 
         state = _state;
         emit StateChange(state);
