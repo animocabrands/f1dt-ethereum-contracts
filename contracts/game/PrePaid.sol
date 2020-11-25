@@ -47,13 +47,13 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @param state The sale that was set
      */
     event OnStateChange(
-        uint256 state
+        uint8 state
     );
 
-    uint256 public constant BEFORE_SALE_STATE = 0;
-    uint256 public constant SALE_START_STATE = 1;
-    uint256 public constant SALE_END_STATE = 2;
-    uint256 public state = BEFORE_SALE_STATE;
+    uint8 public constant BEFORE_SALE_STATE = 0;
+    uint8 public constant SALE_START_STATE = 1;
+    uint8 public constant SALE_END_STATE = 2;
+    uint8 public state = BEFORE_SALE_STATE;
     IERC20Transfers public immutable revv;
     uint256 public globalDeposit = 0;
     uint256 public globalEarnings = 0;
@@ -62,7 +62,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     /**
      * Modifier to make a function callable only when the contract is in a specific state
      */
-    modifier whenInState(uint256 _state) {
+    modifier whenInState(uint8 _state) {
         require(state == _state, "PrePaid: state locked");
         _;
     }
@@ -207,7 +207,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Emits the OnStateChanged event.
      * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
      */
-    function setSaleState(uint256 _state) external onlyOwner {
+    function setSaleState(uint8 _state) external onlyOwner {
         require(_state == BEFORE_SALE_STATE ||
                 _state == SALE_START_STATE ||
                 _state == SALE_END_STATE,"PrePaid: invalid state");
