@@ -43,10 +43,10 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     );
 
     /**
-     * Event emitted when state is changed.
+     * Event emitted when the sale state is changed.
      * @param state The sale that was set
      */
-    event StateChange(
+    event StateChanged(
         uint8 state
     );
 
@@ -212,7 +212,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         require(_state & 0x3 != 0, "PrePaid: invalid state");
         require(_state != state, "PrePaid: state already set");
         state = _state;
-        emit StateChange(_state);
+        emit StateChanged(_state);
     }
 
     /**
