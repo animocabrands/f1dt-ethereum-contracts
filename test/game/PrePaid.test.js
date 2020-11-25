@@ -164,26 +164,4 @@ describe('PrePaid', function () {
 
     });
 
-    describe("withdraw(amount)", function() {
-        it.skip("should revert when paused", async function(){
-            await this.prepaid.pause({from: deployer});
-            const promiseResult = this.prepaid.withdraw({from: participant});
-            await expectRevert(promiseResult,'Pausable: paused');
-        })
-
-        it.skip("should revert when sale is not started", async function() {
-            const beforeSaleState = await this.prepaid.BEFORE_SALE_STATE.call();
-            await this.prepaid.setSaleState(beforeSaleState,{from: deployer});
-            const promiseResult = this.prepaid.withdraw({from: participant});
-            await expectRevert(promiseResult,'PrePaid: state locked');
-        });
-
-        it.skip("should revert if the sale is ongoing", async function() {
-            const startState = await this.prepaid.SALE_START_STATE.call();
-            await this.prepaid.setSaleState(startState,{from: deployer});
-            const promiseResult = this.prepaid.withdraw({from: participant});
-            await expectRevert(promiseResult,'PrePaid: state locked');
-        });
-    })
-
 });
