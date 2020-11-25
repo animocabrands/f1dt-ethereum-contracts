@@ -1,7 +1,7 @@
 const {accounts, contract} = require('@openzeppelin/test-environment');
-const {expectRevert, expectEvent} = require('@openzeppelin/test-helpers');
+const {BN, expectRevert, expectEvent} = require('@openzeppelin/test-helpers');
 const {toWei} = require('web3-utils');
-const {ZeroAddress} = require('@animoca/ethereum-contracts-core_library').constants;
+const {ZeroAddress, Zero, One, Two} = require('@animoca/ethereum-contracts-core_library').constants;
 
 const PrePaid = contract.fromArtifact('PrePaid');
 const REVV = contract.fromArtifact('REVV');
@@ -23,12 +23,12 @@ describe('PrePaid', function () {
     }
 
     async function doApproveSpender(overrides = {}) {
-        const owners = overrides.owners || participants
+        const owners = overrides.owners || participants;
         const spender = overrides.spender || this.prepaid.address;
         const allowances = overrides.allowances || new Array(owners.length).fill(toWei('100000000'));
 
         for (let index = 0; index < owners.length; ++index) {
-            await this.revv.approve(spender, allowances[index], { from: owners[index] });
+            await this.revv.approve(spender, allowances[index], {from: owners[index]});
         }
     }
 
@@ -43,6 +43,261 @@ describe('PrePaid', function () {
         });
     });
 
+    describe('deposit()', function () {
+        beforeEach(async function () {
+            this.revvMaxSupply = Two.pow(new BN(256)).sub(One);
+            await doDeploy.bind(this)({
+                holders: [participant],
+                amounts: [this.revvMaxSupply],
+            });
+            await doApproveSpender.bind(this)({
+                owners: [participant],
+                allowances: [this.revvMaxSupply],
+            });
+            await this.prepaid.unpause({from: deployer});
+        });
+
+        it('should revert if the contract is paused', async function () {
+            await this.prepaid.pause({from: deployer});
+            const revert = this.prepaid.deposit(toWei('100'), {from: participant});
+            await expectRevert(revert, 'Pausable: paused');
+        });
+
+        it('should revert if the sale has started', async function () {
+            await this.prepaid.setSaleStart({from: operator});
+            const revert = this.prepaid.deposit(toWei('100'), {from: participant});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('should revert if the sale has ended', async function () {
+            await this.prepaid.setSaleEnd({from: operator});
+            const revert = this.prepaid.deposit(toWei('100'), {from: participant});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('should revert if the deposit amount is zero', async function () {
+            const revert = this.prepaid.deposit(Zero, {from: participant});
+            await expectRevert(revert, 'PrePaid: zero deposit');
+        });
+
+        it('should revert if the updated global deposit balance overflows', async function () {
+            await this.prepaid.deposit(this.revvMaxSupply, {from: participant});
+            const revert = this.prepaid.deposit(this.revvMaxSupply, {from: participant});
+            await expectRevert(revert, 'SafeMath: addition overflow');
+        });
+
+        it('should revert if the deposit transfer from the sender fails', async function () {
+            await doApproveSpender.bind(this)({
+                owners: [participant],
+                allowances: [Zero],
+            });
+            const revert = this.prepaid.deposit(toWei('100'), {from: participant});
+            await expectRevert.unspecified(revert);
+        });
+    });
+
+    describe('withdraw', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)({
+                holders: [participant],
+                amounts: [toWei('1000000')],
+            });
+            await doApproveSpender.bind(this)({
+                owners: [participant],
+                allowances: [toWei('1000000')],
+            });
+            await this.prepaid.unpause({from: deployer});
+            await this.prepaid.deposit(toWei('100'), {from: participant});
+            await this.prepaid.setSaleEnd({from: operator});
+        });
+
+        it('should revert if the sale has not ended', async function () {
+            await this.prepaid.setSaleStart({from: operator});
+            const revert = this.prepaid.withdraw({from: participant});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('should revert if the sender has no balance to withdraw from', async function () {
+            const revert = this.prepaid.withdraw({from: participant2});
+            await expectRevert(revert, 'PrePaid: no balance');
+        });
+    });
+
+    describe('consume()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)({
+                holders: [participant],
+                amounts: [toWei('1000000')],
+            });
+            await doApproveSpender.bind(this)({
+                owners: [participant],
+                allowances: [toWei('1000000')],
+            });
+            await this.prepaid.unpause({from: deployer});
+            await this.prepaid.deposit(toWei('100'), {from: participant});
+            await this.prepaid.setSaleStart({from: operator});
+        });
+
+        it('should revert if the contract is paused', async function () {
+            await this.prepaid.pause({from: deployer});
+            const revert = this.prepaid.consume(participant, toWei('100'), {from: operator});
+            await expectRevert(revert, 'Pausable: paused');
+        });
+
+        it('should revert if the sale has not started', async function () {
+            await this.prepaid.setSaleState(1, {from: deployer});
+            const revert = this.prepaid.consume(participant, toWei('100'), {from: operator});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('should revert if the sale has ended', async function () {
+            await this.prepaid.setSaleEnd({from: operator});
+            const revert = this.prepaid.consume(participant, toWei('100'), {from: operator});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('should revert if called by any other than a whitelisted operator', async function () {
+            const revert = this.prepaid.consume(participant, toWei('100'), {from: participant});
+            await expectRevert(revert, 'PrePaid: invalid operator');
+        });
+
+        it('should revert if the consumption amount is zero', async function () {
+            const revert = this.prepaid.consume(participant, Zero, {from: operator});
+            await expectRevert(revert, 'PrePaid: zero consumption');
+        });
+
+        it('should revert if the given wallet has an insufficient balance to deduct the specified amount from', async function () {
+            const revert = this.prepaid.consume(participant2, toWei('100'), {from: operator});
+            await expectRevert(revert, 'PrePaid: insufficient funds');
+        });
+    });
+
+    describe('collectRevenue()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)({
+                holders: [participant],
+                amounts: [toWei('1000000')],
+            });
+            await doApproveSpender.bind(this)({
+                owners: [participant],
+                allowances: [toWei('1000000')],
+            });
+            await this.prepaid.unpause({from: deployer});
+            await this.prepaid.deposit(toWei('100'), {from: participant});
+            await this.prepaid.setSaleStart({from: operator});
+            await this.prepaid.consume(participant, toWei('100'), {from: operator});
+            await this.prepaid.setSaleEnd({from: operator});
+        });
+
+        it('reverts if the sale has not ended', async function () {
+            await this.prepaid.setSaleStart({from: operator});
+            const revert = this.prepaid.collectRevenue({from: deployer});
+            await expectRevert(revert, 'PrePaid: state locked');
+        });
+
+        it('reverts if called by any other than the contract owner', async function () {
+            const revert = this.prepaid.collectRevenue({from: participant});
+            await expectRevert(revert, 'Ownable: caller is not the owner');
+        });
+
+        it('reverts if the global earnings balance is zero', async function () {
+            await this.prepaid.collectRevenue({from: deployer});
+            const revert = this.prepaid.collectRevenue({from: deployer});
+            await expectRevert(revert, 'PrePaid: no earnings');
+        });
+    });
+
+    describe('setSaleState()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+        });
+
+        it('reverts if called by any other than the contract owner', async function () {
+            const revert = this.prepaid.setSaleState(2, {from: participant});
+            await expectRevert(revert, 'Ownable: caller is not the owner');
+        });
+
+        it('reverts if the state is not valid', async function () {
+            const revert = this.prepaid.setSaleState(0, {from: deployer});
+            await expectRevert(revert, 'PrePaid: invalid state');
+        });
+
+        it('reverts if the current state is already set', async function () {
+            const revert = this.prepaid.setSaleState(1, {from: deployer});
+            await expectRevert(revert, 'PrePaid: state already set');
+        });
+    });
+
+    describe('setSaleStart()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+        });
+
+        it('reverts if called by any other than a whitelisted operator', async function () {
+            const revert = this.prepaid.setSaleStart({from: participant});
+            await expectRevert(revert, 'PrePaid: invalid operator');
+        });
+
+        it('reverts if the current state is already set', async function () {
+            await this.prepaid.setSaleStart({from: operator});
+            const revert = this.prepaid.setSaleStart({from: operator});
+            await expectRevert(revert, 'PrePaid: state already set');
+        });
+    });
+
+    describe('setSaleEnd()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)({
+                holders: [participant],
+                amounts: [toWei('1000000')],
+            });
+        });
+
+        it('reverts if called by any other than a whitelisted operator', async function () {
+            const revert = this.prepaid.setSaleEnd({from: participant});
+            await expectRevert(revert, 'PrePaid: invalid operator');
+        });
+
+        it('reverts if the current state is already set', async function () {
+            await this.prepaid.setSaleEnd({from: operator});
+            const revert = this.prepaid.setSaleEnd({from: operator});
+            await expectRevert(revert, 'PrePaid: state already set');
+        });
+    });
+
+    describe('pause()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+        });
+
+        it('reverts if called by any other than the contract owner', async function () {
+            const revert = this.prepaid.pause({from: participant});
+            await expectRevert(revert, 'Ownable: caller is not the owner');
+        });
+
+        it('reverts if the contract is already paused', async function () {
+            const revert = this.prepaid.pause({from: deployer});
+            await expectRevert(revert, 'Pausable: paused');
+        });
+    });
+
+    describe('unpause()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+            await this.prepaid.unpause({from: deployer});
+        });
+
+        it('reverts if called by any other than the contract owner', async function () {
+            const revert = this.prepaid.unpause({from: participant});
+            await expectRevert(revert, 'Ownable: caller is not the owner');
+        });
+
+        it('reverts if the contract is already unpaused', async function () {
+            const revert = this.prepaid.unpause({from: deployer});
+            await expectRevert(revert, 'Pausable: not paused');
+        });
+    });
+
     describe('contract', function () {
         beforeEach(async function () {
             await doDeploy.bind(this)({
@@ -51,7 +306,7 @@ describe('PrePaid', function () {
             });
             await doApproveSpender.bind(this)({
                 owners: [participant, participant2],
-                allowances: new Array(2).fill(toWei('100000000'))
+                allowances: new Array(2).fill(toWei('100000000')),
             });
         });
 
