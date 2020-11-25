@@ -8,18 +8,23 @@ const PrePaid = contract.fromArtifact('PrePaid');
 const REVV = contract.fromArtifact('REVV');
 
 const [ deployer, operator, anonymous, ...participants ] = accounts;
-const [participant, participant2, participant3] = participants;
+const [ participant, participant2, participant3 ] = participants;
 
-describe('PrePaid', function () {
+describe.only('PrePaid', function () {
 
     async function doDeploy(overrides = {}) {
         this.revv = await REVV.new(
             overrides.holders || [ participant ],
-            overrides.amounts || [ toWei('1000000') ],
+            overrides.amounts || [ toWei('100000000') ],
             { from: overrides.deployer || deployer });
 
-        this.contract = await PrePaid.new(
+        this.prepaid = await PrePaid.new(
             this.revv.address,
+            { from: overrides.deployer || deployer });
+
+        await this.prepaid.whitelistOperator(
+            overrides.operator || operator,
+            true,
             { from: overrides.deployer || deployer });
     }
 
@@ -47,11 +52,10 @@ describe('PrePaid', function () {
 
     describe("contract", function() {
         beforeEach(async function() {
-            const revvAmount = new Array(participants.length);
-            revvAmount.fill(toWei('100000000'));
-            this.revv = await REVV.new(participants, revvAmount, {from: deployer});
-            this.prepaid = await PrePaid.new(this.revv.address, {from: deployer});
-            this.prepaid.whitelistOperator( operator, true ,{from:deployer});
+            await doDeploy.bind(this)({
+                holders: participants,
+                amounts: new Array(participants.length).fill(toWei('100000000'))
+            });
             // approval revv token to prepaid contract
             await this.revv.approve(this.prepaid.address, toWei('100000000'), {from: participant});
             await this.revv.approve(this.prepaid.address, toWei('100000000'), {from: participant2});
@@ -66,22 +70,23 @@ describe('PrePaid', function () {
         describe("setSaleState", function() {
 
             it("can set state BEFORE_SALE_STATE", async function() {
-                await expectEvent(await this.prepaid.setSaleState('0', {from: deployer}), "StateChange", {state : "0"});
-                (await this.prepaid.state()).should.be.bignumber.equal("0");
-            });
-
-            it("can set state SALE_START_STATE", async function() {
-                await expectEvent(await this.prepaid.setSaleState('1', {from: deployer}), "StateChange", {state : "1"});
+                await this.prepaid.setSaleStart({from: operator});
+                await expectEvent(await this.prepaid.setSaleState('1', {from: deployer}), "StateChanged", {state : "1"});
                 (await this.prepaid.state()).should.be.bignumber.equal("1");
             });
 
-            it("can set state SALE_END_STATE", async function() {
-                await expectEvent(await this.prepaid.setSaleState('2', {from: deployer}), "StateChange", {state : "2"});
+            it("can set state SALE_START_STATE", async function() {
+                await expectEvent(await this.prepaid.setSaleState('2', {from: deployer}), "StateChanged", {state : "2"});
                 (await this.prepaid.state()).should.be.bignumber.equal("2");
             });
 
+            it("can set state SALE_END_STATE", async function() {
+                await expectEvent(await this.prepaid.setSaleState('3', {from: deployer}), "StateChanged", {state : "3"});
+                (await this.prepaid.state()).should.be.bignumber.equal("3");
+            });
+
             it("revert if unknown state", async function() {
-                const revert = this.prepaid.setSaleState('3', {from: deployer});
+                const revert = this.prepaid.setSaleState('0', {from: deployer});
                 await expectRevert(revert, 'PrePaid: invalid state');
             });
 
@@ -187,7 +192,7 @@ describe('PrePaid', function () {
                 await this.prepaid.unpause({from: deployer});
                 await this.prepaid.deposit(toWei('1000'), {from: participant});
                 await this.prepaid.deposit(toWei('1000'), {from: participant2});
-                await this.prepaid.setSaleState('1', {from: deployer});
+                await this.prepaid.setSaleStart({from: operator});
             });
 
             it("consumes", async function() {
@@ -232,9 +237,9 @@ describe('PrePaid', function () {
                 await this.prepaid.unpause({from: deployer});
                 await this.prepaid.deposit(toWei('1000'), {from: participant});
                 await this.prepaid.deposit(toWei('1000'), {from: participant2});
-                await this.prepaid.setSaleState('1', {from: deployer});
+                await this.prepaid.setSaleStart({from: operator});
                 await this.prepaid.consume(participant2, toWei("10"), {from: operator});
-                await this.prepaid.setSaleState('2', {from: deployer});
+                await this.prepaid.setSaleEnd({from: operator});
             });
 
 
