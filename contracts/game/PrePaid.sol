@@ -212,7 +212,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         require(_state & 0x3 != 0, "PrePaid: invalid state");
         require(_state != state, "PrePaid: state already set");
         state = _state;
-        emit StateChange(state);
+        emit StateChange(_state);
     }
 
     /**
