@@ -39,14 +39,20 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     event OnWithdraw(address wallet, uint256 amount, uint256 balance);
 
     /**
-     * Event emitted on sale start
+     * Event emitted when the sale started state is set.
+     * @param state The sale started state that was set.
      */
-    event OnSaleStarted();
+    event SaleStarted(
+        bool state
+    );
 
     /**
-     * Event emitted on sale end
+     * Event emitted when the sale ended state is set.
+     * @param state The sale ended state that was set.
      */
-    event OnSaleEnded();
+    event SaleEnded(
+        bool state
+    );
 
     /**
      * Modifier to make a function callable only when the sale has not started.
@@ -221,27 +227,27 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     }
     
     /**
-     * Starts the sale.
-     * @dev Reverts if the contract is paused.
-     * @dev Reverts if the sale has started.
-     * @dev Reverts if the sale has ended.
+     * Sets the sale started state.
      * @dev Reverts if called by any other than the contract owner.
-     * @dev Emits the OnSaleStarted event.
+     * @dev Emits the SaleStarted event.
+     * @param start The sale started state to set. Specifying `true` starts the sale
+     *  period, `false` resets the sale started state.
      */
-    function startSale() external whenNotPaused whenNotStarted whenNotEnded onlyOwner {
-        saleStarted = true;
-        emit OnSaleStarted();
+    function setStartSale(bool start) external onlyOwner {
+        saleStarted = start;
+        emit SaleStarted(start);
     }
 
     /**
-     * Ends the sale.
-     * @dev Reverts if the sale has ended.
+     * Sets the sale ended state.
      * @dev Reverts if called by any other than the contract owner.
-     * @dev Emits the OnSaleEnded event.
+     * @dev Emits the SaleEnded event.
+     * @param end The sale ended state to set. Specifying `true` ends the sale period,
+     *  `false` resets the sale ended state.
      */
-    function endSale() external whenNotEnded onlyOwner {
-        saleEnded = true;
-        emit OnSaleEnded();
+    function setEndSale(bool end) external onlyOwner {
+        saleEnded = end;
+        emit SaleEnded(end);
     }
 
      /**
