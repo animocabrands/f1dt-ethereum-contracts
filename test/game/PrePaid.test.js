@@ -137,6 +137,10 @@ describe('PrePaid', function () {
                 await this.prepaid.deposit(toWei('100'), {from: participant});
                 expectRevert(this.prepaid.withdraw({from: deployer}), "PrePaid: state locked");
             });
+
+            it("collectRevenue should revert", async function() {
+                expectRevert(this.prepaid.collectRevenue({from: deployer}), "PrePaid: state locked");
+            });
         });
         
         describe("during sales", function() {
@@ -158,6 +162,11 @@ describe('PrePaid', function () {
             it("withdraw should revert", async function() {
                 const revert = this.prepaid.withdraw({from: deployer});
                 expectRevert(revert, "PrePaid: state locked");
+            });
+
+
+            it("collectRevenue should revert", async function() {
+                expectRevert(this.prepaid.collectRevenue({from: deployer}), "PrePaid: state locked");
             });
 
         });
