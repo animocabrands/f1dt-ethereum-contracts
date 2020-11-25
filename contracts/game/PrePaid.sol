@@ -46,7 +46,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * Event emitted when state is changed.
      * @param state The sale that was set
      */
-    event OnStateChange(
+    event StateChange(
         uint8 state
     );
 
@@ -204,7 +204,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * Sets the sale state.
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
-     * @dev Emits the OnStateChanged event.
+     * @dev Emits the StateChanged event.
      * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
      */
     function setSaleState(uint8 _state) external onlyOwner {
@@ -213,7 +213,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
                 _state == SALE_END_STATE,"PrePaid: invalid state");
 
         state = _state;
-        emit OnStateChange(state);
+        emit StateChange(state);
     }
 
      /**
