@@ -22,6 +22,16 @@ describe('PrePaid', function () {
         });
     }
 
+    async function doApproveSpender(overrides = {}) {
+        const owners = overrides.owners || participants
+        const spender = overrides.spender || this.prepaid.address;
+        const allowances = overrides.allowances || new Array(owners.length).fill(toWei('100000000'));
+
+        for (let index = 0; index < owners.length; ++index) {
+            await this.revv.approve(spender, allowances[index], { from: owners[index] });
+        }
+    }
+
     describe('constructor()', function () {
         it('should revert with a zero address for the revv contract', async function () {
             await expectRevert(PrePaid.new(ZeroAddress, {from: deployer}), 'PrePaid: zero address');
@@ -39,9 +49,10 @@ describe('PrePaid', function () {
                 holders: participants,
                 amounts: new Array(participants.length).fill(toWei('100000000')),
             });
-            // approval revv token to prepaid contract
-            await this.revv.approve(this.prepaid.address, toWei('100000000'), {from: participant});
-            await this.revv.approve(this.prepaid.address, toWei('100000000'), {from: participant2});
+            await doApproveSpender.bind(this)({
+                owners: [participant, participant2],
+                allowances: new Array(2).fill(toWei('100000000'))
+            });
         });
 
         describe('discount', function () {
