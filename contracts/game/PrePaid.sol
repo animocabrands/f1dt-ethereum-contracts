@@ -27,7 +27,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @param wallet The wallet address of the user.
      * @param amount The amount added to the user's escrow balance.
      */
-    event Deposit(
+    event Deposited(
         address wallet,
         uint256 amount
     );
@@ -37,7 +37,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @param wallet The wallet address of the user.
      * @param amount The amount deducted from user's escrow balance.
      */
-    event Withdraw(
+    event Withdrawn(
         address wallet,
         uint256 amount
     );
@@ -128,7 +128,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the deposit amount is zero.
      * @dev Reverts if the updated global deposit balance overflows.
      * @dev Reverts if the deposit transfer from the sender fails.
-     * @dev Emits the OnDeposit event.
+     * @dev Emits the Deposited event.
      * @dev An amount of ERC20 `revv` is transferred from the sender to this contract.
      * @param amount The amount to deposit.
      */
@@ -144,7 +144,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             revv.transferFrom(sender, address(this), amount),
             "PrePaid: transfer in failed"
         );
-        emit Deposit(sender, amount);
+        emit Deposited(sender, amount);
     }
 
     /**
@@ -152,7 +152,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the sale has not ended.
      * @dev Reverts if the sender has no balance to withdraw from.
      * @dev Reverts if the transfer to the sender fails.
-     * @dev Emits the OnWithdraw event.
+     * @dev Emits the Withdrawn event.
      * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      */
     function withdraw() external whenEnded {
@@ -164,7 +164,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             "PrePaid: transfer out failed"
         );
         balanceOf[sender] = 0;
-        emit Withdraw(sender, balance);
+        emit Withdrawn(sender, balance);
     }
 
      /**
