@@ -201,19 +201,43 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     }
     
     /**
-     * Sets the sale state.
-     * @dev Reverts if called by any other than the contract owner.
-     * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
-     * @dev Emits the StateChanged event.
-     * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
-     */
-    function setSaleState(uint8 _state) external onlyOwner {
+    * Sets the sale state.
+    * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+    * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+    * @dev Emits the StateChanged event.
+    */
+    function _setSaleState(uint8 _state) internal {
         require(_state == BEFORE_SALE_STATE ||
                 _state == SALE_START_STATE ||
                 _state == SALE_END_STATE,"PrePaid: invalid state");
 
         state = _state;
         emit StateChange(state);
+    }
+
+    /**
+     * Sets the sale state.
+     * @dev Reverts if called by any other than the contract owner.
+     * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+     */
+    function setSaleState(uint8 _state) external onlyOwner {
+        _setSaleState(_state);
+    }
+
+     /**
+     * Sets the sale start state.
+     * @dev Reverts if called by any other than the operator.
+     */
+    function setSaleStart() external onlyWhitelistedOperator {
+        _setSaleState(SALE_START_STATE);
+    }
+
+     /**
+     * Sets the sale end state.
+     * @dev Reverts if called by any other than the operator.
+     */
+    function setSaleEnd() external onlyWhitelistedOperator {
+        _setSaleState(SALE_END_STATE);
     }
 
      /**
