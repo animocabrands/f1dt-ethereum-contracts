@@ -23,20 +23,24 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     using SafeMath for uint256;
 
     /**
-     * Event emitted on deposit
-     * @param wallet The address of the user.
-     * @param amount The amount deposited to the user's escrow balance.
-     * @param balance The user's new escrow balance after the deposit.
+     * Event emitted when the user deposits into their escrow balance.
+     * @param wallet The wallet address of the user.
+     * @param amount The amount added to the user's escrow balance.
      */
-    event OnDeposit(address wallet, uint256 amount, uint256 balance);
+    event Deposit(
+        address wallet,
+        uint256 amount
+    );
 
     /**
-     * Event emitted on withdraw
-     * @param wallet The address of the user.
-     * @param amount Amount deducted from user's escrow balance.
-     * @param balance The user's new escrow balance after the withdrawal.
+     * Event emitted when the user withdraws from their escrow balance.
+     * @param wallet The wallet address of the user.
+     * @param amount The amount deducted from user's escrow balance.
      */
-    event OnWithdraw(address wallet, uint256 amount, uint256 balance);
+    event Withdraw(
+        address wallet,
+        uint256 amount
+    );
 
     /**
      * Event emitted when the sale started state is set.
@@ -140,7 +144,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             revv.transferFrom(sender, address(this), amount),
             "PrePaid: transfer in failed"
         );
-        emit OnDeposit(sender, amount, newBalance);
+        emit Deposit(sender, amount);
     }
 
     /**
@@ -160,7 +164,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             "PrePaid: transfer out failed"
         );
         balanceOf[sender] = 0;
-        emit OnWithdraw(sender, balance, 0);
+        emit Withdraw(sender, balance);
     }
 
      /**
@@ -270,5 +274,3 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         _unpause();
     }
 }
-
-
