@@ -43,50 +43,27 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     );
 
     /**
-     * Event emitted when the sale started state is set.
-     * @param state The sale started state that was set.
+     * Event emitted when state is changed.
+     * @param state The sale that was set
      */
-    event SaleStarted(
-        bool state
+    event OnStateChange(
+        uint8 state
     );
 
-    /**
-     * Event emitted when the sale ended state is set.
-     * @param state The sale ended state that was set.
-     */
-    event SaleEnded(
-        bool state
-    );
+    uint8 public constant BEFORE_SALE_STATE = 0;
+    uint8 public constant SALE_START_STATE = 1;
+    uint8 public constant SALE_END_STATE = 2;
+    uint8 public state = BEFORE_SALE_STATE;
+    IERC20Transfers public immutable revv;
+    uint256 public globalDeposit = 0;
+    uint256 public globalEarnings = 0;
+    mapping(address => uint256) public balanceOf; // wallet => escrowed amount
 
     /**
-     * Modifier to make a function callable only when the sale has not started.
+     * Modifier to make a function callable only when the contract is in a specific state
      */
-    modifier whenNotStarted() {
-        require(saleStarted == false, "PrePaid: sale started");
-        _;
-    }
-
-    /**
-     * Modifier to make a function callable only when the sale has started.
-     */
-    modifier whenStarted() {
-        require(saleStarted == true, "PrePaid: sale not started");
-        _;
-    }
-
-    /**
-     * Modifier to make a function callable only when the sale has not ended.
-     */
-    modifier whenNotEnded() {
-        require(saleEnded == false, "PrePaid: sale ended");
-        _;
-    }
-
-    /**
-     * Modifier to make a function callable only when the sale has ended.
-     */
-    modifier whenEnded() {
-        require(saleEnded == true, "PrePaid: sale not ended");
+    modifier whenInState(uint8 _state) {
+        require(state == _state, "PrePaid: state locked");
         _;
     }
 
@@ -97,13 +74,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         require(isOperator(_msgSender()), "PrePaid: invalid operator");
         _;
     }
-
-    IERC20Transfers public immutable revv;
-    bool public saleStarted = false;
-    bool public saleEnded = false;
-    uint256 public globalDeposit = 0;
-    uint256 public globalEarnings = 0;
-    mapping(address => uint256) public balanceOf; // wallet => escrowed amount
 
     /**
      * @dev Reverts if `revv_` is the zero address.
@@ -134,7 +104,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      */
     function deposit(
         uint256 amount
-    ) external whenNotPaused whenNotStarted whenNotEnded {
+    ) external whenNotPaused whenInState(BEFORE_SALE_STATE) {
         require(amount != 0, "PrePaid: zero deposit");
         globalDeposit = globalDeposit.add(amount);
         address sender = _msgSender();
@@ -155,7 +125,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Emits the Withdrawn event.
      * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      */
-    function withdraw() external whenEnded {
+    function withdraw() external whenInState(SALE_END_STATE) {
         address sender = _msgSender();
         uint256 balance = balanceOf[sender];
         require(balance != 0, "PrePaid: no balance");
@@ -185,7 +155,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     function consume(
         address wallet,
         uint256 amount
-    ) external whenNotPaused whenStarted whenNotEnded onlyWhitelistedOperator {
+    ) external whenNotPaused whenInState(SALE_START_STATE) onlyWhitelistedOperator {
         require(amount != 0, "PrePaid: zero consumption");
         uint256 balance = balanceOf[wallet];
         require(balance >= amount, "PrePaid: insufficient funds");
@@ -201,7 +171,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the transfer to the sender fails.
      * @dev An amount of ERC20 `revv` is transferred from this contract to the sender.
      */
-    function collectRevenue() external whenEnded onlyOwner {
+    function collectRevenue() external whenInState(SALE_END_STATE) onlyOwner {
         require(globalEarnings != 0, "PrePaid: no earnings");
         require(
             revv.transfer(_msgSender(), globalEarnings),
@@ -231,27 +201,19 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     }
     
     /**
-     * Sets the sale started state.
+     * Sets the sale state.
      * @dev Reverts if called by any other than the contract owner.
-     * @dev Emits the SaleStarted event.
-     * @param start The sale started state to set. Specifying `true` starts the sale
-     *  period, `false` resets the sale started state.
+     * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+     * @dev Emits the OnStateChanged event.
+     * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
      */
-    function setStartSale(bool start) external onlyOwner {
-        saleStarted = start;
-        emit SaleStarted(start);
-    }
+    function setSaleState(uint8 _state) external onlyOwner {
+        require(_state == BEFORE_SALE_STATE ||
+                _state == SALE_START_STATE ||
+                _state == SALE_END_STATE,"PrePaid: invalid state");
 
-    /**
-     * Sets the sale ended state.
-     * @dev Reverts if called by any other than the contract owner.
-     * @dev Emits the SaleEnded event.
-     * @param end The sale ended state to set. Specifying `true` ends the sale period,
-     *  `false` resets the sale ended state.
-     */
-    function setEndSale(bool end) external onlyOwner {
-        saleEnded = end;
-        emit SaleEnded(end);
+        state = _state;
+        emit OnStateChange(state);
     }
 
      /**
