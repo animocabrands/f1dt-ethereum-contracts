@@ -115,15 +115,17 @@ describe('PrePaid', function () {
         })
 
         it("should revert if the salesStart", async function() {
-            await this.prepaid.setStartSale(true,{from: deployer});
+            const startState = await this.prepaid.SALE_START_STATE.call();
+            await this.prepaid.setSaleState(startState,{from: deployer});
             const promiseResult = this.prepaid.deposit(toWei('1'), {from: participant});
-            await expectRevert(promiseResult,'PrePaid: sale started');
+            await expectRevert(promiseResult,'PrePaid: state locked');
         });
 
         it("should revert if the salesEnd", async function() {
-            await this.prepaid.setEndSale(true,{from: deployer});
+            const endState = await this.prepaid.SALE_END_STATE.call();
+            await this.prepaid.setSaleState(endState,{from: deployer});
             const promiseResult = this.prepaid.deposit(toWei('1'), {from: participant});
-            await expectRevert(promiseResult,'PrePaid: sale ended');
+            await expectRevert(promiseResult,'PrePaid: state locked');
         });
 
     });
