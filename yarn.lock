@@ -45,9 +45,9 @@
     "@openzeppelin/gsn-provider" "^0.1.10"
 
 "@animoca/ethereum-contracts-nft_staking@=4.0.0":
-  version "3.0.4"
-  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-3.0.4.tgz#28e7d151c953fde649a3ebe75d98388870105ef7"
-  integrity sha512-m2vgcxdux/6Ez5aoSu/WD3ncOKt24+xCdRt8zmIt4T4JG5bNgre1eJ4g30aqEPwCXKQL7HnNR3k7jgnh4pOLmQ==
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@animoca/ethereum-contracts-nft_staking/-/ethereum-contracts-nft_staking-4.0.0.tgz#059ecfdcb7418f0a225bbe0a2341e13d7d7361e0"
+  integrity sha512-A6Bu0JgnbKHt0yT10GC1Nm7wUL2d5hKvlKsL+I5SPB6soHe+B0Ydjl/+GXTvIGo+f6hH01+d0yzfKoVgC939dg==
 
 "@animoca/ethereum-contracts-sale_base@=6.0.0":
   version "6.0.0"
