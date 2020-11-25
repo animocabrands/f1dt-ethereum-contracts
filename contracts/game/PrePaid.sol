@@ -145,7 +145,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Emits the OnWithdraw event.
      * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      */
-    function withdrawAll() external whenEnded {
+    function withdraw() external whenEnded {
         address sender = _msgSender();
         uint256 balance = balanceOf[sender];
         require(balance != 0, "PrePaid: no balance");
@@ -155,34 +155,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         );
         balanceOf[sender] = 0;
         emit OnWithdraw(sender, balance, 0);
-    }
-
-    /**
-     * Withdraws `amount` from the sender's escrow balance to their wallet.
-     * @dev Reverts if the contract is paused.
-     * @dev Reverts if sale has started.
-     * @dev Reverts if withdrawal amount is zero.
-     * @dev Reverts if the sender has an insufficient balance to withdraw the specified
-     *  `amount` from.
-     * @dev Reverts if the transfer to the sender fails.
-     * @dev Emits the OnWithdraw event.
-     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
-     * @param amount The amount to withdraw.
-     */
-    function withdraw(
-        uint256 amount
-    ) external whenEnded {
-        require(amount != 0, "PrePaid: zero withdrawal");
-        address sender = _msgSender();
-        uint256 balance = balanceOf[sender];
-        require(balance >= amount, "PrePaid: insufficient funds");
-        require(
-            revv.transfer(sender, amount),
-            "PrePaid: transfer out failed"
-        );
-        uint256 newBalance = balance - amount;
-        balanceOf[sender] = newBalance;
-        emit OnWithdraw(sender, amount, newBalance);
     }
 
      /**
