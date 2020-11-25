@@ -6,7 +6,6 @@ import "@openzeppelin/contracts/GSN/Context.sol";
 import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
-import "@animoca/ethereum-contracts-core_library/contracts/payment/PayoutWallet.sol";
 import "@animoca/ethereum-contracts-core_library/contracts/access/WhitelistedOperators.sol";
 
 /// Minimal transfers-only ERC20 interface
@@ -16,35 +15,78 @@ interface IERC20Transfers {
 }
 
 /**
- * @title PrePaidContract.
- * Contract which manages the deposits made by wallets for pre sale
- * Participants are allowed to make deopsits and withdraw before sale starts
+ * @title PrePaid contract.
+ * Contract which manages the deposits made by wallets for pre-sale. Participants are
+ * allowed to make deposits before the sale starts, and withdrawals after the sale ends.
  */
 contract PrePaid is Context, Pausable, WhitelistedOperators {
     using SafeMath for uint256;
+
     /**
      * Event emitted on deposit
      * @param wallet The address of the user.
-     * @param amount New amount in user's escorw after deposit
+     * @param amount The amount deposited to the user's escrow balance.
+     * @param balance The user's new escrow balance after the deposit.
      */
-    event OnDeposit(address wallet, uint256 amount);
+    event OnDeposit(address wallet, uint256 amount, uint256 balance);
 
     /**
      * Event emitted on withdraw
      * @param wallet The address of the user.
-     * @param amount Amount deducted from user's escorw
+     * @param amount Amount deducted from user's escrow balance.
+     * @param balance The user's new escrow balance after the withdrawal.
      */
-    event OnWithdraw(address wallet, uint256 amount);
+    event OnWithdraw(address wallet, uint256 amount, uint256 balance);
 
     /**
      * Event emitted on sale start
      */
-    event OnSaleStart();
+    event OnSaleStarted();
 
     /**
      * Event emitted on sale end
      */
-    event OnSaleEnd();
+    event OnSaleEnded();
+
+    /**
+     * Modifier to make a function callable only when the sale has not started.
+     */
+    modifier whenNotStarted() {
+        require(saleStarted == false, "PrePaid: sale started");
+        _;
+    }
+
+    /**
+     * Modifier to make a function callable only when the sale has started.
+     */
+    modifier whenStarted() {
+        require(saleStarted == true, "PrePaid: sale not started");
+        _;
+    }
+
+    /**
+     * Modifier to make a function callable only when the sale has not ended.
+     */
+    modifier whenNotEnded() {
+        require(saleEnded == false, "PrePaid: sale ended");
+        _;
+    }
+
+    /**
+     * Modifier to make a function callable only when the sale has ended.
+     */
+    modifier whenEnded() {
+        require(saleEnded == true, "PrePaid: sale not ended");
+        _;
+    }
+
+    /**
+     * Modifier to make a function callable only by a whitelisted operator.
+     */
+    modifier onlyWhitelistedOperator() {
+        require(isOperator(_msgSender()), "PrePaid: invalid operator");
+        _;
+    }
 
     IERC20Transfers public immutable revv;
     bool public saleStarted = false;
@@ -55,7 +97,6 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
     /**
      * @dev Reverts if `revv_` is the zero address.
-     * @dev Reverts if any element of `amounts` is zero.
      * @param revv_ An ERC20-compliant contract address.
      */
     constructor(
@@ -67,36 +108,45 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     }
 
     /**
-     * Add amount to user's deposit and globalDeposit
-     * @dev Reverts if sale has started
-     * @dev Emits a OnDeposit event.
+     * Deposits `amount` into the sender's escrow balance and updates the global deposit
+     * balance.
+     * @dev Sender should ensure that this contract has a transfer allowance of
+     *  at least `amount` of REVV from their account before calling this function.
+     * @dev Reverts if the contract is paused.
+     * @dev Reverts if the sale has started.
+     * @dev Reverts if the sale has ended.
+     * @dev Reverts if the deposit amount is zero.
+     * @dev Reverts if the updated global deposit balance overflows.
+     * @dev Reverts if the deposit transfer from the sender fails.
+     * @dev Emits the OnDeposit event.
      * @dev An amount of ERC20 `revv` is transferred from the sender to this contract.
      * @param amount The amount to deposit.
      */
-    function deposit(uint256 amount) whenNotPaused public {
-        address sender = _msgSender();
-        require(saleStarted == false, "PrePaid: sale started");
+    function deposit(
+        uint256 amount
+    ) external whenNotPaused whenNotStarted whenNotEnded {
         require(amount != 0, "PrePaid: zero deposit");
-        uint256 newAmount = balanceOf[sender].add(amount);
-        balanceOf[sender] = newAmount;
+        globalDeposit = globalDeposit.add(amount);
+        address sender = _msgSender();
+        uint256 newBalance = balanceOf[sender] + amount;
+        balanceOf[sender] = newBalance;
         require(
             revv.transferFrom(sender, address(this), amount),
             "PrePaid: transfer in failed"
         );
-        globalDeposit = globalDeposit.add(amount);
-        emit OnDeposit(sender, newAmount);
+        emit OnDeposit(sender, amount, newBalance);
     }
 
     /**
-     * Withdraw amount to user's deposit
-     * @dev Reverts if sale has started
-     * @dev Emits a OnWithdraw event.
+     * Withdraws the remainder of the sender's escrow balance to their wallet.
+     * @dev Reverts if the sale has not ended.
+     * @dev Reverts if the sender has no balance to withdraw from.
+     * @dev Reverts if the transfer to the sender fails.
+     * @dev Emits the OnWithdraw event.
      * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
-     * @param amount The amount to withdraw.
      */
-    function withdrawAll() whenNotPaused public {
+    function withdrawAll() external whenEnded {
         address sender = _msgSender();
-        require(saleEnded == true, "PrePaid: sale not ended");
         uint256 balance = balanceOf[sender];
         require(balance != 0, "PrePaid: no balance");
         require(
@@ -104,130 +154,139 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
             "PrePaid: transfer out failed"
         );
         balanceOf[sender] = 0;
-        emit OnWithdraw(sender, balance);
+        emit OnWithdraw(sender, balance, 0);
     }
 
     /**
-     * Withdraw amount to user's deposit
-     * @dev Reverts if sale has started
-     * @dev Emits a OnWithdraw event.
+     * Withdraws `amount` from the sender's escrow balance to their wallet.
+     * @dev Reverts if the contract is paused.
+     * @dev Reverts if sale has started.
+     * @dev Reverts if withdrawal amount is zero.
+     * @dev Reverts if the sender has an insufficient balance to withdraw the specified
+     *  `amount` from.
+     * @dev Reverts if the transfer to the sender fails.
+     * @dev Emits the OnWithdraw event.
      * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
      * @param amount The amount to withdraw.
      */
-    function withdraw(uint256 amount) whenNotPaused public {
+    function withdraw(
+        uint256 amount
+    ) external whenEnded {
+        require(amount != 0, "PrePaid: zero withdrawal");
         address sender = _msgSender();
-        require(saleStarted == false, "PrePaid: sale started");
-        require(balanceOf[sender] >= amount, "PrePaid: insufficient funds");
-        uint256 newAmount = balanceOf[sender].sub(amount);
-        balanceOf[sender] = newAmount;
+        uint256 balance = balanceOf[sender];
+        require(balance >= amount, "PrePaid: insufficient funds");
         require(
             revv.transfer(sender, amount),
             "PrePaid: transfer out failed"
         );
-        emit OnWithdraw(sender, newAmount);
+        uint256 newBalance = balance - amount;
+        balanceOf[sender] = newBalance;
+        emit OnWithdraw(sender, amount, newBalance);
     }
 
      /**
-     * consume prepay
-     * @dev Reverts if sale has started
-     * @dev Emits a OnWithdraw event.
-     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
-     * @param amount The amount to withdraw.
+     * Consumes a pre-paid `amount` from the specified wallet's escrow balance and
+     * updates the global earnings balance.
+     * @dev Reverts if the contract is paused.
+     * @dev Reverts if sale has not started.
+     * @dev Reverts if the sale has ended.
+     * @dev Reverts if called by any other than a whitelisted operator.
+     * @dev Reverts if the consumption amount is zero.
+     * @dev Reverts if the given wallet has an insufficient balance to deduct the
+     *  specified `amount` from.
+     * @dev Reverts if the updated global earnings balance overflows.
+     * @dev An amount of ERC20 `revv` is transferred from the contract to the sender.
+     * @param wallet The wallet from which to consume `amount` from its escrow balance.
+     * @param amount The amount to consume.
      */
-    function consume(address wallet, uint256 amount) whenNotPaused public {
-        address sender = _msgSender();
-        require(isOperator(sender), "PrePaid: only operator");
-        require(saleStarted == false, "PrePaid: sale started");
-        require(balanceOf[wallet] >= amount, "PrePaid: insufficient funds");
-        uint256 newAmount = balanceOf[wallet].sub(amount);
-        balanceOf[wallet] = newAmount;
-        require(
-            revv.transfer(sender, amount),
-            "PrePaid: transfer out failed"
-        );
+    function consume(
+        address wallet,
+        uint256 amount
+    ) external whenNotPaused whenStarted whenNotEnded onlyWhitelistedOperator {
+        require(amount != 0, "PrePaid: zero consumption");
+        uint256 balance = balanceOf[wallet];
+        require(balance >= amount, "PrePaid: insufficient funds");
+        balanceOf[wallet] = balance - amount;
         globalEarnings = globalEarnings.add(amount);
     }
 
     /**
      * Deducts revv escrowed by wallet and deposits to operator
-     * @dev Reverts if the wallet has no amount escrowed
-     * @dev Reverts if amount is greater than revv escrowed
-     * @dev Reverts if sale has not ended
+     * @dev Reverts if the sale has not ended.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts if the global earnings balance is zero.
+     * @dev Reverts if the transfer to the sender fails.
      * @dev An amount of ERC20 `revv` is transferred from this contract to the sender.
      */
-    function collectRevenue() public onlyOwner{
-        address sender = _msgSender();
-        require(saleEnded == true, "PrePaid: sale not ended");
-        require(globalEarnings > 0, "PrePaid: no earnings");
-        
+    function collectRevenue() external whenEnded onlyOwner {
+        require(globalEarnings != 0, "PrePaid: no earnings");
         require(
-            revv.transfer(sender, globalEarnings),
+            revv.transfer(_msgSender(), globalEarnings),
             "PrePaid: transfer out failed"
         );
-
         globalEarnings = 0;
     }
 
     /**
-     * Gets the amount escrowed for wallet
-     * @param wallet The address of the wallet
-     * @return amount escrowed for wallet
+     * Gets the discount percentage based on the global deposit balance.
+     * @return The discount percentage.
      */
-    function getBalance(address wallet) 
-        external
-        view
-        returns (uint256 memory amount)
-    {
-        return balanceOf[wallet];
-    }
+    function getDiscount() external view returns (
+        uint256
+    ) {
+        uint256 value = globalDeposit;
 
-    /**
-     * Gets the current discount based on globalDeposit
-     * @return discount percentage
-     */
-    function getDiscount()
-        external
-        view
-        returns (uint256 memory discount)
-    {
-        if(globalDeposit >= 40000000000000000000000000)
-            return 50;
-        else if(globalDeposit >= 30000000000000000000000000)
-            return 25;
-        else if(globalDeposit >= 20000000000000000000000000)
-            return 10;
-        else
+        if (value < 2e25) {
             return 0;
-
+        } else if (value < 3e25) {
+            return 10;
+        } else if (value < 4e25) {
+            return 25;
+        } else {
+            return 50;
+        }
     }
     
-    function startSale() whenNotPaused external onlyOwner {
-        require(saleStarted == false, "PrePaid: already started");
+    /**
+     * Starts the sale.
+     * @dev Reverts if the contract is paused.
+     * @dev Reverts if the sale has started.
+     * @dev Reverts if the sale has ended.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Emits the OnSaleStarted event.
+     */
+    function startSale() external whenNotPaused whenNotStarted whenNotEnded onlyOwner {
         saleStarted = true;
         emit OnSaleStarted();
     }
 
-    function endSale() whenNotPaused external onlyOwner {
-        require(saleStarted == true, "PrePaid: sale not started");
-        require(saleEnded == false, "PrePaid: already ended");
+    /**
+     * Ends the sale.
+     * @dev Reverts if the sale has ended.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Emits the OnSaleEnded event.
+     */
+    function endSale() external whenNotEnded onlyOwner {
         saleEnded = true;
-        emit OnSaleEnd();
+        emit OnSaleEnded();
     }
 
-
      /**
-     * Pauses the deposit operations.
-     * @dev Reverts if the sender is not the contract owner.
-     * @dev Reverts if the contract is paused already.
+     * Pauses the contract.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts if the contract is paused.
+     * @dev Emits the Paused event.
      */
     function pause() external onlyOwner {
         _pause();
     }
 
     /**
-     * Unpauses the deposit operations.
-     * @dev Reverts if the sender is not the contract owner.
+     * Unpauses the contract.
+     * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if the contract is not paused.
+     * @dev Emits the Unpaused event.
      */
     function unpause() external onlyOwner {
         _unpause();
