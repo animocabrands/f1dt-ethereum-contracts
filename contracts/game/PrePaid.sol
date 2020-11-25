@@ -63,8 +63,8 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     /**
      * Modifier to make a function callable only when the contract is in a specific state
      */
-    modifier whenInState(uint8 _state) {
-        require(state == _state, "PrePaid: state locked");
+    modifier whenInState(uint8 state_) {
+        require(state == state_, "PrePaid: state locked");
         _;
     }
 
@@ -204,25 +204,25 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     /**
     * Sets the sale state.
     * @dev Reverts if state is not one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
-    * @dev Reverts if the current state is already set to `_state`.
-    * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+    * @dev Reverts if the current state is already set to `state_`.
+    * @param state_ The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
     * @dev Emits the StateChanged event.
     */
-    function _setSaleState(uint8 _state) internal {
-        require(_state & 0x3 != 0, "PrePaid: invalid state");
-        require(_state != state, "PrePaid: state already set");
-        state = _state;
-        emit StateChanged(_state);
+    function _setSaleState(uint8 state_) internal {
+        require(state_ & 0x3 != 0, "PrePaid: invalid state");
+        require(state_ != state, "PrePaid: state already set");
+        state = state_;
+        emit StateChanged(state_);
     }
 
     /**
      * Sets the sale state.
      * @dev Reverts if called by any other than the contract owner.
-     * @dev Reverts if the current state is already set to `_state`.
-     * @param _state The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
+     * @dev Reverts if the current state is already set to `state_`.
+     * @param state_ The state to set. Should be one of BEFORE_SALE_STATE, SALE_START_STATE or SALE_END_STATE
      */
-    function setSaleState(uint8 _state) external onlyOwner {
-        _setSaleState(_state);
+    function setSaleState(uint8 state_) external onlyOwner {
+        _setSaleState(state_);
     }
 
      /**
