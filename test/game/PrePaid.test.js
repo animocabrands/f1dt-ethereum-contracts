@@ -171,6 +171,31 @@ describe('PrePaid', function () {
 
         });
 
+        describe("post sales", function() {
+            beforeEach(async function() {
+                await this.prepaid.unpause({from: deployer});
+                await this.prepaid.deposit(toWei('1000'), {from: participant});
+                await this.prepaid.setSaleState('2', {from: deployer});
+            });
+
+
+            it("deposit should revert", async function(){
+                const revert = this.prepaid.deposit(toWei('1'), {from: participant});
+                await expectRevert(revert, "PrePaid: state locked");
+            });
+
+            it("withdraw should not revert", async function() {
+                await this.prepaid.withdraw({from: participant});
+            });
+
+
+            it("collectRevenue should not be state locked", async function() {
+                const revert = this.prepaid.collectRevenue({from: deployer});
+                await expectRevert(revert, "PrePaid: no earnings");
+            });
+
+        });
+
     });
 
 });
