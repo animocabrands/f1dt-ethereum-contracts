@@ -250,6 +250,15 @@ describe('PrePaid', function () {
                 (await this.prepaid.balanceOf(participant)).should.be.bignumber.equal(toWei('0'));
             });
 
+            it("withdraw twice should revert", async function() {
+                (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei("99999000"));
+                await this.prepaid.withdraw({from: participant});
+                const revert = this.prepaid.withdraw({from: participant});
+                await expectRevert(revert, "PrePaid: no balance");
+                (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei("100000000"));
+                (await this.prepaid.balanceOf(participant)).should.be.bignumber.equal(toWei('0'));
+            });
+
 
             it("collectRevenue should revert if called twice", async function() {
                 (await this.prepaid.collectRevenue({from: deployer}));
