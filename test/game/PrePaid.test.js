@@ -31,7 +31,7 @@ describe('PrePaid', function () {
             await this.revv.approve(spender, allowances[index], {from: owners[index]});
         }
     }
-    describe("coverage", function() {
+    describe('coverage', function () {
         describe('constructor()', function () {
             it('should revert with a zero address for the revv contract', async function () {
                 await expectRevert(PrePaid.new(ZeroAddress, {from: deployer}), 'PrePaid: zero address');
@@ -228,26 +228,26 @@ describe('PrePaid', function () {
             });
 
             it('can set state BEFORE_SALE_STATE', async function () {
-                await this.prepaid.setSaleState(2, {from: deployer})
+                await this.prepaid.setSaleState(2, {from: deployer});
                 await expectEvent(await this.prepaid.setSaleState('1', {from: deployer}), 'StateChanged', {state: '1'});
                 (await this.prepaid.state()).should.be.bignumber.equal('1');
             });
-    
+
             it('can set state SALE_START_STATE', async function () {
                 await expectEvent(await this.prepaid.setSaleState('2', {from: deployer}), 'StateChanged', {state: '2'});
                 (await this.prepaid.state()).should.be.bignumber.equal('2');
             });
-    
+
             it('can set state SALE_END_STATE', async function () {
                 await expectEvent(await this.prepaid.setSaleState('3', {from: deployer}), 'StateChanged', {state: '3'});
                 (await this.prepaid.state()).should.be.bignumber.equal('3');
             });
-    
+
             it('revert if unknown state', async function () {
                 const revert = this.prepaid.setSaleState('0', {from: deployer});
                 await expectRevert(revert, 'PrePaid: invalid state');
             });
-    
+
             it('revert if not owner', async function () {
                 const revert = this.prepaid.setSaleState(0, {from: anonymous});
                 await expectRevert(revert, 'Ownable: caller is not the owner');
@@ -263,7 +263,7 @@ describe('PrePaid', function () {
 
             it('emits state change event when sale starts', async function () {
                 const receipt = await this.prepaid.setSaleStart({from: operator});
-                await expectEvent(receipt, 'StateChanged', {state : '2'});
+                await expectEvent(receipt, 'StateChanged', {state: '2'});
                 (await this.prepaid.state()).should.be.bignumber.equal('2');
             });
 
@@ -289,7 +289,7 @@ describe('PrePaid', function () {
 
             it('emits state change event when sale ends', async function () {
                 const receipt = await this.prepaid.setSaleEnd({from: operator});
-                await expectEvent(receipt, 'StateChanged', {state : '3'});
+                await expectEvent(receipt, 'StateChanged', {state: '3'});
                 (await this.prepaid.state()).should.be.bignumber.equal('3');
             });
 
@@ -340,7 +340,6 @@ describe('PrePaid', function () {
     });
 
     describe('discount', function () {
-
         beforeEach(async function () {
             await doDeploy.bind(this)({
                 holders: [participant],
@@ -537,7 +536,7 @@ describe('PrePaid', function () {
                 await expectRevert(revert, 'PrePaid: no earnings');
             });
 
-            it("withdraw all balance", async function() {
+            it('withdraw all balance', async function () {
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('99999000'));
                 (await this.revv.balanceOf(deployer)).should.be.bignumber.equal(toWei('0'));
                 await this.prepaid.withdraw({from: participant});
@@ -547,11 +546,10 @@ describe('PrePaid', function () {
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('100000000'));
                 (await this.revv.balanceOf(deployer)).should.be.bignumber.equal(toWei('10'));
             });
-            
         });
 
         describe('scenario', function () {
-            before(async function(){
+            before(async function () {
                 await doDeploy.bind(this)({
                     holders: participants,
                     amounts: new Array(participants.length).fill(toWei('100000000')),
@@ -562,17 +560,17 @@ describe('PrePaid', function () {
                 });
             });
 
-            it("transfer ownership", async function(){
-                const receipt = (await this.prepaid.transferOwnership(operation, {from: deployer}));
-                await expectEvent(receipt, "OwnershipTransferred", {previousOwner: deployer, newOwner: operation});
+            it('transfer ownership', async function () {
+                const receipt = await this.prepaid.transferOwnership(operation, {from: deployer});
+                await expectEvent(receipt, 'OwnershipTransferred', {previousOwner: deployer, newOwner: operation});
             });
 
-            it("unpaused", async function(){
-                const receipt = (await this.prepaid.unpause({from: operation}));
-                await expectEvent(receipt, "Unpaused", {account: operation});
+            it('unpaused', async function () {
+                const receipt = await this.prepaid.unpause({from: operation});
+                await expectEvent(receipt, 'Unpaused', {account: operation});
             });
 
-            it("user deposits", async function() {
+            it('user deposits', async function () {
                 await this.prepaid.deposit(toWei('10000000'), {from: participant});
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('90000000'));
                 await this.prepaid.deposit(toWei('20000000'), {from: participant2});
@@ -584,7 +582,7 @@ describe('PrePaid', function () {
                 (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('30000000'));
             });
 
-            it("user deposits more", async function() {
+            it('user deposits more', async function () {
                 await this.prepaid.deposit(toWei('10000000'), {from: participant});
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('80000000'));
                 await this.prepaid.deposit(toWei('30000000'), {from: participant3});
@@ -596,16 +594,14 @@ describe('PrePaid', function () {
                 (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('70000000'));
             });
 
-            
-
-            it("start sales", async function(){
+            it('start sales', async function () {
                 await expectEvent(await this.prepaid.setSaleStart({from: operator}), 'StateChanged', {state: '2'});
             });
 
-            it("user consumes", async function() {
-                await (await this.prepaid.consume(participant, toWei('10000000'), {from: operator}));
-                await (await this.prepaid.consume(participant2, toWei('10000000'), {from: operator}));
-                await (await this.prepaid.consume(participant3, toWei('30000000'), {from: operator}));
+            it('user consumes', async function () {
+                await await this.prepaid.consume(participant, toWei('10000000'), {from: operator});
+                await await this.prepaid.consume(participant2, toWei('10000000'), {from: operator});
+                await await this.prepaid.consume(participant3, toWei('30000000'), {from: operator});
                 (await this.prepaid.balanceOf(participant)).should.be.bignumber.equal(toWei('10000000'));
                 (await this.prepaid.balanceOf(participant2)).should.be.bignumber.equal(toWei('10000000'));
                 (await this.prepaid.balanceOf(participant3)).should.be.bignumber.equal(toWei('0'));
@@ -615,31 +611,26 @@ describe('PrePaid', function () {
                 (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('70000000'));
             });
 
-            it("ends sales", async function(){
+            it('ends sales', async function () {
                 await expectEvent(await this.prepaid.setSaleEnd({from: operator}), 'StateChanged', {state: '3'});
             });
 
-            it("collect revenue", async function() {
+            it('collect revenue', async function () {
                 await this.prepaid.collectRevenue({from: operation});
                 (await this.revv.balanceOf(operation)).should.be.bignumber.equal(toWei('50000000'));
                 (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('20000000'));
             });
-            
-            it("user withdraw", async function() {
+
+            it('user withdraw', async function () {
                 await this.prepaid.withdraw({from: participant});
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('90000000'));
                 await this.prepaid.withdraw({from: participant2});
                 (await this.revv.balanceOf(participant2)).should.be.bignumber.equal(toWei('90000000'));
                 // user use up the balance no need for withdrawal
-                const revert =  this.prepaid.withdraw({from: participant3});
-                expectRevert(revert, "PrePaid: no balance");
+                const revert = this.prepaid.withdraw({from: participant3});
+                expectRevert(revert, 'PrePaid: no balance');
                 (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('0'));
             });
-
-
-
         });
-
-
     });
 });
