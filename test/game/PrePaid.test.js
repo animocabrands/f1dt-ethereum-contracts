@@ -38,8 +38,19 @@ describe('PrePaid', function () {
             });
 
             it('should deploy with correct parameters', async function () {
-                this.revv = await REVV.new([participant], [toWei('1000000')], {from: deployer});
-                PrePaid.new(this.revv.address, {from: deployer});
+                await doDeploy.bind(this)();
+            });
+
+            it('should assign the REVV contract component', async function () {
+                await doDeploy.bind(this)();
+                const actual = await this.prepaid.revv();
+                actual.should.equal(this.revv.address);
+            });
+
+            it('should pause the contract', async function () {
+                await doDeploy.bind(this)();
+                const actual = await this.prepaid.paused();
+                actual.should.be.true;
             });
         });
 
@@ -94,6 +105,46 @@ describe('PrePaid', function () {
                 const revert = this.prepaid.deposit(toWei('100'), {from: participant});
                 await expectRevert.unspecified(revert);
             });
+
+            it('should correctly update the global deposit amount', async function () {
+                const amount = Two;
+                const before = await this.prepaid.globalDeposit();
+                const expected = before.add(amount);
+                await this.prepaid.deposit(amount, {from: participant});
+                const actual = await this.prepaid.globalDeposit();
+                actual.should.be.bignumber.equal(expected);
+            });
+
+            it("should correctly update the sender's escrow balance", async function () {
+                const amount = Two;
+                const before = await this.prepaid.balanceOf(participant);
+                const expected = before.add(amount);
+                await this.prepaid.deposit(amount, {from: participant});
+                const actual = await this.prepaid.balanceOf(participant);
+                actual.should.be.bignumber.equal(expected);
+            });
+
+            it('should correctly transfer escrow amount from the sender', async function () {
+                const amount = Two;
+                const prepaidBalance = await this.revv.balanceOf(this.prepaid.address);
+                const senderBalance = await this.revv.balanceOf(participant);
+                const prepaidExpected = prepaidBalance.add(amount);
+                const senderExpected = senderBalance.sub(amount);
+                await this.prepaid.deposit(amount, {from: participant});
+                const prepaidActual = await this.revv.balanceOf(this.prepaid.address);
+                const senderActual = await this.revv.balanceOf(participant);
+                prepaidActual.should.be.bignumber.equal(prepaidExpected);
+                senderActual.should.be.bignumber.equal(senderExpected);
+            });
+
+            it('should emit the Deposited event', async function () {
+                const amount = Two;
+                const receipt = await this.prepaid.deposit(amount, {from: participant});
+                expectEvent(receipt, 'Deposited', {
+                    wallet: participant,
+                    amount: amount,
+                });
+            });
         });
 
         describe('withdraw()', function () {
@@ -120,6 +171,36 @@ describe('PrePaid', function () {
             it('should revert if the sender has no balance to withdraw from', async function () {
                 const revert = this.prepaid.withdraw({from: participant2});
                 await expectRevert(revert, 'PrePaid: no balance');
+            });
+
+            it('should correctly transfer escrow balance to the sender', async function () {
+                const amount = await this.prepaid.balanceOf(participant);
+                const prepaidBalance = await this.revv.balanceOf(this.prepaid.address);
+                const senderBalance = await this.revv.balanceOf(participant);
+                const prepaidExpected = prepaidBalance.sub(amount);
+                const senderExpected = senderBalance.add(amount);
+                await this.prepaid.withdraw({from: participant});
+                const prepaidActual = await this.revv.balanceOf(this.prepaid.address);
+                const senderActual = await this.revv.balanceOf(participant);
+                prepaidActual.should.be.bignumber.equal(prepaidExpected);
+                senderActual.should.be.bignumber.equal(senderExpected);
+            });
+
+            it("should correctly zero out the sender's escrow balance", async function () {
+                const balanceBefore = await this.prepaid.balanceOf(participant);
+                balanceBefore.should.be.bignumber.not.equal(Zero);
+                await this.prepaid.withdraw({from: participant});
+                const balanceAfter = await this.prepaid.balanceOf(participant);
+                balanceAfter.should.be.bignumber.equal(Zero);
+            });
+
+            it('should emit the Withddrawn event', async function () {
+                const amount = await this.prepaid.balanceOf(participant);
+                const receipt = await this.prepaid.withdraw({from: participant});
+                expectEvent(receipt, 'Withdrawn', {
+                    wallet: participant,
+                    amount: amount,
+                });
             });
         });
 
@@ -170,6 +251,24 @@ describe('PrePaid', function () {
                 const revert = this.prepaid.consume(participant2, toWei('100'), {from: operator});
                 await expectRevert(revert, 'PrePaid: insufficient funds');
             });
+
+            it('should correctly update the escrow balance of the wallet', async function () {
+                const amount = Two;
+                const balance = await this.prepaid.balanceOf(participant);
+                const expected = balance.sub(amount);
+                await this.prepaid.consume(participant, amount, {from: operator});
+                const actual = await this.prepaid.balanceOf(participant);
+                actual.should.be.bignumber.equal(expected);
+            });
+
+            it('should correctly update the global earnings amount', async function () {
+                const amount = Two;
+                const before = await this.prepaid.globalEarnings();
+                const expected = before.add(amount);
+                await this.prepaid.consume(participant, amount, {from: operator});
+                const actual = await this.prepaid.globalEarnings();
+                actual.should.be.bignumber.equal(expected);
+            });
         });
 
         describe('collectRevenue()', function () {
@@ -204,6 +303,27 @@ describe('PrePaid', function () {
                 await this.prepaid.collectRevenue({from: deployer});
                 const revert = this.prepaid.collectRevenue({from: deployer});
                 await expectRevert(revert, 'PrePaid: no earnings');
+            });
+
+            it('should correctly transfer the global earnings to the sender', async function () {
+                const amount = await this.prepaid.globalEarnings();
+                const prepaidBalance = await this.revv.balanceOf(this.prepaid.address);
+                const senderBalance = await this.revv.balanceOf(deployer);
+                const prepaidExpected = prepaidBalance.sub(amount);
+                const senderExpected = senderBalance.add(amount);
+                await this.prepaid.collectRevenue({from: deployer});
+                const prepaidActual = await this.revv.balanceOf(this.prepaid.address);
+                const senderActual = await this.revv.balanceOf(deployer);
+                prepaidActual.should.be.bignumber.equal(prepaidExpected);
+                senderActual.should.be.bignumber.equal(senderExpected);
+            });
+
+            it('should correctly zero out the global earnings amount', async function () {
+                const before = await this.prepaid.globalEarnings();
+                before.should.be.bignumber.not.equal(Zero);
+                await this.prepaid.collectRevenue({from: deployer});
+                const after = await this.prepaid.globalEarnings();
+                after.should.be.bignumber.equal(Zero);
             });
         });
 
@@ -281,10 +401,7 @@ describe('PrePaid', function () {
 
         describe('setSaleEnd()', function () {
             beforeEach(async function () {
-                await doDeploy.bind(this)({
-                    holders: [participant],
-                    amounts: [toWei('1000000')],
-                });
+                await doDeploy.bind(this)();
             });
 
             it('emits state change event when sale ends', async function () {
@@ -319,6 +436,21 @@ describe('PrePaid', function () {
                 const revert = this.prepaid.pause({from: deployer});
                 await expectRevert(revert, 'Pausable: paused');
             });
+
+            it('should pause the contract', async function () {
+                await this.prepaid.unpause({from: deployer});
+                let paused = await this.prepaid.paused();
+                paused.should.be.false;
+                await this.prepaid.pause({from: deployer});
+                paused = await this.prepaid.paused();
+                paused.should.be.true;
+            });
+
+            it('should emit the Paused event', async function () {
+                await this.prepaid.unpause({from: deployer});
+                const receipt = await this.prepaid.pause({from: deployer});
+                expectEvent(receipt, 'Paused');
+            });
         });
 
         describe('unpause()', function () {
@@ -335,6 +467,21 @@ describe('PrePaid', function () {
             it('reverts if the contract is already unpaused', async function () {
                 const revert = this.prepaid.unpause({from: deployer});
                 await expectRevert(revert, 'Pausable: not paused');
+            });
+
+            it('should unpause the contract', async function () {
+                await this.prepaid.pause({from: deployer});
+                let paused = await this.prepaid.paused();
+                paused.should.be.true;
+                await this.prepaid.unpause({from: deployer});
+                paused = await this.prepaid.paused();
+                paused.should.be.false;
+            });
+
+            it('should emit the Unpaused event', async function () {
+                await this.prepaid.pause({from: deployer});
+                const receipt = await this.prepaid.unpause({from: deployer});
+                expectEvent(receipt, 'Unpaused');
             });
         });
     });
