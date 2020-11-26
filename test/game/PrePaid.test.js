@@ -261,7 +261,11 @@ describe('PrePaid', function () {
                 await doDeploy.bind(this)();
             });
 
-            // todo check event for sales start
+            it('emits state change event when sale starts', async function () {
+                const receipt = await this.prepaid.setSaleStart({from: operator});
+                await expectEvent(receipt, 'StateChanged', {state : '2'});
+                (await this.prepaid.state()).should.be.bignumber.equal('2');
+            });
 
             it('reverts if called by any other than a whitelisted operator', async function () {
                 const revert = this.prepaid.setSaleStart({from: participant});
@@ -283,7 +287,11 @@ describe('PrePaid', function () {
                 });
             });
 
-            // todo check event for sales end
+            it('emits state change event when sale ends', async function () {
+                const receipt = await this.prepaid.setSaleEnd({from: operator});
+                await expectEvent(receipt, 'StateChanged', {state : '3'});
+                (await this.prepaid.state()).should.be.bignumber.equal('3');
+            });
 
             it('reverts if called by any other than a whitelisted operator', async function () {
                 const revert = this.prepaid.setSaleEnd({from: participant});
