@@ -7,12 +7,7 @@ import "@openzeppelin/contracts/math/SafeMath.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/Pausable.sol";
 import "@animoca/ethereum-contracts-core_library/contracts/access/WhitelistedOperators.sol";
-
-/// Minimal transfers-only ERC20 interface
-interface IERC20Transfers {
-    function transfer(address recipient, uint256 amount) external returns (bool);
-    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
-}
+import "../token/ERC20/REVV.sol";
 
 /**
  * @title PrePaid contract.
@@ -55,7 +50,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
     uint8 public constant SALE_END_STATE = 3;
 
     uint8 public state = BEFORE_SALE_STATE;
-    IERC20Transfers public immutable revv;
+    REVV public immutable revv;
     uint256 public globalDeposit = 0;
     uint256 public globalEarnings = 0;
     mapping(address => uint256) public balanceOf; // wallet => escrowed amount
@@ -78,12 +73,12 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
 
     /**
      * @dev Reverts if `revv_` is the zero address.
-     * @param revv_ An ERC20-compliant contract address.
+     * @param revv_ The REVV token contract address.
      */
     constructor(
-        IERC20Transfers revv_
+        REVV revv_
     ) public {
-        require(revv_ != IERC20Transfers(0), "PrePaid: zero address");
+        require(revv_ != REVV(0), "PrePaid: zero address");
         revv = revv_;
         _pause(); // pause on start
     }
@@ -100,7 +95,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the updated global deposit balance overflows.
      * @dev Reverts if the deposit transfer from the sender fails.
      * @dev Emits the Deposited event.
-     * @dev An amount of ERC20 `revv` is transferred from the sender to this contract.
+     * @dev An amount of REVV is transferred from the sender to this contract.
      * @param amount The amount to deposit.
      */
     function deposit(
@@ -124,7 +119,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the sender has no balance to withdraw from.
      * @dev Reverts if the transfer to the sender fails.
      * @dev Emits the Withdrawn event.
-     * @dev An amount of ERC20 `revv` is transferred from the contract to sender.
+     * @dev An amount of REVV is transferred from the contract to sender.
      */
     function withdraw() external whenInState(SALE_END_STATE) {
         address sender = _msgSender();
@@ -149,7 +144,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if the given wallet has an insufficient balance to deduct the
      *  specified `amount` from.
      * @dev Reverts if the updated global earnings balance overflows.
-     * @dev An amount of ERC20 `revv` is transferred from the contract to the sender.
+     * @dev An amount of REVV is transferred from the contract to the sender.
      * @param wallet The wallet from which to consume `amount` from its escrow balance.
      * @param amount The amount to consume.
      */
@@ -170,7 +165,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if the global earnings balance is zero.
      * @dev Reverts if the transfer to the sender fails.
-     * @dev An amount of ERC20 `revv` is transferred from this contract to the sender.
+     * @dev An amount of REVV is transferred from this contract to the sender.
      */
     function collectRevenue() external whenInState(SALE_END_STATE) onlyOwner {
         require(globalEarnings != 0, "PrePaid: no earnings");
