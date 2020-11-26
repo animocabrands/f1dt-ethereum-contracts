@@ -157,7 +157,7 @@ contract PrePaid is Context, Pausable, WhitelistedOperators {
         address wallet,
         uint256 amount
     ) external whenNotPaused whenInState(SALE_START_STATE) onlyWhitelistedOperator {
-        require(amount != 0, "PrePaid: zero consumption");
+        require(amount != 0, "PrePaid: zero amount");
         uint256 balance = balanceOf[wallet];
         require(balance >= amount, "PrePaid: insufficient funds");
         balanceOf[wallet] = balance - amount;
