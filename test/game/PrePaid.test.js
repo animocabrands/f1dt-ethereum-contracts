@@ -661,6 +661,11 @@ describe('PrePaid', function () {
                 await expectRevert(revert, 'PrePaid: state locked');
             });
 
+            it('consume should revert', async function () {
+                const revert = this.prepaid.consume(participant, toWei('10'), {from: operator});
+                await expectRevert(revert, 'PrePaid: state locked');
+            });
+
             it('withdraw should not revert', async function () {
                 (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('99999000'));
                 await this.prepaid.withdraw({from: participant});
