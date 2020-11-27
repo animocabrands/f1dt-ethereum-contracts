@@ -12,6 +12,12 @@ const [deployer, payout, owner, operator] = accounts;
 
 describe('F1DT RCK', function() {
     describe('constructor(holders, amounts, totalSupply', function() {
+        it('should revert with invalid arguments', async function() {
+            await expectRevert(
+                F1DT_RCK.new([deployer], [TOKEN_INITIAL_AMOUNT, TOKEN_INITIAL_AMOUNT], TOKEN_TOTAL_SUPPLY, {from: deployer}), 
+                'F1DT_RCK: wrong arguments'
+            );
+        });
         it('should revert with a zero supply', async function() {
             await expectRevert(
                 F1DT_RCK.new([deployer], [TOKEN_INITIAL_AMOUNT], 0, {from: deployer}), 
@@ -52,7 +58,7 @@ describe('F1DT RCK', function() {
         });
         describe('Token Mint', function() {
             it('should return the correct total supply after minting', async function() {
-                //TODO check: _totalSupply = _totalSupply.add(amount);
+                
                 // console.log("===============================");
                 // console.log("CHECK MINT...")
             });
