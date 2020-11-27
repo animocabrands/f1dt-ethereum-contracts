@@ -25,6 +25,7 @@ abstract contract ERC20WithFixedSupply is ERC20WithOperators {
 
         _beforeTokenTransfer(address(0), account, amount);
 
+        // Total supply will not be changed
         //_totalSupply = _totalSupply.add(amount);
         _balances[account] = _balances[account].add(amount);
         emit Transfer(address(0), account, amount);
