@@ -153,6 +153,7 @@ contract CrateKeySale is FixedPricesSale {
      *  - Computes the pricing formula, including any discount logic and price conversion;
      *  - Set the value of `purchase.totalPrice`;
      *  - Add any relevant extra data related to pricing in `purchase.pricingData` and document how to interpret it.
+     * @dev Applies discount pricing to the total price from the PrePaid contract.
      * @dev Reverts if `purchase.sku` does not exist.
      * @dev Reverts if `purchase.token` is not supported by the SKU.
      * @dev Reverts in case of price overflow.
@@ -181,8 +182,8 @@ contract CrateKeySale is FixedPricesSale {
      *  - Ensure the payment reaches destination in the expected output token;
      *  - Handle any token swap logic;
      *  - Add any relevant extra data related to payment in `purchase.paymentData` and document how to interpret it.
-     * @dev Reverts in case of payment failure.
      * @dev Consumes purchase funds from the PrePaid contract for the purchaser.
+     * @dev Reverts in case of payment failure.
      * @param purchase The purchase conditions.
      */
     function _payment(
@@ -200,7 +201,7 @@ contract CrateKeySale is FixedPricesSale {
      *  - Handle any internal logic related to the delivery, including the remaining supply update;
      *  - Add any relevant extra data related to delivery in `purchase.deliveryData` and document how to interpret it.
      * @dev Transfers tokens from the ERC20 F1DTCrateKey token contract associated with the SKU being purchased, of the
-     *  specified quantity.
+     *  specified purchase quantity.
      * @param purchase The purchase conditions.
      */
     function _delivery(
