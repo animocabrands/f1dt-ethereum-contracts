@@ -49,6 +49,7 @@ contract CrateKeySale is FixedPricesSale {
      * Creates an SKU.
      * @dev Deprecated. Please use `createSku(bytes32, uint256, uint256, address, string, string)` for creating
      *  inventory SKUs.
+     * @dev Reverts if called.
      * @param *sku* the SKU identifier.
      * @param *totalSupply* the initial total supply.
      * @param *maxQuantityPerPurchase* The maximum allowed quantity for a single purchase.
@@ -106,6 +107,44 @@ contract CrateKeySale is FixedPricesSale {
         crateKey.transferOwnership(owner());
 
         crateKeys[sku] = crateKey;
+    }
+
+    /**
+     * Sets the token prices for the specified product SKU.
+     * @dev Deprecated. Please use `updateSkuPricing(bytes32, uint256)` for setting the price of an inventory SKU.
+     * @dev Reverts if called.
+     * @param *sku* The identifier of the SKU.
+     * @param *tokens* The list of payment tokens to update.
+     * @param *prices* The list of prices to apply for each payment token.
+     */
+    function updateSkuPricing(
+        bytes32 /*sku*/,
+        address[] memory /*tokens*/,
+        uint256[] memory /*prices*/
+    ) public override onlyOwner {
+        revert("Deprecated. Please use `updateSkuPricing(bytes32, uint256)`");
+    }
+
+    /**
+     * Sets the token price for the specified product SKU.
+     * @dev Updates the SKU pricing for the escrow token of the PrePaid contract.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts if `sku` does not exist.
+     * @dev Emits the `SkuPricingUpdate` event.
+     * @param sku The identifier of the SKU.
+     * @param price The price to apply to the SKU's payment token.
+     */
+    function updateSkuPricing(
+        bytes32 sku,
+        uint256 price
+    ) public onlyOwner {
+        address[] memory tokens = new address[](1);
+        tokens[0] = address(prepaid.revv());
+
+        uint256[] memory prices = new uint256[](1);
+        prices[0] = price;
+
+        super.updateSkuPricing(sku, tokens, prices);
     }
 
     /**
