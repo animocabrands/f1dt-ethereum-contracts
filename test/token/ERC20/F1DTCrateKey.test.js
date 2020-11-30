@@ -98,7 +98,7 @@ describe('F1DT Crate Key', function() {
     });
 
     describe('Token', function() {
-        describe('Token Specification', function() {
+        describe('Specification', function() {
             beforeEach(async function() {
                 this.f1dtCck = await getInstance(TOKENS.F1DT_CCK);
                 this.f1dtEck = await getInstance(TOKENS.F1DT_ECK);
@@ -178,5 +178,12 @@ describe('F1DT Crate Key', function() {
                 });
             });
         });
+        describe('Burn Operation', function() {
+            describe('F1DT.CCK', function() { 
+                it('should burn ... TODO', async function() {
+                    console.log("BURN ... TODO");
+                });
+            });
+         });
     });
 });

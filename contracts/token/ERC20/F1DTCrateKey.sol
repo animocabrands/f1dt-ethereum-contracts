@@ -50,7 +50,30 @@ contract F1DTCrateKey is ERC20, Ownable {
         holder = holder_;
         _totalSupply = totalSupply_;
         _balances[holder_] = totalSupply_;
+
+        //CHECK MINT ...
+        _mint(holder, _totalSupply);
     }
 
-    //TODO add burn condition
+    function _mint(address account, uint256 amount) internal override {
+        require(account != address(0), "F1DTCrateKey: mint to the zero address");
+
+        _beforeTokenTransfer(address(0), account, amount);
+
+        //CHECK TOTAL SUPPLY
+        //_totalSupply = _totalSupply.add(amount);
+        _balances[account] = _balances[account].add(amount);
+        emit Transfer(address(0), account, amount);
+    }
+
+    //TODO BURN CONDITION...
+
+    /**
+     * @dev Destroys `amount` tokens from the caller.
+     *
+     * See {ERC20-_burn}.
+     */
+    function burn(uint256 amount) public onlyOwner {
+        _burn(_msgSender(), amount);
+    }
 }
