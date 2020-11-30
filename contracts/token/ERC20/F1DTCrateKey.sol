@@ -12,7 +12,7 @@ import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/ERC20WithOp
  * @dev F1DT.LCK for Legendary crate. Total supply: 1320
  * @dev F1DT.RCK for Rare crate. Total supply: 5350
  */
-contract F1DTCrateKey is ERC20WithOperators {
+contract F1DTCrateKey is ERC20, Ownable {
 
     // solhint-disable-next-line const-name-snakecase
     string public override symbol;
@@ -38,7 +38,7 @@ contract F1DTCrateKey is ERC20WithOperators {
         string memory symbol_, 
         string memory name_,    
         address holder_, 
-        uint256 totalSupply_) public ERC20WithOperators() {
+        uint256 totalSupply_) public {
 
         require(bytes(symbol_).length > 0, "F1DTCrateKey: invalid symbol");
         require(bytes(name_).length > 0, "F1DTCrateKey: invalid name");
