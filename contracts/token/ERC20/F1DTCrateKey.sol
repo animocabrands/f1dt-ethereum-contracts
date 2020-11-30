@@ -4,6 +4,14 @@ pragma solidity 0.6.8;
 
 import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/ERC20WithOperators.sol";
 
+/**
+ * @title F1DTCrateKey
+ * A token contract for Crate Keys
+ * @dev F1DT.CCK for Common crate. Total supply: 6700
+ * @dev F1DT.ECK for Epic crate. Total supply: 4050
+ * @dev F1DT.LCK for Legendary crate. Total supply: 1320
+ * @dev F1DT.RCK for Rare crate. Total supply: 5350
+ */
 contract F1DTCrateKey is ERC20WithOperators {
 
     // solhint-disable-next-line const-name-snakecase
@@ -17,6 +25,10 @@ contract F1DTCrateKey is ERC20WithOperators {
 
     /**
      * Constructor.
+     * @dev Reverts if `symbol_` is not valid
+     * @dev Reverts if `name_` is not valid
+     * @dev Reverts if `holder_` is an invalid address
+     * @dev Reverts if `totalSupply_` is equal to zero
      * @param symbol_ Symbol of the token.
      * @param name_ Name of the token.
      * @param holder_ Holder account of the initial supply.
@@ -39,4 +51,6 @@ contract F1DTCrateKey is ERC20WithOperators {
         _totalSupply = totalSupply_;
         _balances[holder_] = totalSupply_;
     }
+
+    //TODO add burn condition
 }
