@@ -8,10 +8,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title F1DTCrateKey
  * A token contract for Crate Keys
- * @dev F1DT.CCK for Common crate. Total supply: 6700
- * @dev F1DT.ECK for Epic crate. Total supply: 4050
- * @dev F1DT.LCK for Legendary crate. Total supply: 1320
- * @dev F1DT.RCK for Rare crate. Total supply: 5350
+ * @dev F1DT.CCK for Common crate. Initial supply: 6700. Max Supply: 6700.
+ * @dev F1DT.ECK for Epic crate. Initial supply: 4000. Max Supply: 5350.
+ * @dev F1DT.LCK for Legendary crate. Initial supply: 1320. Max Supply: 4050.
+ * @dev F1DT.RCK for Rare crate. Initial supply: 5350. Max Supply: 1320.
  */
 contract F1DTCrateKey is ERC20, Ownable {
 
