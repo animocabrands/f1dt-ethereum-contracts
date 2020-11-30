@@ -9,9 +9,6 @@ import "../game/PrePaid.sol";
 /**
  * @title CrateKeySale
  * A FixedPricesSale contract implementation that handles the purchase of ERC20 F1DTCrateKey tokens.
- *
- * PurchaseData.pricingData:
- *  - [0] uint256: discount percentage
  */
 contract CrateKeySale is FixedPricesSale {
 
@@ -22,20 +19,20 @@ contract CrateKeySale is FixedPricesSale {
 
     /**
      * Constructor.
+     * @dev Reverts if the `prepaid_` is the zero address.
      * @dev Emits the `MagicValues` event.
      * @dev Emits the `Paused` event.
-     * @param skusCapacity The cap for the number of managed SKUs.
+     * @dev Emits the `PayoutWalletSet` event.
      * @param prepaid_ The address of the PrePaid contract from which purchase payments will be taken from.
      */
     constructor (
-        uint256 skusCapacity,
         PrePaid prepaid_
     )
         public
         FixedPricesSale(
-            address(0),
-            skusCapacity,
-            1
+            _msgSender(),   // payout wallet (unused)
+            4,  // SKUs capacity (for each type of crate key only)
+            1   // tokens per-SKU capacity (PrePaid escrow token only)
         )
     {
         require(
@@ -46,15 +43,42 @@ contract CrateKeySale is FixedPricesSale {
     }
 
     /**
+     * Actvates, or 'starts', the contract.
+     * @dev Starts the PrePaid contract if is hasn't already been started.
+     * @dev Reverts if the PrePaid contract is paused.
+     * @dev Reverts if this sale contract is not whitelisted with the PrePaid contract.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts if the contract has already been started.
+     * @dev Reverts if the contract is not paused.
+     * @dev Emits the `Started` event.
+     * @dev Emits the `Unpaused` event.
+     */
+    function start() public override onlyOwner {
+        require(
+            !prepaid.paused(),
+            "CrateKeySale: PrePaid contract paused");
+
+        require(
+            prepaid.isOperator(address(this)),
+            "CrateKeySale: sale contract is not operator");
+
+        super.start();
+
+        if (prepaid.state() == prepaid.BEFORE_SALE_STATE()) {
+            prepaid.setSaleStart();
+        }
+    }
+
+    /**
      * Creates an SKU.
-     * @dev Deprecated. Please use `createSku(bytes32, uint256, uint256, address, string, string)` for creating
+     * @dev Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, F1DTCrateKey)` for creating
      *  inventory SKUs.
      * @dev Reverts if called.
      * @param *sku* the SKU identifier.
      * @param *totalSupply* the initial total supply.
      * @param *maxQuantityPerPurchase* The maximum allowed quantity for a single purchase.
-     * @param *notificationsReceiver* The purchase notifications receiver contract address. If set to the zero address,
-     *  the notification is not enabled.
+     * @param *notificationsReceiver* The purchase notifications receiver contract address.
+     *  If set to the zero address, the notification is not enabled.
      */
     function createSku(
         bytes32 /*sku*/,
@@ -62,118 +86,63 @@ contract CrateKeySale is FixedPricesSale {
         uint256 /*maxQuantityPerPurchase*/,
         address /*notificationsReceiver*/
     ) public override onlyOwner {
-        revert("Deprecated. Please use `createSku(bytes32, uint256, uint256, address, string, string)`");
+        revert("Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, F1DTCrateKey)`");
     }
 
     /**
-     * Creates an SKU.
-     * @dev Creates and deploys an ERC20 F1DTCrateKey token contract.
-     * @dev Created ERC20 F1DTCrateKey token contracts will have their ownership transferred to the current owner of
-     *  this sale contract.
-     * @dev The created ERC20 F1DTCrateKey token contract sets this contract as a whitelisted operator.
+     * Creates an SKU and associates the specified ERC20 F1DTCrateKey token contract with it.
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if `totalSupply` is zero.
      * @dev Reverts if `sku` already exists.
      * @dev Reverts if `notificationsReceiver` is not the zero address and is not a contract address.
      * @dev Reverts if the update results in too many SKUs.
+     * @dev Reverts if the `totalSupply` is SUPPLY_UNLIMITED.
+     * @dev Reverts if the `crateKey` is the zero address.
+     * @dev Reverts if the associated ERC20 F1DTCrateKey token contract holder has a token balance less than
+     *  `totalSupply`.
+     * @dev Reverts if the sale contract has an allowance from the ERC20 F1DTCrateKey token contract holder
+     *  not-equal-to `tokenSupply`.
      * @dev Emits the `SkuCreation` event.
-     * @param sku the SKU identifier.
-     * @param totalSupply the initial total supply.
+     * @param sku The SKU identifier.
+     * @param totalSupply The initial total supply.
      * @param maxQuantityPerPurchase The maximum allowed quantity for a single purchase.
-     * @param notificationsReceiver The purchase notifications receiver contract address. If set to the zero address,
-     *  the notification is not enabled.
-     * @param crateKeySymbol The symbol of the ERC20 F1DTCrateKey token contract.
-     * @param crateKeyName The name of the ERC20 F1DTCrateKey token contract.
+     * @param crateKey The ERC20 F1DTCrateKey token contract to bind with the SKU.
      */
-    function createSku(
+    function createCrateKeySku(
         bytes32 sku,
         uint256 totalSupply,
         uint256 maxQuantityPerPurchase,
-        address notificationsReceiver,
-        string calldata crateKeySymbol,
-        string calldata crateKeyName
+        F1DTCrateKey crateKey
     ) external onlyOwner {
+        require(
+            totalSupply != SUPPLY_UNLIMITED,
+            "CrateKeySale: invalid total supply");
+        
+        require(
+            crateKey != F1DTCrateKey(0),
+            "CrateKeySale: zero address");
+
         super.createSku(
             sku,
             totalSupply,
             maxQuantityPerPurchase,
-            notificationsReceiver);
+            address(0));    // notifications receiver
 
-        F1DTCrateKey crateKey = new F1DTCrateKey(
-            crateKeySymbol,
-            crateKeyName,
-            address(this),
-            totalSupply);
-        crateKey.transferOwnership(owner());
+        address crateKeyHolder = crateKey.holder();
 
+        // holder balance should be equal to or more than the SKU sale total supply since it could also include the
+        // supply reserved for operations purposes
+        require(
+            crateKey.balanceOf(crateKeyHolder) >= totalSupply,
+            "CrateKeySale: insufficient balance");
+
+        // allowance should match the SKU sale total supply to restrict what portion of the holder supply balance is
+        // reserved for the crate key sale
+        require(
+            crateKey.allowance(crateKeyHolder, address(this)) == totalSupply,
+            "CrateKeySale: invalid allowance");
+        
         crateKeys[sku] = crateKey;
-    }
-
-    /**
-     * Sets the token prices for the specified product SKU.
-     * @dev Deprecated. Please use `updateSkuPricing(bytes32, uint256)` for setting the price of an inventory SKU.
-     * @dev Reverts if called.
-     * @param *sku* The identifier of the SKU.
-     * @param *tokens* The list of payment tokens to update.
-     * @param *prices* The list of prices to apply for each payment token.
-     */
-    function updateSkuPricing(
-        bytes32 /*sku*/,
-        address[] memory /*tokens*/,
-        uint256[] memory /*prices*/
-    ) public override onlyOwner {
-        revert("Deprecated. Please use `updateSkuPricing(bytes32, uint256)`");
-    }
-
-    /**
-     * Sets the token price for the specified product SKU.
-     * @dev Updates the SKU pricing for the escrow token of the PrePaid contract.
-     * @dev Reverts if called by any other than the contract owner.
-     * @dev Reverts if `sku` does not exist.
-     * @dev Emits the `SkuPricingUpdate` event.
-     * @param sku The identifier of the SKU.
-     * @param price The price to apply to the SKU's payment token.
-     */
-    function updateSkuPricing(
-        bytes32 sku,
-        uint256 price
-    ) public onlyOwner {
-        address[] memory tokens = new address[](1);
-        tokens[0] = address(prepaid.revv());
-
-        uint256[] memory prices = new uint256[](1);
-        prices[0] = price;
-
-        super.updateSkuPricing(sku, tokens, prices);
-    }
-
-    /**
-     * Lifecycle step which computes the purchase price.
-     * @dev Responsibilities:
-     *  - Computes the pricing formula, including any discount logic and price conversion;
-     *  - Set the value of `purchase.totalPrice`;
-     *  - Add any relevant extra data related to pricing in `purchase.pricingData` and document how to interpret it.
-     * @dev Applies discount pricing to the total price from the PrePaid contract.
-     * @dev Reverts if `purchase.sku` does not exist.
-     * @dev Reverts if `purchase.token` is not supported by the SKU.
-     * @dev Reverts in case of price overflow.
-     * @dev purchase.pricingData[0] contains the discount percent applied to the total price.
-     * @param purchase The purchase conditions.
-     */
-    function _pricing(
-        PurchaseData memory purchase
-    ) internal override view {
-        super._pricing(purchase);
-
-        uint256 discountPercent = prepaid.getDiscount();
-
-        if (discountPercent != 0) {
-            uint256 discountAmount = purchase.totalPrice.mul(discountPercent).div(100);
-            purchase.totalPrice = purchase.totalPrice.sub(discountAmount);
-        }
-
-        purchase.pricingData = new bytes32[](1);
-        purchase.pricingData[0] = bytes32(discountPercent);
     }
 
     /**
@@ -183,7 +152,8 @@ contract CrateKeySale is FixedPricesSale {
      *  - Handle any token swap logic;
      *  - Add any relevant extra data related to payment in `purchase.paymentData` and document how to interpret it.
      * @dev Consumes purchase funds from the PrePaid contract for the purchaser.
-     * @dev Reverts in case of payment failure.
+     * @dev Reverts if the purchaser has no prepaid amount deposited.
+     * @dev Reverts if the purchaser has an insufficient prepaid deposit amount to cover the entire purchase.
      * @param purchase The purchase conditions.
      */
     function _payment(
@@ -202,6 +172,8 @@ contract CrateKeySale is FixedPricesSale {
      *  - Add any relevant extra data related to delivery in `purchase.deliveryData` and document how to interpret it.
      * @dev Transfers tokens from the ERC20 F1DTCrateKey token contract associated with the SKU being purchased, of the
      *  specified purchase quantity.
+     * @dev Reverts if the holder has an insufficient ERC20 F1DTCrateKey token balance for the transfer.
+     * @dev Reverts if the sale contract has an insufficient ERC20 F1DTCrateKey allowance for the transfer.
      * @param purchase The purchase conditions.
      */
     function _delivery(
@@ -211,7 +183,8 @@ contract CrateKeySale is FixedPricesSale {
 
         F1DTCrateKey crateKey = crateKeys[purchase.sku];
 
-        crateKey.transfer(
+        crateKey.transferFrom(
+            crateKey.holder(),
             purchase.recipient,
             purchase.quantity);
     }
