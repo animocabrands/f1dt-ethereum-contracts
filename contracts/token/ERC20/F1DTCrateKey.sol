@@ -32,50 +32,50 @@ contract F1DTCrateKey is ERC20, Ownable {
      * @dev Reverts if `totalSupply_` is equal to zero
      * @param symbol_ Symbol of the token.
      * @param name_ Name of the token.
-     * @param holder_ Holder account of the initial supply.
-     * @param totalSupply_ Total amount of tokens in existence.
+     * @param holder_ Holder account of the token initial supply.
+     * @param initialSupply_ Initial supply amount
      */
     constructor (
         string memory symbol_, 
         string memory name_,    
         address holder_, 
-        uint256 totalSupply_) public {
+        uint256 initialSupply_) public {
 
         require(bytes(symbol_).length > 0, "F1DTCrateKey: invalid symbol");
         require(bytes(name_).length > 0, "F1DTCrateKey: invalid name");
         require(holder_ != address(0), "F1DTCrateKey: invalid holder");
-        require(totalSupply_ != 0, "F1DTCrateKey: invalid total supply");
+        require(initialSupply_ != 0, "F1DTCrateKey: invalid initial supply");
 
         symbol = symbol_;
         name = name_;
         holder = holder_;
-        _totalSupply = totalSupply_;
-        _balances[holder_] = totalSupply_;
 
-        //CHECK MINT ...
-        _mint(holder, _totalSupply);
+        _mint(holder, initialSupply_);
     }
-
-    function _mint(address account, uint256 amount) internal override {
-        require(account != address(0), "F1DTCrateKey: mint to the zero address");
-
-        _beforeTokenTransfer(address(0), account, amount);
-
-        //CHECK TOTAL SUPPLY
-        //_totalSupply = _totalSupply.add(amount);
-        _balances[account] = _balances[account].add(amount);
-        emit Transfer(address(0), account, amount);
-    }
-
-    //TODO BURN CONDITION...
 
     /**
-     * @dev Destroys `amount` tokens from the caller.
-     *
-     * See {ERC20-_burn}.
+     * Mint `amount` tokens.
+     * In addition to the initial supply, more keys could be added 
+     * based on the amount of REVV deposited by players.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts is `amount` is invalid
+     * @param amount_ Amount of token to mint
      */
-    function burn(uint256 amount) external onlyOwner {
-        //TODO Check parent function and also: _beforeTokenTransfer
-        _burn(_msgSender(), amount);
+    function mint(uint256 amount_) external onlyOwner {
+        require(amount_ != 0, "F1DTCrateKey: invalid amount");
+
+        _mint(_msgSender(), amount_);
+    }
+
+    /**
+     * Destroys `amount` tokens.
+     * @dev Reverts if called by any other than the contract owner.
+     * @dev Reverts is `amount` is invalid
+     * @param amount_ Amount of token to burn
+     */
+    function burn(uint256 amount_) external onlyOwner {
+        require(amount_ != 0, "F1DTCrateKey: invalid amount");
+
+        _burn(_msgSender(), amount_);
     }
 }
