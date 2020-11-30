@@ -13,6 +13,15 @@ contract F1DTCrateKey is ERC20WithOperators {
     // solhint-disable-next-line const-name-snakecase
     uint8 public constant override decimals = 18;
 
+    address public holder;
+
+    /**
+     * Constructor.
+     * @param symbol_ Symbol of the token.
+     * @param name_ Name of the token.
+     * @param holder_ Holder account of the initial supply.
+     * @param totalSupply_ Total amount of tokens in existence.
+     */
     constructor (
         string memory symbol_, 
         string memory name_,    
@@ -26,6 +35,8 @@ contract F1DTCrateKey is ERC20WithOperators {
 
         symbol = symbol_;
         name = name_;
+        holder = holder_;
         _totalSupply = totalSupply_;
+        _balances[holder_] = totalSupply_;
     }
 }
