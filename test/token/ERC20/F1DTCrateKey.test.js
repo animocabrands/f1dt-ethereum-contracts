@@ -6,13 +6,14 @@ const { ZeroAddress, Zero } = require('@animoca/ethereum-contracts-core_library/
 
 const F1DTCrateKey = contract.fromArtifact('F1DTCrateKey');
 const TOKEN_DECIMALS = '18';
+const TOKEN_AMOUNT_TO_BURN = '1000';
 const [deployer, payout, owner, operator] = accounts;
 
 const TOKENS = {
     F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), totalSupply: '6700'},
+    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), totalSupply: '5350'},
     F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), totalSupply: '4050'},
     F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), totalSupply: '1320'},
-    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), totalSupply: '5350'},
 };
 
 async function getInstance(token, account, totalSupply, config) {
@@ -61,7 +62,7 @@ function tokenConstructorChecks(token) {
     });
 }
 
-//FIX: Invalid contract instance
+//FIX: * REVIEW -> Invalid contract instance
 // function tokenSpecificationChecks(contractInstance, token) {
 //     it('should return the correct name', async function() {
 //         const tokenName = await contractInstance.name();
@@ -86,25 +87,25 @@ describe('F1DT Crate Key', function() {
         describe('F1DT.CCK', function() {
             tokenConstructorChecks(TOKENS.F1DT_CCK);
         });
+        describe('F1DT.RCK', function() {
+            tokenConstructorChecks(TOKENS.F1DT_RCK);
+        });
         describe('F1DT.ECK', function() {
             tokenConstructorChecks(TOKENS.F1DT_ECK);
         });
         describe('F1DT.LCK', function() {
             tokenConstructorChecks(TOKENS.F1DT_LCK);
         });
-        describe('F1DT.RCK', function() {
-            tokenConstructorChecks(TOKENS.F1DT_RCK);
-        });
     });
 
     describe('Token', function() {
+        beforeEach(async function() {
+            this.f1dtCck = await getInstance(TOKENS.F1DT_CCK);
+            this.f1dtEck = await getInstance(TOKENS.F1DT_ECK);
+            this.f1dtLck = await getInstance(TOKENS.F1DT_LCK);
+            this.f1dtRck = await getInstance(TOKENS.F1DT_RCK);
+        });
         describe('Specification', function() {
-            beforeEach(async function() {
-                this.f1dtCck = await getInstance(TOKENS.F1DT_CCK);
-                this.f1dtEck = await getInstance(TOKENS.F1DT_ECK);
-                this.f1dtLck = await getInstance(TOKENS.F1DT_LCK);
-                this.f1dtRck = await getInstance(TOKENS.F1DT_RCK);
-            });
             describe('F1DT.CCK', function() {
                 it('should return the correct name', async function() {
                     const tokenName = await this.f1dtCck.name();
@@ -121,6 +122,24 @@ describe('F1DT Crate Key', function() {
                 it('should return the correct supply', async function() {
                     const tokenSupply = await this.f1dtCck.totalSupply();
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_CCK.totalSupply);
+                });
+            });
+            describe('F1DT.RCK', function() {
+                it('should return the correct name', async function() {
+                    const tokenName = await this.f1dtRck.name();
+                    tokenName.should.be.equal(TOKENS.F1DT_RCK.name);
+                });
+                it('should return the correct symbol', async function() {
+                    const tokenSymbol = await this.f1dtRck.symbol();
+                    tokenSymbol.should.be.equal(TOKENS.F1DT_RCK.symbol);
+                });
+                it('should return the correct decimals', async function() {
+                    const tokenDecimals = await this.f1dtRck.decimals();
+                    tokenDecimals.should.be.bignumber.equal(TOKEN_DECIMALS);
+                });
+                it('should return the correct supply', async function() {
+                    const tokenSupply = await this.f1dtRck.totalSupply();
+                    tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_RCK.totalSupply);
                 });
             });
             describe('F1DT.ECK', function() {
@@ -159,29 +178,96 @@ describe('F1DT Crate Key', function() {
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_LCK.totalSupply);
                 });
             });
-            describe('F1DT.RCK', function() {
-                it('should return the correct name', async function() {
-                    const tokenName = await this.f1dtRck.name();
-                    tokenName.should.be.equal(TOKENS.F1DT_RCK.name);
-                });
-                it('should return the correct symbol', async function() {
-                    const tokenSymbol = await this.f1dtRck.symbol();
-                    tokenSymbol.should.be.equal(TOKENS.F1DT_RCK.symbol);
-                });
-                it('should return the correct decimals', async function() {
-                    const tokenDecimals = await this.f1dtRck.decimals();
-                    tokenDecimals.should.be.bignumber.equal(TOKEN_DECIMALS);
-                });
-                it('should return the correct supply', async function() {
-                    const tokenSupply = await this.f1dtRck.totalSupply();
-                    tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_RCK.totalSupply);
-                });
-            });
+            
         });
         describe('Burn Operation', function() {
             describe('F1DT.CCK', function() { 
-                it('should burn ... TODO', async function() {
-                    console.log("BURN ... TODO");
+                it('should fail due to invalid onwer', async function() {
+                    await expectRevert(
+                        this.f1dtCck.burn(TOKENS.F1DT_CCK.totalSupply, {from: operator}),
+                        'Ownable: caller is not the owner'
+                    );
+                });
+                it('should fail due to invalid amount', async function() {
+                    await expectRevert(
+                        this.f1dtCck.burn('100000', {from: deployer}),
+                        'ERC20: burn amount exceeds balance'
+                    );
+                });
+                it('should burn the tokens', async function() {
+                    const receipt = await this.f1dtCck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    expectEvent(receipt, 'Transfer', {
+                        _from: deployer,
+                        _to: ZeroAddress,
+                        _value: TOKEN_AMOUNT_TO_BURN
+                    })
+                });
+            });
+
+            describe('F1DT.RCK', function() { 
+                it('should fail due to invalid onwer', async function() {
+                    await expectRevert(
+                        this.f1dtRck.burn(TOKENS.F1DT_RCK.totalSupply, {from: operator}),
+                        'Ownable: caller is not the owner'
+                    );
+                });
+                it('should fail due to invalid amount', async function() {
+                    await expectRevert(
+                        this.f1dtRck.burn('100000', {from: deployer}),
+                        'ERC20: burn amount exceeds balance'
+                    );
+                });
+                it('should burn the tokens', async function() {
+                    const receipt = await this.f1dtRck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    expectEvent(receipt, 'Transfer', {
+                        _from: deployer,
+                        _to: ZeroAddress,
+                        _value: TOKEN_AMOUNT_TO_BURN
+                    })
+                });
+            });
+            describe('F1DT.ECK', function() { 
+                it('should fail due to invalid onwer', async function() {
+                    await expectRevert(
+                        this.f1dtEck.burn(TOKENS.F1DT_ECK.totalSupply, {from: operator}),
+                        'Ownable: caller is not the owner'
+                    );
+                });
+                it('should fail due to invalid amount', async function() {
+                    await expectRevert(
+                        this.f1dtEck.burn('100000', {from: deployer}),
+                        'ERC20: burn amount exceeds balance'
+                    );
+                });
+                it('should burn the tokens', async function() {
+                    const receipt = await this.f1dtEck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    expectEvent(receipt, 'Transfer', {
+                        _from: deployer,
+                        _to: ZeroAddress,
+                        _value: TOKEN_AMOUNT_TO_BURN
+                    })
+                });
+            });
+            describe('F1DT.LCK', function() { 
+                it('should fail due to invalid onwer', async function() {
+                    await expectRevert(
+                        this.f1dtLck.burn(TOKENS.F1DT_LCK.totalSupply, {from: operator}),
+                        'Ownable: caller is not the owner'
+                    );
+                });
+                it('should fail due to invalid amount', async function() {
+                    await expectRevert(
+                        this.f1dtLck.burn('100000', {from: deployer}),
+                        'ERC20: burn amount exceeds balance'
+                    );
+                });
+                it('should burn the tokens', async function() {
+                    const receipt = await this.f1dtLck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    expectEvent(receipt, 'Transfer', {
+                        _from: deployer,
+                        _to: ZeroAddress,
+                        _value: TOKEN_AMOUNT_TO_BURN
+                    })
                 });
             });
          });

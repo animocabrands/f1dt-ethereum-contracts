@@ -2,7 +2,8 @@
 
 pragma solidity 0.6.8;
 
-import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/ERC20WithOperators.sol";
+import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
  * @title F1DTCrateKey
@@ -73,7 +74,8 @@ contract F1DTCrateKey is ERC20, Ownable {
      *
      * See {ERC20-_burn}.
      */
-    function burn(uint256 amount) public onlyOwner {
+    function burn(uint256 amount) external onlyOwner {
+        //TODO Check parent function and also: _beforeTokenTransfer
         _burn(_msgSender(), amount);
     }
 }
