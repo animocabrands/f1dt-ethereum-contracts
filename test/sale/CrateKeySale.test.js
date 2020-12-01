@@ -177,7 +177,7 @@ describe('CrateKeySale', function () {
             const revert = this.sale.createSku(sku, One, One, ZeroAddress, {from: deployer});
             await expectRevert(
                 revert,
-                'Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, F1DTCrateKey)`'
+                'Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, IF1DTCrateKey)`'
             );
         });
     });

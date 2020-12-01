@@ -13,7 +13,7 @@ import "../game/PrePaid.sol";
 contract CrateKeySale is FixedPricesSale {
 
     /* sku => crate key */
-    mapping (bytes32 => F1DTCrateKey) public crateKeys;
+    mapping (bytes32 => IF1DTCrateKey) public crateKeys;
 
     PrePaid public prepaid;
 
@@ -70,7 +70,7 @@ contract CrateKeySale is FixedPricesSale {
 
     /**
      * Creates an SKU.
-     * @dev Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, F1DTCrateKey)` for creating
+     * @dev Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, IF1DTCrateKey)` for creating
      *  inventory SKUs.
      * @dev Reverts if called.
      * @param *sku* the SKU identifier.
@@ -85,7 +85,7 @@ contract CrateKeySale is FixedPricesSale {
         uint256 /*maxQuantityPerPurchase*/,
         address /*notificationsReceiver*/
     ) public override onlyOwner {
-        revert("Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, F1DTCrateKey)`");
+        revert("Deprecated. Please use `createCrateKeySku(bytes32, uint256, uint256, IF1DTCrateKey)`");
     }
 
     /**
@@ -110,14 +110,14 @@ contract CrateKeySale is FixedPricesSale {
         bytes32 sku,
         uint256 totalSupply,
         uint256 maxQuantityPerPurchase,
-        F1DTCrateKey crateKey
+        IF1DTCrateKey crateKey
     ) external onlyOwner {
         require(
             totalSupply != SUPPLY_UNLIMITED,
             "CrateKeySale: invalid total supply");
         
         require(
-            crateKey != F1DTCrateKey(0),
+            crateKey != IF1DTCrateKey(0),
             "CrateKeySale: zero address");
 
         super.createSku(
@@ -179,7 +179,7 @@ contract CrateKeySale is FixedPricesSale {
     ) internal override {
         super._delivery(purchase);
 
-        F1DTCrateKey crateKey = crateKeys[purchase.sku];
+        IF1DTCrateKey crateKey = crateKeys[purchase.sku];
 
         crateKey.transferFrom(
             crateKey.holder(),
@@ -188,3 +188,46 @@ contract CrateKeySale is FixedPricesSale {
     }
 
 }
+
+/**
+ * @dev Interface of the ERC20 F1DTCrateKey token contract.
+ */
+interface IF1DTCrateKey {
+
+    /**
+     * Returns the amount of tokens owned by `account`.
+     * @param account The account whose token balance will be retrieved.
+     * @return The amount of tokens owned by `account`.
+     */
+    function balanceOf(address account) external view returns (uint256);
+
+    /**
+     * Returns the remaining number of tokens that `spender` will be allowed to spend on behalf of `owner` through
+     *  {transferFrom}.
+     * @dev This value is zero by default.
+     * @dev This value changes when {approve} or {transferFrom} are called.
+     * @param owner The account who has granted a spending allowance to the spender.
+     * @param spender The account who has been granted a spending allowance by the owner.
+     * @return The remaining number of tokens that `spender` will be allowed to spend on behalf of `owner` through
+     *  {transferFrom}.
+     */
+    function allowance(address owner, address spender) external view returns (uint256);
+
+    /**
+     * Moves `amount` tokens from `sender` to `recipient` using the allowance mechanism. 
+     * @dev `amount` is deducted from the caller's allowance.
+     * @dev Emits a {Transfer} event.
+     * @param sender The account where the tokens will be transferred from.
+     * @param recipient The account where the tokens will be transferred to.
+     * @param amount The amount of tokens being transferred.
+     * @return Boolean indicating whether the operation succeeded.
+     */
+    function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * Returns the account holding the initial token supply.
+     * @return The account holding the initial token supply.
+     */
+    function holder() external view returns (address);
+}
+
