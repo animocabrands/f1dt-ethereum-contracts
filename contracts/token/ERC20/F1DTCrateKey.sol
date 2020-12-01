@@ -8,10 +8,10 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 /**
  * @title F1DTCrateKey
  * A token contract for Crate Keys
- * @dev F1DT.CCK for Common crate. Initial supply: 5000. Max Supply: 6700.
- * @dev F1DT.RCK for Rare crate. Initial supply: 4000. Max Supply: 5350.
- * @dev F1DT.ECK for Epic crate. Initial supply: 3000. Max Supply: 4050.
- * @dev F1DT.LCK for Legendary crate. Initial supply: 1000. Max Supply: 1320.
+ * @dev F1DT.CCK for Common crate.
+ * @dev F1DT.RCK for Rare crate.
+ * @dev F1DT.ECK for Epic crate.
+ * @dev F1DT.LCK for Legendary crate.
   */
 contract F1DTCrateKey is ERC20, Ownable {
 
@@ -33,24 +33,24 @@ contract F1DTCrateKey is ERC20, Ownable {
      * @param symbol_ Symbol of the token.
      * @param name_ Name of the token.
      * @param holder_ Holder account of the token initial supply.
-     * @param initialSupply_ Initial supply amount
+     * @param totalSupply_ Total supply amount
      */
     constructor (
         string memory symbol_, 
         string memory name_,    
         address holder_, 
-        uint256 initialSupply_) public {
+        uint256 totalSupply_) public {
 
         require(bytes(symbol_).length > 0, "F1DTCrateKey: invalid symbol");
         require(bytes(name_).length > 0, "F1DTCrateKey: invalid name");
         require(holder_ != address(0), "F1DTCrateKey: invalid holder");
-        require(initialSupply_ != 0, "F1DTCrateKey: invalid initial supply");
+        require(totalSupply_ != 0, "F1DTCrateKey: invalid initial supply");
 
         symbol = symbol_;
         name = name_;
         holder = holder_;
 
-        _mint(holder, initialSupply_);
+        _mint(holder, totalSupply_);
     }
 
     /**
