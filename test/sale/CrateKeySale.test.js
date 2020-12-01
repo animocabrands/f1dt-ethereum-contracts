@@ -395,7 +395,7 @@ describe('CrateKeySale', function () {
             await expectRevert(revert, 'PrePaid: insufficient funds');
         });
 
-        it("purchases if the purchaser has a sufficient prepaid deposit for the purchase", async function () {
+        it('purchases if the purchaser has a sufficient prepaid deposit for the purchase', async function () {
             const skuInfo = await this.sale.getSkuInfo(sku);
             const price = skuInfo.prices[0];
             const amount = price;
@@ -410,7 +410,7 @@ describe('CrateKeySale', function () {
             actual.should.be.bignumber.equal(expected);
         });
 
-        it("purchases if the purchaser has a more than sufficient prepaid deposit for the purchase", async function () {
+        it('purchases if the purchaser has a more than sufficient prepaid deposit for the purchase', async function () {
             const skuInfo = await this.sale.getSkuInfo(sku);
             const price = skuInfo.prices[0];
             const amount = price.addn(1);
