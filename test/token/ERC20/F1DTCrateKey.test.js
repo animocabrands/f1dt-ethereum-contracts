@@ -127,8 +127,8 @@ describe('F1DT Crate Key', function() {
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_CCK.initialSupply);
                 });
                 it('should return the correct holder', async function() {
-                    const tokenDecimals = await this.f1dtCck.holder();
-                    tokenDecimals.should.be.equal(TOKEN_HOLDER);
+                    const tokenHolder = await this.f1dtCck.holder();
+                    tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
             });
 
@@ -150,8 +150,8 @@ describe('F1DT Crate Key', function() {
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_RCK.initialSupply);
                 });
                 it('should return the correct holder', async function() {
-                    const tokenDecimals = await this.f1dtRck.holder();
-                    tokenDecimals.should.be.equal(TOKEN_HOLDER);
+                    const tokenHolder = await this.f1dtRck.holder();
+                    tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
             });
             describe('F1DT.ECK', function() {
@@ -172,8 +172,8 @@ describe('F1DT Crate Key', function() {
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_ECK.initialSupply);
                 });
                 it('should return the correct holder', async function() {
-                    const tokenDecimals = await this.f1dtEck.holder();
-                    tokenDecimals.should.be.equal(TOKEN_HOLDER);
+                    const tokenHolder = await this.f1dtEck.holder();
+                    tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
             });
             describe('F1DT.LCK', function() {
@@ -194,8 +194,8 @@ describe('F1DT Crate Key', function() {
                     tokenSupply.should.be.bignumber.equal(TOKENS.F1DT_LCK.initialSupply);
                 });
                 it('should return the correct holder', async function() {
-                    const tokenDecimals = await this.f1dtLck.holder();
-                    tokenDecimals.should.be.equal(TOKEN_HOLDER);
+                    const tokenHolder = await this.f1dtLck.holder();
+                    tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
             });
         });
