@@ -145,28 +145,42 @@ describe('CrateKeySale', function () {
             expectEvent(receipt, 'Unpaused', {account: deployer});
         });
 
-        describe('when the prepaid period sale period has started', function () {
-            it('does not start the prepaid contract sale period', async function () {
+        describe('prepaid sale state', function () {
+            it('starts the prepaid contract sale period if the prepaid state is BEFORE_SALE_STATE', async function () {
                 await doStartPrepaidPeriod.bind(this)();
+                await doWhitelistSaleContract.bind(this)();
+                const prepaidBeforeSaleState = await this.prepaid.BEFORE_SALE_STATE();
+                const prepaidSaleStartState = await this.prepaid.SALE_START_STATE();
+                const stateBefore = await this.prepaid.state();
+                stateBefore.should.be.bignumber.equal(prepaidBeforeSaleState);
+                const receipt = await this.sale.start({from: deployer});
+                expectEvent.inTransaction(receipt.tx, this.prepaid, 'StateChanged', {state: prepaidSaleStartState});
+                const stateAfter = await this.prepaid.state();
+                stateAfter.should.be.bignumber.equal(prepaidSaleStartState);
+            });
+
+            it('does not start the prepaid contract sale period if the prepaid state is SALE_START_STATE', async function () {
+                await doStartPrepaidPeriod.bind(this)();
+                await doWhitelistSaleContract.bind(this)();
+                const prepaidSaleStartState = await this.prepaid.SALE_START_STATE();
+                await this.prepaid.setSaleState(prepaidSaleStartState, {from: deployer});
+                const stateBefore = await this.prepaid.state();
+                stateBefore.should.be.bignumber.equal(prepaidSaleStartState);
+                const receipt = await this.sale.start({from: deployer});
+                expectEvent.notEmitted(receipt, 'StateChanged');
+                const stateAfter = await this.prepaid.state();
+                stateAfter.should.be.bignumber.equal(prepaidSaleStartState);
+            });
+
+            it('reverts if the prepaid contract state is SALE_END_STATE', async function () {
+                await doStartPrepaidPeriod.bind(this)();
+                await doWhitelistSaleContract.bind(this)();
                 const prepaidSaleEndState = await this.prepaid.SALE_END_STATE();
                 await this.prepaid.setSaleState(prepaidSaleEndState, {from: deployer});
                 const stateBefore = await this.prepaid.state();
                 stateBefore.should.be.bignumber.equal(prepaidSaleEndState);
-                await doStartSalePeriod.bind(this)();
-                const stateAfter = await this.prepaid.state();
-                stateAfter.should.be.bignumber.equal(prepaidSaleEndState);
-            });
-        });
-
-        describe('when the prepaid contract sale period has not started', function () {
-            it('does starts the prepaid contract sale period', async function () {
-                await doStartPrepaidPeriod.bind(this)();
-                const prepaidSaleStartState = await this.prepaid.SALE_START_STATE();
-                const stateBefore = await this.prepaid.state();
-                stateBefore.should.be.bignumber.not.equal(prepaidSaleStartState);
-                await doStartSalePeriod.bind(this)();
-                const stateAfter = await this.prepaid.state();
-                stateAfter.should.be.bignumber.equal(prepaidSaleStartState);
+                const revert = this.sale.start({from: deployer});
+                await expectRevert(revert, 'CrateKeySale: invalid PrePaid state');
             });
         });
     });
@@ -247,8 +261,8 @@ describe('CrateKeySale', function () {
                 const revert = this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
                     from: deployer,
                 });
-            await expectRevert(revert, 'CrateKeySale: insufficient balance');
-        });
+                await expectRevert(revert, 'CrateKeySale: insufficient balance');
+            });
 
             it('creates the sku if the crate key holder token balance equals the SKU total supply', async function () {
                 const balance = await this.crateKey.balanceOf(holder);
@@ -289,8 +303,8 @@ describe('CrateKeySale', function () {
                 const revert = this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
                     from: deployer,
                 });
-            await expectRevert(revert, 'CrateKeySale: invalid allowance');
-        });
+                await expectRevert(revert, 'CrateKeySale: invalid allowance');
+            });
 
             it('creates the sku if the sale contract has a crate key allowance equals the SKU total supply', async function () {
                 const totalSupply = Two;
@@ -338,7 +352,9 @@ describe('CrateKeySale', function () {
             await doDeploy.bind(this)();
             await doCreateSku.bind(this)();
             const otherErc20 = await REVV.new([purchaser], [toWei('1000')], {from: deployer});
-            const revert = this.sale.updateSkuPricing(sku, [this.revv.address, otherErc20.address], [One, One], {from: deployer});
+            const revert = this.sale.updateSkuPricing(sku, [this.revv.address, otherErc20.address], [One, One], {
+                from: deployer,
+            });
             await expectRevert(revert, 'Sale: too many tokens');
         });
     });
@@ -362,7 +378,7 @@ describe('CrateKeySale', function () {
             // TODO:
         });
 
-        it('reverts if the sale contract has an insufficient crate key token allowance for delivery', async function() {
+        it('reverts if the sale contract has an insufficient crate key token allowance for delivery', async function () {
             // TODO:
         });
     });

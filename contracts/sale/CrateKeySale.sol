@@ -44,11 +44,12 @@ contract CrateKeySale is FixedPricesSale {
 
     /**
      * Actvates, or 'starts', the contract.
-     * @dev Starts the PrePaid contract if is hasn't already been started.
+     * @dev Starts the PrePaid contract sale period if is hasn't already been started.
      * @dev Reverts if the PrePaid contract is paused.
      * @dev Reverts if this sale contract is not whitelisted with the PrePaid contract.
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if the contract has already been started.
+     * @dev Reverts if the PrePaid contract is not in the sale period after calling.
      * @dev Emits the `Started` event.
      * @dev Emits the `Unpaused` event.
      */
@@ -66,6 +67,10 @@ contract CrateKeySale is FixedPricesSale {
         if (prepaid.state() == prepaid.BEFORE_SALE_STATE()) {
             prepaid.setSaleStart();
         }
+
+        require(
+            prepaid.state() == prepaid.SALE_START_STATE(),
+            "CrateKeySale: invalid PrePaid state");
     }
 
     /**
