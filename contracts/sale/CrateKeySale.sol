@@ -31,7 +31,7 @@ contract CrateKeySale is FixedPricesSale {
         public
         FixedPricesSale(
             _msgSender(),   // payout wallet (unused)
-            4,  // SKUs capacity (for each type of crate key only)
+            4,  // SKUs capacity (each type of crate key only)
             1   // tokens per-SKU capacity (PrePaid escrow token only)
         )
     {
@@ -49,7 +49,6 @@ contract CrateKeySale is FixedPricesSale {
      * @dev Reverts if this sale contract is not whitelisted with the PrePaid contract.
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if the contract has already been started.
-     * @dev Reverts if the contract is not paused.
      * @dev Emits the `Started` event.
      * @dev Emits the `Unpaused` event.
      */
@@ -94,14 +93,13 @@ contract CrateKeySale is FixedPricesSale {
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts if `totalSupply` is zero.
      * @dev Reverts if `sku` already exists.
-     * @dev Reverts if `notificationsReceiver` is not the zero address and is not a contract address.
      * @dev Reverts if the update results in too many SKUs.
      * @dev Reverts if the `totalSupply` is SUPPLY_UNLIMITED.
      * @dev Reverts if the `crateKey` is the zero address.
      * @dev Reverts if the associated ERC20 F1DTCrateKey token contract holder has a token balance less than
      *  `totalSupply`.
      * @dev Reverts if the sale contract has an allowance from the ERC20 F1DTCrateKey token contract holder
-     *  not-equal-to `tokenSupply`.
+     *  not-equal-to `totalSupply`.
      * @dev Emits the `SkuCreation` event.
      * @param sku The SKU identifier.
      * @param totalSupply The initial total supply.
