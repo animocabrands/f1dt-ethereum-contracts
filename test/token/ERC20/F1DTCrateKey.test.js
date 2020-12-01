@@ -65,26 +65,6 @@ function tokenConstructorChecks(token) {
     });
 }
 
-//FIX: * REVIEW -> Invalid contract instance
-// function tokenSpecificationChecks(contractInstance, token) {
-//     it('should return the correct name', async function() {
-//         const tokenName = await contractInstance.name();
-//         tokenName.should.be.equal(token.name);
-//     });
-//     it('should return the correct symbol', async function() {
-//         const tokenSymbol = await contractInstance.symbol();
-//         tokenSymbol.should.be.equal(token.symbol);
-//     });
-//     it('should return the correct decimals', async function() {
-//         const tokenDecimals = await contractInstance.decimals();
-//         tokenDecimals.should.be.bignumber.equal(TOKEN_DECIMALS);
-//     });
-//     it('should return the correct supply', async function() {
-//         const tokenSupply = await contractInstance.totalSupply();
-//         tokenSupply.should.be.bignumber.equal(token.totalSupply);
-//     });
-// };
-
 describe('F1DT Crate Key', function() {
     describe('constructor(symbol, name, holder, totalSupply', function() {
         describe('F1DT.CCK', function() {
@@ -198,100 +178,6 @@ describe('F1DT Crate Key', function() {
                     tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
             });
-        });
-
-        describe('Mint Operation', function() {
-            describe('F1DT.CCK', function() { 
-                it('should fail due to invalid onwer', async function() {
-                    await expectRevert(
-                        this.f1dtCck.mint(TOKEN_AMOUNT_TO_MINT, {from: operator}),
-                        'Ownable: caller is not the owner'
-                    );
-                }); 
-                it('should fail due to zero amount', async function() {
-                    await expectRevert(
-                        this.f1dtCck.mint(Zero, {from: deployer}),
-                        'F1DTCrateKey: invalid amount'
-                    );
-                }); 
-                it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtCck.mint(TOKEN_AMOUNT_TO_MINT, {from: deployer});
-                    expectEvent(receipt, 'Transfer', {
-                        _from: ZeroAddress,
-                        _to: deployer,
-                        _value: TOKEN_AMOUNT_TO_MINT
-                    })
-                });
-            });
-
-            describe('F1DT.RCK', function() {
-                it('should fail due to invalid onwer', async function() {
-                    await expectRevert(
-                        this.f1dtRck.mint(TOKEN_AMOUNT_TO_MINT, {from: operator}),
-                        'Ownable: caller is not the owner'
-                    );
-                }); 
-                it('should fail due to zero amount', async function() {
-                    await expectRevert(
-                        this.f1dtRck.mint(Zero, {from: deployer}),
-                        'F1DTCrateKey: invalid amount'
-                    );
-                }); 
-                it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtRck.mint(TOKEN_AMOUNT_TO_MINT, {from: deployer});
-                    expectEvent(receipt, 'Transfer', {
-                        _from: ZeroAddress,
-                        _to: deployer,
-                        _value: TOKEN_AMOUNT_TO_MINT
-                    })
-                });
-             });
-
-             describe('F1DT.ECK', function() {
-                it('should fail due to invalid onwer', async function() {
-                    await expectRevert(
-                        this.f1dtEck.mint(TOKEN_AMOUNT_TO_MINT, {from: operator}),
-                        'Ownable: caller is not the owner'
-                    );
-                }); 
-                it('should fail due to zero amount', async function() {
-                    await expectRevert(
-                        this.f1dtEck.mint(Zero, {from: deployer}),
-                        'F1DTCrateKey: invalid amount'
-                    );
-                }); 
-                it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtEck.mint(TOKEN_AMOUNT_TO_MINT, {from: deployer});
-                    expectEvent(receipt, 'Transfer', {
-                        _from: ZeroAddress,
-                        _to: deployer,
-                        _value: TOKEN_AMOUNT_TO_MINT
-                    })
-                });
-             });
-
-             describe('F1DT.LCK', function() {
-                it('should fail due to invalid onwer', async function() {
-                    await expectRevert(
-                        this.f1dtLck.mint(TOKEN_AMOUNT_TO_MINT, {from: operator}),
-                        'Ownable: caller is not the owner'
-                    );
-                }); 
-                it('should fail due to zero amount', async function() {
-                    await expectRevert(
-                        this.f1dtLck.mint(Zero, {from: deployer}),
-                        'F1DTCrateKey: invalid amount'
-                    );
-                }); 
-                it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtLck.mint(TOKEN_AMOUNT_TO_MINT, {from: deployer});
-                    expectEvent(receipt, 'Transfer', {
-                        _from: ZeroAddress,
-                        _to: deployer,
-                        _value: TOKEN_AMOUNT_TO_MINT
-                    })
-                });
-             });
         });
 
         describe('Burn Operation', function() {

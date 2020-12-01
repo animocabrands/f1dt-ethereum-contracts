@@ -54,20 +54,6 @@ contract F1DTCrateKey is ERC20, Ownable {
     }
 
     /**
-     * Mint `amount` tokens.
-     * In addition to the initial supply, more keys could be added 
-     * based on the amount of REVV deposited by players.
-     * @dev Reverts if called by any other than the contract owner.
-     * @dev Reverts is `amount` is invalid
-     * @param amount_ Amount of token to mint
-     */
-    function mint(uint256 amount_) external onlyOwner {
-        require(amount_ != 0, "F1DTCrateKey: invalid amount");
-
-        _mint(_msgSender(), amount_);
-    }
-
-    /**
      * Destroys `amount` tokens.
      * @dev Reverts if called by any other than the contract owner.
      * @dev Reverts is `amount` is invalid
