@@ -137,7 +137,7 @@ contract CrateKeySale is FixedPricesSale {
         // allowance should match the SKU sale total supply to restrict what portion of the holder supply balance is
         // reserved for the crate key sale
         require(
-            crateKey.allowance(crateKeyHolder, address(this)) == totalSupply,
+            crateKey.allowance(crateKeyHolder, address(this)) >= totalSupply,
             "CrateKeySale: invalid allowance");
         
         crateKeys[sku] = crateKey;

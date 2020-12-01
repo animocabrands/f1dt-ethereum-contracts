@@ -239,17 +239,88 @@ describe('CrateKeySale', function () {
             });
         });
 
-        it('reverts if the crate key holder token balance is less than total supply', async function () {
-            await this.crateKey.approve(this.sale.address, One, {from: holder});
-            const totalSupply = new BN(11);
-            const revert = this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {from: deployer});
+        describe('crate key holder token balance', function () {
+            it('reverts if the crate key holder token balance is less than SKU total supply', async function () {
+                const balance = await this.crateKey.balanceOf(holder);
+                await this.crateKey.approve(this.sale.address, balance, {from: holder});
+                const totalSupply = balance.addn(1);
+                const revert = this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
             await expectRevert(revert, 'CrateKeySale: insufficient balance');
         });
 
-        it('reverts if the sale contract does not have a crate key allowance equal to total supply', async function () {
-            await this.crateKey.approve(this.sale.address, One, {from: holder});
-            const revert = this.sale.createCrateKeySku(sku, Two, One, this.crateKey.address, {from: deployer});
+            it('creates the sku if the crate key holder token balance equals the SKU total supply', async function () {
+                const balance = await this.crateKey.balanceOf(holder);
+                await this.crateKey.approve(this.sale.address, balance, {from: holder});
+                const totalSupply = balance;
+                const receipt = await this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
+                expectEvent(receipt, 'SkuCreation', {
+                    sku: sku,
+                    totalSupply: totalSupply,
+                    maxQuantityPerPurchase: One,
+                    notificationsReceiver: ZeroAddress,
+                });
+            });
+
+            it('creates the sku if the crate key holder token balance is more than the SKU total supply', async function () {
+                const balance = await this.crateKey.balanceOf(holder);
+                await this.crateKey.approve(this.sale.address, balance, {from: holder});
+                const totalSupply = balance.subn(1);
+                const receipt = await this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
+                expectEvent(receipt, 'SkuCreation', {
+                    sku: sku,
+                    totalSupply: totalSupply,
+                    maxQuantityPerPurchase: One,
+                    notificationsReceiver: ZeroAddress,
+                });
+            });
+        });
+
+        describe('sale contract crate key allowance', function () {
+            it('reverts if the sale contract has a crate key allowance less than the SKU total supply', async function () {
+                const totalSupply = Two;
+                const allowance = totalSupply.subn(1);
+                await this.crateKey.approve(this.sale.address, allowance, {from: holder});
+                const revert = this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
             await expectRevert(revert, 'CrateKeySale: invalid allowance');
+        });
+
+            it('creates the sku if the sale contract has a crate key allowance equals the SKU total supply', async function () {
+                const totalSupply = Two;
+                const allowance = totalSupply;
+                await this.crateKey.approve(this.sale.address, allowance, {from: holder});
+                const receipt = await this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
+                expectEvent(receipt, 'SkuCreation', {
+                    sku: sku,
+                    totalSupply: totalSupply,
+                    maxQuantityPerPurchase: One,
+                    notificationsReceiver: ZeroAddress,
+                });
+            });
+
+            it('creates the sku if the sale contract has a crate key allowance greater than the SKU total supply', async function () {
+                const totalSupply = Two;
+                const allowance = totalSupply.addn(1);
+                await this.crateKey.approve(this.sale.address, allowance, {from: holder});
+                const receipt = await this.sale.createCrateKeySku(sku, totalSupply, One, this.crateKey.address, {
+                    from: deployer,
+                });
+                expectEvent(receipt, 'SkuCreation', {
+                    sku: sku,
+                    totalSupply: totalSupply,
+                    maxQuantityPerPurchase: One,
+                    notificationsReceiver: ZeroAddress,
+                });
+            });
         });
 
         it('binds the crate key with the sku', async function () {
