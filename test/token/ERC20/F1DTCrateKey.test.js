@@ -8,7 +8,6 @@ const [deployer, payout, owner, operator] = accounts;
 
 const F1DTCrateKey = contract.fromArtifact('F1DTCrateKey');
 const TOKEN_DECIMALS = '18';
-const TOKEN_AMOUNT_TO_BURN = '1000';
 const TOKEN_HOLDER = deployer;
 
 const TOKENS = {
@@ -200,11 +199,11 @@ describe('F1DT Crate Key', function() {
                     );
                 });
                 it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtCck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    const receipt = await this.f1dtCck.burn(TOKENS.F1DT_CCK.totalSupply, {from: deployer});
                     expectEvent(receipt, 'Transfer', {
                         _from: deployer,
                         _to: ZeroAddress,
-                        _value: TOKEN_AMOUNT_TO_BURN
+                        _value: TOKENS.F1DT_CCK.totalSupply
                     })
                 });
             });
@@ -228,11 +227,11 @@ describe('F1DT Crate Key', function() {
                     );
                 });
                 it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtRck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    const receipt = await this.f1dtRck.burn(TOKENS.F1DT_RCK.totalSupply, {from: deployer});
                     expectEvent(receipt, 'Transfer', {
                         _from: deployer,
                         _to: ZeroAddress,
-                        _value: TOKEN_AMOUNT_TO_BURN
+                        _value: TOKENS.F1DT_RCK.totalSupply
                     })
                 });
             });
@@ -256,11 +255,11 @@ describe('F1DT Crate Key', function() {
                     );
                 });
                 it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtEck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    const receipt = await this.f1dtEck.burn(TOKENS.F1DT_ECK.totalSupply, {from: deployer});
                     expectEvent(receipt, 'Transfer', {
                         _from: deployer,
                         _to: ZeroAddress,
-                        _value: TOKEN_AMOUNT_TO_BURN
+                        _value: TOKENS.F1DT_ECK.totalSupply
                     })
                 });
             });
@@ -284,11 +283,11 @@ describe('F1DT Crate Key', function() {
                     );
                 });
                 it('should burn the tokens', async function() {
-                    const receipt = await this.f1dtLck.burn(TOKEN_AMOUNT_TO_BURN, {from: deployer});
+                    const receipt = await this.f1dtLck.burn(TOKENS.F1DT_LCK.totalSupply, {from: deployer});
                     expectEvent(receipt, 'Transfer', {
                         _from: deployer,
                         _to: ZeroAddress,
-                        _value: TOKEN_AMOUNT_TO_BURN
+                        _value: TOKENS.F1DT_LCK.totalSupply
                     })
                 });
             });
