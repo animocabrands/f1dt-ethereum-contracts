@@ -1,7 +1,7 @@
 const {accounts, contract} = require('@openzeppelin/test-environment');
 const {BN, expectEvent, expectRevert} = require('@openzeppelin/test-helpers');
 const {toWei} = require('web3-utils');
-const {ZeroAddress, Zero, One, Two} = require('@animoca/ethereum-contracts-core_library').constants;
+const {ZeroAddress, Zero, One, Two, Three} = require('@animoca/ethereum-contracts-core_library').constants;
 const {stringToBytes32} = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
 
 const Sale = contract.fromArtifact('CrateKeySale');
@@ -53,13 +53,22 @@ describe('CrateKeySale', function () {
     }
 
     async function doCreateSku(overrides = {}) {
-        await this.crateKey.approve(this.sale.address, overrides.skuCapacity || One, {from: holder});
+        await this.crateKey.approve(this.sale.address, overrides.skuTotalSupply || One, {from: holder});
         await this.sale.createCrateKeySku(
             overrides.sku || sku,
-            overrides.skuCapacity || One,
-            overrides.skuTokenCapacity || One,
+            overrides.skuTotalSupply || One,
+            overrides.skuMaxQuantityPerPurchase || One,
             this.crateKey.address,
             {from: overrides.deployer || deployer}
+        );
+    }
+
+    async function doUpdateSkuPricing(overrides = {}) {
+        await this.sale.updateSkuPricing(
+            overrides.sku || sku,
+            overrides.tokens || [this.revv.address],
+            overrides.prices || [Two],
+            {from: deployer}
         );
     }
 
@@ -360,26 +369,116 @@ describe('CrateKeySale', function () {
     });
 
     describe('_payment()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+            await doStartPrepaidPeriod.bind(this)();
+            await doCreateSku.bind(this)();
+            await doUpdateSkuPricing.bind(this)();
+            await doWhitelistSaleContract.bind(this)();
+        });
+
         it('reverts if the purchaser has no prepaid amount deposited', async function () {
-            // TODO:
+            await doStartSalePeriod.bind(this)();
+            const revert = this.sale.purchaseFor(purchaser, this.revv.address, sku, One, '0x', {from: purchaser});
+            await expectRevert(revert, 'PrePaid: insufficient funds');
         });
 
         it('reverts if the purchaser has an insufficient prepaid deposit for the purchase', async function () {
-            // TODO:
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price.subn(1);
+            const quantity = One;
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const revert = this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            await expectRevert(revert, 'PrePaid: insufficient funds');
         });
 
-        it("purchases with the purchaser's prepaid deposit", async function () {
-            // TODO:
+        it("purchases if the purchaser has a sufficient prepaid deposit for the purchase", async function () {
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price;
+            const quantity = One;
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const balanceBefore = await this.prepaid.balanceOf(purchaser);
+            const expected = balanceBefore.sub(price);
+            await this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            const actual = await this.prepaid.balanceOf(purchaser);
+            actual.should.be.bignumber.equal(expected);
+        });
+
+        it("purchases if the purchaser has a more than sufficient prepaid deposit for the purchase", async function () {
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price.addn(1);
+            const quantity = One;
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const balanceBefore = await this.prepaid.balanceOf(purchaser);
+            const expected = balanceBefore.sub(price);
+            await this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            const actual = await this.prepaid.balanceOf(purchaser);
+            actual.should.be.bignumber.equal(expected);
         });
     });
 
     describe('_delivery()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+            await doStartPrepaidPeriod.bind(this)();
+            await doCreateSku.bind(this)();
+            await doUpdateSkuPricing.bind(this)();
+            await doWhitelistSaleContract.bind(this)();
+        });
+
         it('reverts if the holder has an insufficient crate key token balance for delivery', async function () {
-            // TODO:
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price;
+            const quantity = skuInfo.totalSupply;
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const balance = await this.crateKey.balanceOf(holder);
+            await this.crateKey.transfer(deployer, balance, {from: holder});
+            const revert = this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            await expectRevert(revert, 'ERC20: transfer amount exceeds balance');
         });
 
         it('reverts if the sale contract has an insufficient crate key token allowance for delivery', async function () {
-            // TODO:
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price;
+            const quantity = skuInfo.totalSupply;
+            await this.crateKey.approve(this.sale.address, Zero, {from: holder});
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const revert = this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            await expectRevert(revert, 'ERC20: transfer amount exceeds allowance');
+        });
+
+        it('delivers', async function () {
+            const skuInfo = await this.sale.getSkuInfo(sku);
+            const price = skuInfo.prices[0];
+            const amount = price;
+            const quantity = One;
+            await this.revv.approve(this.prepaid.address, amount, {from: purchaser});
+            await this.prepaid.deposit(amount, {from: purchaser});
+            await doStartSalePeriod.bind(this)();
+            const balanceBefore = await this.crateKey.balanceOf(purchaser);
+            const supplyBefore = await this.crateKey.balanceOf(holder);
+            const expectedBalance = balanceBefore.add(quantity);
+            const expectedSupply = supplyBefore.sub(quantity);
+            await this.sale.purchaseFor(purchaser, this.revv.address, sku, quantity, '0x', {from: purchaser});
+            const actualBalance = await this.crateKey.balanceOf(purchaser);
+            const actualSupply = await this.crateKey.balanceOf(holder);
+            actualBalance.should.be.bignumber.equal(expectedBalance);
+            actualSupply.should.be.bignumber.equal(expectedSupply);
         });
     });
 });
