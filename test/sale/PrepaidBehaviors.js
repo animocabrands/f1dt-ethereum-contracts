@@ -22,8 +22,12 @@ module.exports.beforeDeposit = function (deployer = accounts[0], operation = acc
         });
 
         it('unpaused', async function () {
-            const receipt = await this.prepaid.unpause({ from: operation });
-            await expectEvent(receipt, 'Unpaused', { account: operation });
+            //This pause validation is due to another test cases that changes this state
+            const isPaused = await this.prepaid.paused({ from: operation });
+            if (isPaused) {
+                const receipt = await this.prepaid.unpause({ from: operation });
+                await expectEvent(receipt, 'Unpaused', { account: operation });
+            }
         });
     });
 };

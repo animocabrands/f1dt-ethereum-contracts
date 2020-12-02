@@ -5,7 +5,7 @@ const PrepaidBehavior = require('./PrepaidBehaviors');
 const TokenBehavior = require("./TokenBehaviors");
 const SaleBehaviour = require('./SaleBehaviours')
 
-const [deployer, operator, operation, holder, anonymous, ...participants] = accounts;
+const [deployer, operator, operation, holder, purchaser, anonymous, ...participants] = accounts;
 const [participant, participant2, participant3] = participants;
 
 function addSkuBehavior() {
@@ -41,8 +41,8 @@ describe("scenario", async function () {
         /**        CREATE TOKENS            */
         TokenBehavior.createCrateKeyTokens(holder);
 
-        /**        CREATE SKUs          */
-        SaleBehaviour.createCrateKeySku(deployer, operation, holder);
+        /**        CREATE SKUs, SET PRICE AND START SALE          */
+        SaleBehaviour.createCrateKeySku(deployer, operation, holder, purchaser);
 
         /**        SET DISCOUNT          */
 

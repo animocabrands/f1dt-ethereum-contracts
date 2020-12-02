@@ -5,9 +5,10 @@ const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-cor
 const {stringToBytes32} = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
 const ContractDeployer = require('../helpers/ContractDeployer')
 
-const [deployer, operator, holder] = accounts;
+const [deployer, purchaser, operator, holder] = accounts;
 const TOKENS = ContractDeployer.TOKENS;
 
+const REVV = contract.fromArtifact('REVV');
 
 /**
  * Set Allowance and Create CrateKey Sku
@@ -23,6 +24,7 @@ module.exports.createCrateKeySku = function(
     deployer = accounts[0], 
     operation = accounts[1],
     holder = accounts[2],
+    purchaser = accounts[3],
     f1dtCckContract,
     f1dtRckContract,
     f1dtEckContract,
@@ -48,7 +50,6 @@ module.exports.createCrateKeySku = function(
 
         await this.f1dtCck.approve(this.sale.address, totalSupply, {from: holder});
         const receipt = await this.sale.createCrateKeySku(sku, totalSupply, totalSupply, this.f1dtCck.address, {from: deployer});
-        
         expectEvent(receipt, 'SkuCreation', {
             sku: sku,
             totalSupply: totalSupply,
@@ -56,6 +57,31 @@ module.exports.createCrateKeySku = function(
             notificationsReceiver: ZeroAddress,
         });
     });
+
+    it('set the sku price', async function () {
+        // Simulate a sku value
+        const sku = stringToBytes32(TOKENS.F1DT_CCK.symbol);
+
+        //const otherErc20 = await REVV.new([purchaser], [toWei('1000')], {from: deployer});
+        const revert = await this.sale.updateSkuPricing(sku, [this.revv.address], [One], {from: deployer});
+    });
+
+    it('start sale', async function() {
+        const isPaused = await this.prepaid.paused({ from: deployer });
+        const isSalePrepaidOperator = await this.prepaid.isOperator(this.sale.address);
+
+        if (isPaused) {
+            this.prepaid.unpause({from: deployer});
+        }
+
+        console.log("================================");
+        console.log(isSalePrepaidOperator);
+        console.log(isPaused);
+        console.log("================================");
+
+        //await this.sale.start({from: deployer});
+    });
+
 }
 
 
