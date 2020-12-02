@@ -11,6 +11,7 @@ const deployer = accounts[0];
  */
 module.exports.beforeDeposit = function (deployer = accounts[0], operation = accounts[1], prepaidContract) {
     context("before deposit", function () {
+
         before(function () {
             this.prepaid = prepaidContract || this.prepaid;
         });

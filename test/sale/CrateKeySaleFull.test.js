@@ -16,7 +16,7 @@ describe("scenario", async function () {
     
     before(async function () {
         this.revv = await ContractDeployer.deployREVV({from: deployer});
-        this.prepaid = await ContractDeployer.deployPrepaid();
+        this.prepaid = await ContractDeployer.deployPrepaid({from: deployer});
 
         //CrateKey Tokens
         const tokens = await ContractDeployer.deployCrateKeyTokens({from: deployer}, holder);
@@ -38,13 +38,19 @@ describe("scenario", async function () {
         /**        USERS DEPOSIT DURING PREPAID PERIOD (BEFORE SALE START)            */
         PrepaidBehavior.userDeposit(participants);
 
-        /**        DEPLOY CRATEKEY TOKENS            */
+        /**        CREATE TOKENS            */
         TokenBehavior.createCrateKeyTokens(holder);
 
         /**        CREATE SKUs          */
-        SaleBehaviour.createCrateKeySku(holder);
+        SaleBehaviour.createCrateKeySku(deployer, operation, holder);
 
-        /**        DEPLOY SALE          */
+        /**        SET DISCOUNT          */
+
+
+        /**        START SALE          */
+
+        /**        BUY ITEMS          */
+
 
     });
 

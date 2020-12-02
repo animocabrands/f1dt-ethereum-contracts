@@ -5,7 +5,7 @@ const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-cor
 const {stringToBytes32} = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
 const ContractDeployer = require('../helpers/ContractDeployer')
 
-const [deployer, holder] = accounts;
+const [deployer, operator, holder] = accounts;
 const TOKENS = ContractDeployer.TOKENS;
 
 
@@ -20,11 +20,14 @@ const TOKENS = ContractDeployer.TOKENS;
  * @param {string} saleContract 
  */
 module.exports.createCrateKeySku = function(
-    tokenHolder = holder, 
+    deployer = accounts[0], 
+    operation = accounts[1],
+    holder = accounts[2],
     f1dtCckContract,
     f1dtRckContract,
     f1dtEckContract,
     f1dtLckContract,
+    prepaidContract,
     saleContract
 ) {
     before(async function() {
@@ -32,6 +35,7 @@ module.exports.createCrateKeySku = function(
         this.f1dtRck = f1dtRckContract || this.f1dtRck;
         this.f1dtEck = f1dtEckContract || this.f1dtEck;
         this.f1dtLck = f1dtLckContract || this.f1dtLck;
+        this.prepaid = prepaidContract || this.prepaid;
         this.sale = saleContract || this.sale;
     });
 
@@ -40,16 +44,17 @@ module.exports.createCrateKeySku = function(
     it('creates the sku', async function () {
         // Simulate a sku value
         const sku = stringToBytes32(TOKENS.F1DT_CCK.symbol);
+        const totalSupply = TOKENS.F1DT_CCK.totalSupply;
 
-        await this.f1dtCck.approve(this.sale.address, One, {from: tokenHolder});
-        const receipt = await this.sale.createCrateKeySku(sku, One, One, this.f1dtCck.address, {from: deployer});
-            expectEvent(receipt, 'SkuCreation', {
-                sku: sku,
-                totalSupply: One,
-                maxQuantityPerPurchase: One,
-                notificationsReceiver: ZeroAddress,
-            });
-
+        await this.f1dtCck.approve(this.sale.address, totalSupply, {from: holder});
+        const receipt = await this.sale.createCrateKeySku(sku, totalSupply, totalSupply, this.f1dtCck.address, {from: deployer});
+        
+        expectEvent(receipt, 'SkuCreation', {
+            sku: sku,
+            totalSupply: totalSupply,
+            maxQuantityPerPurchase: totalSupply,
+            notificationsReceiver: ZeroAddress,
+        });
     });
 }
 
