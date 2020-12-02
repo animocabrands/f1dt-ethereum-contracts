@@ -52,6 +52,12 @@ describe('PrePaid', function () {
                 const actual = await this.prepaid.paused();
                 actual.should.be.true;
             });
+
+            it("should have owner", async function(){
+                await doDeploy.bind(this)();
+                const actual = await this.prepaid.owner();
+                actual.should.be.bignumber.equal(deployer);
+            });
         });
 
         describe('deposit()', function () {
