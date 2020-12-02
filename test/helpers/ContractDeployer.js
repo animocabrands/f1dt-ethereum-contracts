@@ -8,8 +8,8 @@ const deployer = accounts[0];
 /**
  * @async
  * @param {Web3Option} options 
- * @param {String[]} addresses 
- * @param {String[]} amountPerAccount 
+ * @param {string[]} addresses 
+ * @param {string[]} amountPerAccount 
  */
 module.exports.deployREVV = async function (options = { from: deployer }, addresses = accounts, amountPerAccount = toWei('100000000')) {
     const REVV = contract.fromArtifact('REVV');
@@ -21,7 +21,7 @@ module.exports.deployREVV = async function (options = { from: deployer }, addres
 /**
  * @async
  * @param {Web3Option} options 
- * @param {String} revvAddress
+ * @param {string} revvAddress
  */
 module.exports.deployPrepaid = async function (options = { from: deployer }, revvAddress) {
     if(this.revv || revvAddress) {
@@ -73,7 +73,7 @@ async function getCrateKeyInstance(token, accountHolder, options) {
 /**
  * @async
  * @param {Web3Option} options 
- * @param {String} accountHolder
+ * @param {string} accountHolder
  */
 module.exports.deployCrateKeyTokens = async function(options = {from: deployer}, accountHolder) {
     const f1dtCck = await getCrateKeyInstance(TOKENS.F1DT_CCK, accountHolder, options);
@@ -91,7 +91,7 @@ module.exports.deployCrateKeyTokens = async function(options = {from: deployer},
 /**
  * @async
  * @param {Web3Option} options 
- * @param {Srring} prepaidAddress 
+ * @param {string} prepaidAddress 
  */
 module.exports.deployCrateKeySale = async function(options = {from: deployer}, prepaidAddress) {
     if(this.prepaid || prepaidAddress) {

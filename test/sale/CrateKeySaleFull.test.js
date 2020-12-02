@@ -1,8 +1,9 @@
 const { accounts, contract } = require('@openzeppelin/test-environment');
 const { BN, expectEvent, expectRevert } = require('@openzeppelin/test-helpers');
 const ContractDeployer = require('../helpers/ContractDeployer');
-const PrepaidBehavior = require("./PrepaidBehaviors");
+const PrepaidBehavior = require('./PrepaidBehaviors');
 const TokenBehavior = require("./TokenBehaviors");
+const SaleBehaviour = require('./SaleBehaviours')
 
 const [deployer, operator, operation, holder, anonymous, ...participants] = accounts;
 const [participant, participant2, participant3] = participants;
@@ -39,6 +40,9 @@ describe("scenario", async function () {
 
         /**        DEPLOY CRATEKEY TOKENS            */
         TokenBehavior.createCrateKeyTokens(holder);
+
+        /**        CREATE SKUs          */
+        SaleBehaviour.createCrateKeySku(holder);
 
         /**        DEPLOY SALE          */
 
