@@ -31,8 +31,6 @@ describe("scenario", async function () {
 
     describe("Prepaid", function() {
         /**        DEPLOY AND UNPAUSE PREPAID CONTRACT            */
-        //1. this.prepaid.transferOwnership
-        //2. this.prepaid.unpause
         PrepaidBehavior.beforeDeposit(deployer, operation);
 
         /**        USERS DEPOSIT DURING PREPAID PERIOD (BEFORE SALE START)            */
@@ -44,14 +42,8 @@ describe("scenario", async function () {
         /**        CREATE SKUs, SET PRICE AND START SALE          */
         SaleBehaviour.createCrateKeySku(deployer, operation, holder, purchaser);
 
-        /**        SET DISCOUNT          */
-
-
-        /**        START SALE          */
-
-        /**        BUY ITEMS          */
-
-
+        /**        PURCHASE ITEMS ON SALE          */
+        
     });
 
 });
