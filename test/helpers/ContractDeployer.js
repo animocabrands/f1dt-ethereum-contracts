@@ -18,7 +18,11 @@ module.exports.deployREVV = async function (options = { from: deployer }, addres
     return this.revv;
 };
 
-
+/**
+ * @async
+ * @param {Web3Option} options 
+ * @param {String} revvAddress
+ */
 module.exports.deployPrepaid = async function (options = { from: deployer }, revvAddress) {
     if(this.revv || revvAddress) {
         const PrePaid = contract.fromArtifact('Prepaid');
@@ -41,9 +45,17 @@ const TOKENS = {
     F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), totalSupply: '3000'},
     F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), totalSupply: '1000'},
 };
+
+/**
+ * F1DT Tokens Spec
+ */
 module.exports.TOKENS = TOKENS;
 
 const TOKEN_DECIMALS = '18';
+
+/**
+ * Token Decimals Spec
+ */
 module.exports.TOKEN_DECIMALS = TOKEN_DECIMALS;
 
 async function getCrateKeyInstance(token, accountHolder, options) {
@@ -58,6 +70,11 @@ async function getCrateKeyInstance(token, accountHolder, options) {
     ); 
 };
 
+/**
+ * @async
+ * @param {Web3Option} options 
+ * @param {String} accountHolder
+ */
 module.exports.deployCrateKeyTokens = async function(options = {from: deployer}, accountHolder) {
     const f1dtCck = await getCrateKeyInstance(TOKENS.F1DT_CCK, accountHolder, options);
     const f1dtEck = await getCrateKeyInstance(TOKENS.F1DT_ECK, accountHolder, options);
@@ -69,4 +86,20 @@ module.exports.deployCrateKeyTokens = async function(options = {from: deployer},
         F1DT_ECK: f1dtEck,
         F1DT_LCK: f1dtLck        
     };
+}
+
+/**
+ * @async
+ * @param {Web3Option} options 
+ * @param {Srring} prepaidAddress 
+ */
+module.exports.deployCrateKeySale = async function(options = {from: deployer}, prepaidAddress) {
+    if(this.prepaid || prepaidAddress) {
+        const CrateKeySale = contract.fromArtifact('CrateKeySale');
+        const address = prepaidAddress || this.prepaid.address;
+        this.sale = await CrateKeySale.new(address, options);
+    } else {
+        throw new Error("Cannot find Prepaid Contract");
+    }
+    return this.sale;
 }

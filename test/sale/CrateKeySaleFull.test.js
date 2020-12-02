@@ -16,12 +16,16 @@ describe("scenario", async function () {
     before(async function () {
         this.revv = await ContractDeployer.deployREVV({from: deployer});
         this.prepaid = await ContractDeployer.deployPrepaid();
-        //Tokens
+
+        //CrateKey Tokens
         const tokens = await ContractDeployer.deployCrateKeyTokens({from: deployer}, holder);
         this.f1dtCck = tokens.F1DT_CCK;
         this.f1dtRck = tokens.F1DT_RCK;
         this.f1dtEck = tokens.F1DT_ECK;
         this.f1dtLck = tokens.F1DT_LCK;
+
+        //CrateKey Sale
+        this.sale = await ContractDeployer.deployCrateKeySale({from: deployer});
     });
 
     describe("Prepaid", function() {
@@ -33,8 +37,11 @@ describe("scenario", async function () {
         /**        USERS DEPOSIT DURING PREPAID PERIOD (BEFORE SALE START)            */
         PrepaidBehavior.userDeposit(participants);
 
-        /**        DEPLOY CRATE TOKENS            */
+        /**        DEPLOY CRATEKEY TOKENS            */
         TokenBehavior.createCrateKeyTokens(holder);
+
+        /**        DEPLOY SALE          */
+
     });
 
 });
