@@ -3,19 +3,15 @@ const {expect} = require('chai');
 const {ether, expectEvent, expectRevert} = require('@openzeppelin/test-helpers');
 const {BN, toAscii} = require('web3-utils');
 const { ZeroAddress, Zero } = require('@animoca/ethereum-contracts-core_library/src/constants');
+const ContractDeployer = require('../../helpers/ContractDeployer')
 
 const [deployer, payout, owner, operator] = accounts;
 
 const F1DTCrateKey = contract.fromArtifact('F1DTCrateKey');
-const TOKEN_DECIMALS = '18';
 const TOKEN_HOLDER = deployer;
 
-const TOKENS = {
-    F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), totalSupply: '5000'},
-    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), totalSupply: '4000'},
-    F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), totalSupply: '3000'},
-    F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), totalSupply: '1000'},
-};
+const TOKENS = ContractDeployer.TOKENS;
+const TOKEN_DECIMALS = ContractDeployer.TOKEN_DECIMALS;
 
 async function getInstance(token, account, totalSupply, config) {
     config = config || {from: deployer};
@@ -82,9 +78,9 @@ describe('F1DT Crate Key', function() {
     describe('Token', function() {
         beforeEach(async function() {
             this.f1dtCck = await getInstance(TOKENS.F1DT_CCK);
-            this.f1dtEck = await getInstance(TOKENS.F1DT_ECK);
-            this.f1dtLck = await getInstance(TOKENS.F1DT_LCK);
             this.f1dtRck = await getInstance(TOKENS.F1DT_RCK);
+            this.f1dtEck = await getInstance(TOKENS.F1DT_ECK);
+            this.f1dtLck = await getInstance(TOKENS.F1DT_LCK);            
         });
         describe('Specification', function() {
             describe('F1DT.CCK', function() {

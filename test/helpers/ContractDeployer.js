@@ -29,3 +29,44 @@ module.exports.deployPrepaid = async function (options = { from: deployer }, rev
     }
     return this.prepaid;
 }
+
+
+function getTokenDescription(type) {
+    return `F1&#174; Delta Time ${type} Crate Key`;
+}
+
+const TOKENS = {
+    F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), totalSupply: '5000'},
+    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), totalSupply: '4000'},
+    F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), totalSupply: '3000'},
+    F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), totalSupply: '1000'},
+};
+module.exports.TOKENS = TOKENS;
+
+const TOKEN_DECIMALS = '18';
+module.exports.TOKEN_DECIMALS = TOKEN_DECIMALS;
+
+async function getCrateKeyInstance(token, accountHolder, options) {
+    const F1DTCrateKey = contract.fromArtifact('F1DTCrateKey');
+
+    return await F1DTCrateKey.new(
+        token.symbol,
+        token.name,
+        accountHolder,
+        token.totalSupply, 
+        options
+    ); 
+};
+
+module.exports.deployCrateKeyTokens = async function(options = {from: deployer}, accountHolder) {
+    const f1dtCck = await getCrateKeyInstance(TOKENS.F1DT_CCK, accountHolder, options);
+    const f1dtEck = await getCrateKeyInstance(TOKENS.F1DT_ECK, accountHolder, options);
+    const f1dtLck = await getCrateKeyInstance(TOKENS.F1DT_LCK, accountHolder, options);
+    const f1dtRck = await getCrateKeyInstance(TOKENS.F1DT_RCK, accountHolder, options);
+    return { 
+        F1DT_CCK: f1dtCck,
+        F1DT_RCK: f1dtRck,
+        F1DT_ECK: f1dtEck,
+        F1DT_LCK: f1dtLck        
+    };
+}
