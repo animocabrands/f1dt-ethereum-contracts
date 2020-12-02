@@ -27,7 +27,6 @@ module.exports.beforeDeposit = function (deployer = accounts[0], operation = acc
     });
 };
 
-
 module.exports.userDeposit = function (partitipants, prepaidContract, revvContract) {
     const [participant, participant2, participant3] = partitipants;
     const deposits = {
@@ -47,28 +46,56 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
         });
 
         it('user deposits', async function () {
+            //Participant 1
             (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('100000000'));
-            await this.prepaid.deposit(toWei('10000000'), { from: participant });
+            
+            const deposit_P1 = toWei('10000000');
+            const receipt_P1 = await this.prepaid.deposit(deposit_P1, { from: participant });
+            await expectEvent(receipt_P1, 'Deposited', {wallet: participant, amount: deposit_P1});
+
             (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('90000000'));
-            await this.prepaid.deposit(toWei('20000000'), { from: participant2 });
-            (await this.revv.balanceOf(participant2)).should.be.bignumber.equal(toWei('80000000'));
-            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('30000000'));
-            // todo discount check
-            (await this.prepaid.getDiscount()).should.be.bignumber.equal('25');
-            // todo total deposit check
-            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('30000000'));
+            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('10000000'));
+            
+            // Discount check - First Condition
+            (await this.prepaid.getDiscount()).should.be.bignumber.equal('0');
+
+            //Participant 2
+            const deposit_P2 = toWei('10000000');
+            const receipt_P2 = await this.prepaid.deposit(deposit_P2, { from: participant2 });
+            await expectEvent(receipt_P2, 'Deposited', {wallet: participant2, amount: deposit_P2});
+
+            (await this.revv.balanceOf(participant2)).should.be.bignumber.equal(toWei('90000000'));
+            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('20000000'));
+            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('20000000'));
+            
+            // Discount check - Second Condition
+            (await this.prepaid.getDiscount()).should.be.bignumber.equal('10');
         });
 
         it('user deposits more', async function () {
-            await this.prepaid.deposit(toWei('10000000'), { from: participant });
+            //Participant 1
+            const deposit_P1 = toWei('10000000');
+            const receipt_P1 = await this.prepaid.deposit(deposit_P1, { from: participant });
+            await expectEvent(receipt_P1, 'Deposited', {wallet: participant, amount: deposit_P1});
+
             (await this.revv.balanceOf(participant)).should.be.bignumber.equal(toWei('80000000'));
-            await this.prepaid.deposit(toWei('30000000'), { from: participant3 });
+            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('30000000'));
+
+            // Discount check - Third Condition
+            (await this.prepaid.getDiscount()).should.be.bignumber.equal('25');
+
+            //Participant 3
+            const deposit_P3 = toWei('30000000');
+            const receipt_P3 = await this.prepaid.deposit(deposit_P3, { from: participant3 });
+            await expectEvent(receipt_P3, 'Deposited', {wallet: participant3, amount: deposit_P3});
+
+            
             (await this.revv.balanceOf(participant3)).should.be.bignumber.equal(toWei('70000000'));
-            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('70000000'));
-            // todo discount check
+            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('60000000'));
+            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('60000000'));
+
+            // Discount check - Fourth Condition
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('50');
-            // todo total deposit check
-            (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('70000000'));
         });
     });
     return deposits;
