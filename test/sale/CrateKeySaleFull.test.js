@@ -114,6 +114,11 @@ describe("scenario", async function () {
             const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const sku = stringToBytes32(tokenObject.symbol);
             const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            /* cannot test the array for prices, the test helper is using a array of [bignumber], it is using he deep comparison for each element,
+                the array in the event is not instantiate by the test, so instance compare will fail. 
+                expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address], prices:[actualPrice]})
+            */
+            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]})
         });
 
         it('update sku price for F1DT.RCK', async function () {
