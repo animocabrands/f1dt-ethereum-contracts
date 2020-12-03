@@ -4,7 +4,7 @@ const ContractDeployer = require('../helpers/ContractDeployer');
 const PrepaidBehavior = require('./PrepaidBehaviors');
 const TokenBehavior = require("./TokenBehaviors");
 const { stringToBytes32 } = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
-const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-core_library').constants;
+const { ZeroAddress, Zero, One, Two, EmptyByte} = require('@animoca/ethereum-contracts-core_library').constants;
 const { toWei } = require('web3-utils');
 const TOKENS = ContractDeployer.TOKENS;
 
@@ -152,12 +152,53 @@ describe("scenario", async function () {
     });
 
     /**        BUY ITEMS          */
-
     describe("Sales(Purchase)", function () {
-        /**        PURCHASE ITEMS ON SALE          */
-        it("should be able to purhcase Common Crate Key", async function () {
-            
-        });
 
+        /**        PURCHASE ITEMS ON SALE          */
+        it("should be able to purhcase all keys once", async function () {
+            for (const tokenObject of Object.values(TOKENS)) {
+                const sku = stringToBytes32(tokenObject.symbol);
+                const beforePurchaseBal = await this.prepaid.balanceOf(participant);
+                const receipt = await this.sale.purchaseFor(participant, 
+                                                            this.revv.address, 
+                                                            sku, 
+                                                            One, 
+                                                            EmptyByte, 
+                                                            { from: participant });
+
+                //Check the event
+                await expectEvent.inTransaction(
+                    receipt.tx,
+                    this.sale,
+                    'Purchase',
+                    {
+                        purchaser: participant,
+                        recipient: participant,
+                        token: this.revv.address,
+                        sku: sku,
+                        quantity: One,
+                        userData: EmptyByte
+                    });           
+
+                //Actual price of the token
+                const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+                const expectedBal = beforePurchaseBal.sub(actualPrice);
+
+                //Check prepaid balance
+                const afterPurchaseBal = await this.prepaid.balanceOf(participant);
+                afterPurchaseBal.should.be.bignumber.eq(expectedBal);
+                
+                //Check key balance
+                const keyBalance = await this.f1dtCck.balanceOf(participant);
+                keyBalance.should.be.bignumber.eq("1");
+            }
+        });
+        
+        //TODO: Purchase key with different purchaser and receiptant
+        //TODO: Purchase key check more than 1 quantity
+        //TODO: Purchase key until out of stock
+        //TODO: Purchase key until out of stock and should reject when there are one more purchase
     });
+    
+    //TODO: WITHDRAW DEPOSIT
 });
