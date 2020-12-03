@@ -5,6 +5,7 @@ const PrepaidBehavior = require('./PrepaidBehaviors');
 const TokenBehavior = require("./TokenBehaviors");
 const { stringToBytes32 } = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
 const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-core_library').constants;
+const { toWei } = require('web3-utils');
 const TOKENS = ContractDeployer.TOKENS;
 
 const [deployer, operation, anonymous, ...participants] = accounts;
@@ -44,6 +45,7 @@ describe("scenario", async function () {
     describe("Sales(setup SKU)", function () {
         
         TokenBehavior.createCrateKeyTokens();
+        const maxQuantity = toWei("20");
 
         it('add Common Crate Keys sku(\'F1DT.CCK\')', async function () {
             // Simulate a sku value
@@ -52,11 +54,11 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, maxQuantity, tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
-                maxQuantityPerPurchase: presaleSupply,
+                maxQuantityPerPurchase: maxQuantity,
                 notificationsReceiver: ZeroAddress,
             });
         });
@@ -68,11 +70,11 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, maxQuantity, tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
-                maxQuantityPerPurchase: presaleSupply,
+                maxQuantityPerPurchase: maxQuantity,
                 notificationsReceiver: ZeroAddress,
             });
         });
@@ -84,11 +86,11 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, maxQuantity, tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
-                maxQuantityPerPurchase: presaleSupply,
+                maxQuantityPerPurchase: maxQuantity,
                 notificationsReceiver: ZeroAddress,
             });
         });
@@ -100,66 +102,34 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, maxQuantity, tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
-                maxQuantityPerPurchase: presaleSupply,
+                maxQuantityPerPurchase: maxQuantity,
                 notificationsReceiver: ZeroAddress,
             });
         });
 
-        it('update sku price for F1DT.CCK', async function () {
-            const tokenObject = TOKENS.F1DT_CCK;
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const sku = stringToBytes32(tokenObject.symbol);
-            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
-            /* cannot test the array for prices, the test helper is using a array of [bignumber], it is using he deep comparison for each element,
-                the array in the event is not instantiate by the test, so instance compare will fail. 
-                expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address], prices:[actualPrice]})
-            */
-            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
+        it('update sku price for all skus', async function () {
+            for (const tokenObject of Object.values(TOKENS)) {
+                const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+                const sku = stringToBytes32(tokenObject.symbol);
+                const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+                /* cannot test the array for prices, the test helper is using a array of [bignumber], it is using he deep comparison for each element,
+                    the array in the event is not instantiate by the test, so instance compare will fail. 
+                    expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address], prices:[actualPrice]})
+                */
+                expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
 
-            const {prices} = await this.sale.getSkuInfo(sku);
-            prices[0].should.be.bignumber.eq(actualPrice);
+                const {prices} = await this.sale.getSkuInfo(sku);
+                prices[0].should.be.bignumber.eq(actualPrice);
+            }
         });
-
-        it('update sku price for F1DT.RCK', async function () {
-            const tokenObject = TOKENS.F1DT_RCK;
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const sku = stringToBytes32(tokenObject.symbol);
-            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
-            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
-
-            const {prices} = await this.sale.getSkuInfo(sku);
-            prices[0].should.be.bignumber.eq(actualPrice);
-        });
-
-        it('update sku price for F1DT.ECK', async function () {
-            const tokenObject = TOKENS.F1DT_ECK;
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const sku = stringToBytes32(tokenObject.symbol);
-            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
-            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
-
-            const {prices} = await this.sale.getSkuInfo(sku);
-            prices[0].should.be.bignumber.eq(actualPrice);
-        });
-
-        it('update sku price for F1DT.LCK', async function () {
-            const tokenObject = TOKENS.F1DT_LCK;
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const sku = stringToBytes32(tokenObject.symbol);
-            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
-            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
-
-            const {prices} = await this.sale.getSkuInfo(sku);
-            prices[0].should.be.bignumber.eq(actualPrice);
-        });        
     })
 
 
-    // /**        CREATE SKUs          */
+    // /**        add sales contract as whitelist operator to prepaid          */
     describe("Prepaid", function () {
         before(function () {
             this.whitelistOperator = this.sale.address;
@@ -167,6 +137,7 @@ describe("scenario", async function () {
 
         PrepaidBehavior.addWhiteListedOperator();
     });
+    
     /**        START SALE          */
     describe("Sales(Start)", function () {
         it("should start sales", async function () {
