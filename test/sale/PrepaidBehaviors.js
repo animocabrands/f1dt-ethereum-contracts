@@ -9,25 +9,16 @@ const deployer = accounts[0];
  * @param {string} operation 
  * @param {*} prepaidContract 
  */
-module.exports.beforeDeposit = function (deployer = accounts[0], operation = accounts[1], prepaidContract) {
-    context("before deposit", function () {
+module.exports.beforeDeposit = function (deployer = accounts[0], prepaidContract) {
+    describe("before deposit", function () {
 
         before(function () {
             this.prepaid = prepaidContract || this.prepaid;
         });
 
-        it('transfer ownership', async function () {
-            const receipt = await this.prepaid.transferOwnership(operation, { from: deployer });
-            await expectEvent(receipt, 'OwnershipTransferred', { previousOwner: deployer, newOwner: operation });
-        });
-
         it('unpaused', async function () {
-            //This pause validation is due to another test cases that changes this state
-            const isPaused = await this.prepaid.paused({ from: operation });
-            if (isPaused) {
-                const receipt = await this.prepaid.unpause({ from: operation });
-                await expectEvent(receipt, 'Unpaused', { account: operation });
-            }
+            const receipt = await this.prepaid.unpause({ from: deployer });
+            await expectEvent(receipt, 'Unpaused', { account: deployer });
         });
     });
 };
@@ -39,7 +30,7 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
         [participant2]: toWei("20000000"),
         [participant3]: toWei("30000000")
     };
-    context("deposit phrase", function () {
+    describe("deposit phrase", function () {
 
         before(async function () {    
             this.prepaid = prepaidContract || this.prepaid;
@@ -93,7 +84,7 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
     return deposits;
 };
 
-module.exports.pauseDeposit = function(participants, operation = accounts[1], prepaidContract){
+module.exports.pauseDeposit = function(participants, deployer = accounts[0], prepaidContract){
     const participant = participants[0];
 
     context("pause deposit", function () {
@@ -102,8 +93,8 @@ module.exports.pauseDeposit = function(participants, operation = accounts[1], pr
         });
 
         it('pause the contract', async function () {
-            const receipt = await this.prepaid.pause({from: operation});
-            await expectEvent(receipt, 'Paused', {account: operation});
+            const receipt = await this.prepaid.pause({from: deployer});
+            await expectEvent(receipt, 'Paused', {account: deployer});
         });
     
         it('should revert when deposit during the pause period', async function() {
@@ -113,7 +104,7 @@ module.exports.pauseDeposit = function(participants, operation = accounts[1], pr
     });
 };
 
-module.exports.unpauseDeposit = function(participants, operation = accounts[1], prepaidContract) {
+module.exports.unpauseDeposit = function(participants, deployer = accounts[0], prepaidContract) {
     const participant3 = participants[2];
 
     context("unpause deposit", function () {
@@ -122,8 +113,8 @@ module.exports.unpauseDeposit = function(participants, operation = accounts[1], 
         });
     
         it('unpause the contract', async function () {
-            const receipt = await this.prepaid.unpause({from: operation});
-            await expectEvent(receipt, 'Unpaused', {account: operation});
+            const receipt = await this.prepaid.unpause({from: deployer});
+            await expectEvent(receipt, 'Unpaused', {account: deployer});
         });
     
         it('deposit after unpause', async function () {
@@ -142,4 +133,24 @@ module.exports.unpauseDeposit = function(participants, operation = accounts[1], 
         });
     });
 }
+
+module.exports.addWhiteListedOperator = function (deployer = accounts[0],operator , prepaidContract) {
+    context("whitelist", function () {
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+            this.operator = operator || this.whitelistOperator;
+        });
+
+        it("adding whitelist operator", async function () {
+            const operator = this.operator;
+            const receipt = await this.prepaid.whitelistOperator(operator,true,{ from: deployer });
+            await expectEvent(receipt, 'WhitelistedOperator', { operator, enabled: true});
+            (await this.prepaid.isOperator(operator)).should.be.true;
+        });
+        
+        after(function () {
+            delete this.operator;
+        })
+    });
+};
 

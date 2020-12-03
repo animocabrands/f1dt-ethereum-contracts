@@ -3,8 +3,6 @@ const { toWei } = require('web3-utils');
 const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-core_library').constants;
 const ContractDeployer = require('../helpers/ContractDeployer')
-
-const [holder] = accounts;
 const TOKENS = ContractDeployer.TOKENS;
 const TOKEN_DECIMALS = ContractDeployer.TOKEN_DECIMALS;
 
@@ -15,7 +13,7 @@ const TOKEN_DECIMALS = ContractDeployer.TOKEN_DECIMALS;
  * @param {*} prepaidContract 
  */
 module.exports.createCrateKeyTokens = function(
-        tokenHolder = holder, 
+        tokenHolder = accounts[1], 
         f1dtCckContract,
         f1dtRckContract,
         f1dtEckContract,

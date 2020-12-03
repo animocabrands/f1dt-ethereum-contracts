@@ -99,8 +99,6 @@ module.exports.deployCrateKeySale = async function(options = {from: deployer}, p
         const address = prepaidAddress || this.prepaid.address;
         this.sale = await CrateKeySale.new(address, options);
 
-        await this.prepaid.whitelistOperator(this.sale.address, true, options);
-
     } else {
         throw new Error("Cannot find Prepaid Contract");
     }
