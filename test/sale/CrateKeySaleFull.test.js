@@ -118,30 +118,44 @@ describe("scenario", async function () {
                 the array in the event is not instantiate by the test, so instance compare will fail. 
                 expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address], prices:[actualPrice]})
             */
-            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]})
+            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
+
+            const {prices} = await this.sale.getSkuInfo(sku);
+            prices[0].should.be.bignumber.eq(actualPrice);
         });
 
         it('update sku price for F1DT.RCK', async function () {
             const tokenObject = TOKENS.F1DT_RCK;
             const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const sku = stringToBytes32(tokenObject.symbol);
-            const revert = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
+
+            const {prices} = await this.sale.getSkuInfo(sku);
+            prices[0].should.be.bignumber.eq(actualPrice);
         });
 
         it('update sku price for F1DT.ECK', async function () {
             const tokenObject = TOKENS.F1DT_ECK;
             const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const sku = stringToBytes32(tokenObject.symbol);
-            const revert = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
+
+            const {prices} = await this.sale.getSkuInfo(sku);
+            prices[0].should.be.bignumber.eq(actualPrice);
         });
 
         it('update sku price for F1DT.LCK', async function () {
             const tokenObject = TOKENS.F1DT_LCK;
             const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const sku = stringToBytes32(tokenObject.symbol);
-            const revert = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
-        });
-        
+            const receipt = await this.sale.updateSkuPricing(sku, [this.revv.address], [actualPrice], { from: deployer });
+            expectEvent(receipt, "SkuPricingUpdate", {sku, tokens: [this.revv.address]});
+
+            const {prices} = await this.sale.getSkuInfo(sku);
+            prices[0].should.be.bignumber.eq(actualPrice);
+        });        
     })
 
 
@@ -168,10 +182,10 @@ describe("scenario", async function () {
 
     /**        BUY ITEMS          */
 
-    describe("Purchase", function () {
+    describe("Sales(Purchase)", function () {
         /**        PURCHASE ITEMS ON SALE          */
         it("should be able to purhcase Common Crate Key", async function () {
-
+            
         });
 
     });
