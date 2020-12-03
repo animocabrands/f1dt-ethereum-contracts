@@ -8,7 +8,7 @@ const TOKEN_DECIMALS = ContractDeployer.TOKEN_DECIMALS;
 
 /**
  * 
- * @param {string} deployer 
+ * @param {string} deployer
  * @param {string} operation 
  * @param {*} prepaidContract 
  */
