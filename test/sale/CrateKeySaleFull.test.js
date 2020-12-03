@@ -276,16 +276,13 @@ describe("scenario", async function () {
             const skuInfo = await this.sale.getSkuInfo(sku, {from: deployer});
             const remainingSupply = skuInfo.totalSupply;
 
-            console.log("======================");
-            console.log(skuInfo.totalSupply.toString());
-
             //Total of purchase operations based on max quantity in order to optimize the test
             let purchaseOperations = remainingSupply.div(new BN(maxQuantity));
                 purchaseOperations = purchaseOperations.sub(new BN(1));
             
             for (saleIndex = 0; saleIndex < purchaseOperations; saleIndex++) {
-                console.log("========== " + saleIndex);
-                
+                console.log(`Purchase item ${saleIndex} of ${purchaseOperations}. Quantity ${maxQuantity}`);    
+
                 const receipt = await this.sale.purchaseFor(participant2, 
                                                             this.revv.address, 
                                                             sku, 
@@ -305,16 +302,22 @@ describe("scenario", async function () {
                         quantity: maxQuantity,
                         userData: EmptyByte
                     });  
-
-                //Will be removed, just to test
-                const totalSupply = (await this.sale.getSkuInfo(sku, {from: deployer})).totalSupply;
-        
-                console.log("======================");
-                console.log(totalSupply.toString());
             }
         });
 
-        //TODO: Purchase key until out of stock and should reject when there are one more purchase
+        it("should be able to purhcase until out of stock and should reject when there are one more purchase", async function () { 
+            //WIP
+            
+            // await expectRevert(this.sale.purchaseFor(participant2, 
+            //                                         this.revv.address, 
+            //                                         sku, 
+            //                                         One, 
+            //                                         EmptyByte, 
+            //                                         { from: participant3 }),
+            //                     'Sale: insufficient supply');
+        });
+        
+        //TODO: check delivery operation 
     });
     
     //TODO: WITHDRAW DEPOSIT
