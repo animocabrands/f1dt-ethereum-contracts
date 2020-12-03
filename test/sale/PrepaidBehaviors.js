@@ -88,7 +88,45 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
 
             // Discount check - Third Condition
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('25');
+        });
+    });
+    return deposits;
+};
 
+module.exports.pauseDeposit = function(participants, operation = accounts[1], prepaidContract){
+    const participant = participants[0];
+
+    context("pause deposit", function () {
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+        });
+
+        it('pause the contract', async function () {
+            const receipt = await this.prepaid.pause({from: operation});
+            await expectEvent(receipt, 'Paused', {account: operation});
+        });
+    
+        it('should revert when deposit during the pause period', async function() {
+            const revert = this.prepaid.deposit(toWei('10000000'), {from: participant});
+            await expectRevert(revert, 'Pausable: paused');
+        });
+    });
+};
+
+module.exports.unpauseDeposit = function(participants, operation = accounts[1], prepaidContract) {
+    const participant3 = participants[2];
+
+    context("unpause deposit", function () {
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+        });
+    
+        it('unpause the contract', async function () {
+            const receipt = await this.prepaid.unpause({from: operation});
+            await expectEvent(receipt, 'Unpaused', {account: operation});
+        });
+    
+        it('deposit after unpause', async function () {
             //Participant 3
             const deposit_P3 = toWei('30000000');
             const receipt_P3 = await this.prepaid.deposit(deposit_P3, { from: participant3 });
@@ -103,7 +141,5 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('50');
         });
     });
-    return deposits;
-};
-
+}
 

@@ -74,10 +74,10 @@ module.exports.createCrateKeySku = function(
             this.prepaid.unpause({from: deployer});
         }
 
-        console.log("================================");
-        console.log(isSalePrepaidOperator);
-        console.log(isPaused);
-        console.log("================================");
+        // console.log("================================");
+        // console.log(isSalePrepaidOperator);
+        // console.log(isPaused);
+        // console.log("================================");
 
         //await this.sale.start({from: deployer});
     });

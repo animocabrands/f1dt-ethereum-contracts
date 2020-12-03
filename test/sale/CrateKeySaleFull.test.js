@@ -6,11 +6,6 @@ const TokenBehavior = require("./TokenBehaviors");
 const SaleBehaviour = require('./SaleBehaviours')
 
 const [deployer, operator, operation, holder, purchaser, anonymous, ...participants] = accounts;
-const [participant, participant2, participant3] = participants;
-
-function addSkuBehavior() {
-    describe("")
-}
 
 describe("scenario", async function () {
     
@@ -36,14 +31,22 @@ describe("scenario", async function () {
         /**        USERS DEPOSIT DURING PREPAID PERIOD (BEFORE SALE START)            */
         PrepaidBehavior.userDeposit(participants);
 
+        /**        PAUSE DEPOSIT        */
+        PrepaidBehavior.pauseDeposit(participants, operation);
+
+        /**        UNPAUSE DEPOSIT        */
+        PrepaidBehavior.unpauseDeposit(participants, operation);        
+    });
+
+    describe("Token", function() {
         /**        CREATE TOKENS            */
         TokenBehavior.createCrateKeyTokens(holder);
 
         /**        CREATE SKUs, SET PRICE AND START SALE          */
         SaleBehaviour.createCrateKeySku(deployer, operation, holder, purchaser);
-
-        /**        PURCHASE ITEMS ON SALE          */
-        
     });
 
+    describe("Prepaid", function() {
+        /**        PURCHASE ITEMS ON SALE          */
+    });
 });
