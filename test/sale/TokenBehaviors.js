@@ -13,20 +13,8 @@ const TOKEN_DECIMALS = ContractDeployer.TOKEN_DECIMALS;
  * @param {*} prepaidContract 
  */
 module.exports.createCrateKeyTokens = function(
-        tokenHolder = accounts[1], 
-        f1dtCckContract,
-        f1dtRckContract,
-        f1dtEckContract,
-        f1dtLckContract) {
-    context("deploy tokens phrase", function() {
-    
-        before(async function() {
-            this.f1dtCck = f1dtCckContract || this.f1dtCck;
-            this.f1dtRck = f1dtRckContract || this.f1dtRck;
-            this.f1dtEck = f1dtEckContract || this.f1dtEck;
-            this.f1dtLck = f1dtLckContract || this.f1dtLck;
-        });
-
+        tokenHolder = accounts[1], deployer = accounts[0]) {
+    context("validate crate keys", function() {
         describe('F1DT.CCK', function() {
             it('should return the correct name', async function() {
                 (await this.f1dtCck.name()).should.be.equal(TOKENS.F1DT_CCK.name);

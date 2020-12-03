@@ -15,15 +15,15 @@ describe("scenario", async function () {
 
         this.prepaid = await ContractDeployer.deployPrepaid({ from: deployer });
 
-        // //CrateKey Tokens
-        const tokens = await ContractDeployer.deployCrateKeyTokens({ from: deployer }, operation);
-        this.f1dtCck = tokens.F1DT_CCK;
-        this.f1dtRck = tokens.F1DT_RCK;
-        this.f1dtEck = tokens.F1DT_ECK;
-        this.f1dtLck = tokens.F1DT_LCK;
-
         // //CrateKey Sale
         this.sale = await ContractDeployer.deployCrateKeySale({ from: deployer });
+
+        this.keys = await ContractDeployer.deployCrateKeyTokens({ from: deployer }, operation);
+        const {F1DT_CCK,F1DT_RCK, F1DT_ECK, F1DT_LCK } = this.keys;
+        this.f1dtCck = F1DT_CCK;
+        this.f1dtEck = F1DT_ECK;
+        this.f1dtLck = F1DT_LCK;
+        this.f1dtRck = F1DT_RCK;
     });
 
     describe("Prepaid", function () {
@@ -40,9 +40,9 @@ describe("scenario", async function () {
     });
 
     describe("Sales(setup SKU)", function () {
-        TokenBehavior.createCrateKeyTokens(operation);
+        TokenBehavior.createCrateKeyTokens();
 
-        SaleBehaviour.createCrateKeySku(deployer, operation);
+        SaleBehaviour.createCrateKeySku();
     })
 
 
@@ -57,16 +57,23 @@ describe("scenario", async function () {
     });
     
     /**        START SALE          */
-    describe("Sales start", function () {
+    describe("Sales(Start)", function () {
         it("should start sales", async function () {
             const receipt = (await this.sale.start({ from: deployer }));
             await expectEvent(receipt, "Started", { account: deployer });
+            (await this.sale.startedAt()).should.be.bignumber.gt("0");
+        });
+        it("prepaid should switch to start state", async function() {
+            const startState = (await this.prepaid.SALE_START_STATE());
+            (await this.prepaid.state()).should.be.bignumber.eq(startState);
         });
     });
 
     /**        BUY ITEMS          */
 
-    describe("Prepaid", function () {
+    describe("Purchase", function () {
         /**        PURCHASE ITEMS ON SALE          */
+        
+
     });
 });

@@ -21,8 +21,8 @@ const REVV = contract.fromArtifact('REVV');
  * @param {string} saleContract 
  */
 module.exports.createCrateKeySku = function (
-    deployer = accounts[0],
     holder = accounts[1],
+    deployer = accounts[0],
     f1dtCckContract,
     f1dtRckContract,
     f1dtEckContract,
@@ -48,7 +48,6 @@ module.exports.createCrateKeySku = function (
             // Simulate a sku value
             const sku = stringToBytes32(TOKENS.F1DT_CCK.symbol);
             const totalSupply = TOKENS.F1DT_CCK.totalSupply;
-
             await this.f1dtCck.approve(this.sale.address, totalSupply, { from: holder });
             const receipt = await this.sale.createCrateKeySku(sku, totalSupply, totalSupply, this.f1dtCck.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
