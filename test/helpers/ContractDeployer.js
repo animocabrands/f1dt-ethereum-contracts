@@ -40,10 +40,10 @@ function getTokenDescription(type) {
 }
 
 const TOKENS = {
-    F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), presaleSupply: toWei('5000'), totalSupply: toWei("6700"), price: toWei("800")},
-    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), presaleSupply: toWei('4000'), totalSupply: toWei("5350"), price: toWei("3800")},
-    F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), presaleSupply: toWei('3000'), totalSupply: toWei("4050"), price: toWei("18000")},
-    F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), presaleSupply: toWei('1000'), totalSupply: toWei("1320"), price: toWei("38000")},
+    F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), presaleSupply: toWei('5000'), totalSupply: toWei("6700"), price: "800"},
+    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), presaleSupply: toWei('4000'), totalSupply: toWei("5350"), price: "3800"},
+    F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), presaleSupply: toWei('3000'), totalSupply: toWei("4050"), price: "18000"},
+    F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), presaleSupply: toWei('1000'), totalSupply: toWei("1320"), price: "38000"},
 };
 
 /**

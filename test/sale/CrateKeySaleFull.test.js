@@ -52,7 +52,7 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, presaleSupply, tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
@@ -68,7 +68,7 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, presaleSupply, tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
@@ -84,7 +84,7 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, presaleSupply, tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
@@ -100,7 +100,7 @@ describe("scenario", async function () {
             const sku = stringToBytes32(tokenObject.symbol);
             const presaleSupply = tokenObject.presaleSupply;
             await tokenContract.approve(this.sale.address, presaleSupply, { from: operation });
-            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, presaleSupply, tokenContract.address, { from: deployer });
+            const receipt = await this.sale.createCrateKeySku(sku, presaleSupply, toWei("20"), tokenContract.address, { from: deployer });
             expectEvent(receipt, 'SkuCreation', {
                 sku: sku,
                 totalSupply: presaleSupply,
