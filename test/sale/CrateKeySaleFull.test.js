@@ -387,7 +387,7 @@ describe("scenario", async function () {
             PrepaidBehavior.withdraws({
                 [participant4]: {
                     name : "participant4",
-                    amount : toWei("10")
+                    amount : toWei('30000000')
                 },
             });
         });
