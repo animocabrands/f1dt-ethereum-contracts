@@ -44,8 +44,8 @@ contract F1DTCrateKey is ERC20, Ownable {
         address holder_, 
         uint256 totalSupply_) public {
 
-        require(bytes(symbol_).length > 0, "F1DTCrateKey: invalid symbol");
-        require(bytes(name_).length > 0, "F1DTCrateKey: invalid name");
+        require(bytes(symbol_).length != 0, "F1DTCrateKey: invalid symbol");
+        require(bytes(name_).length != 0, "F1DTCrateKey: invalid name");
         require(holder_ != address(0), "F1DTCrateKey: invalid holder");
         require(totalSupply_ != 0, "F1DTCrateKey: invalid initial supply");
 
