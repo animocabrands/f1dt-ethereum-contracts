@@ -188,9 +188,13 @@ describe("scenario", async function () {
                 //Check prepaid balance
                 const afterPurchaseBal = await this.prepaid.balanceOf(participant);
                 afterPurchaseBal.should.be.bignumber.eq(expectedBal);
-                
-                //Check key balance
-                const keyBalance = await this.f1dtCck.balanceOf(participant);
+            }
+        });
+
+        it("should be able to deliver all keys to the participant", async function() {
+            for (const key of Object.values(this.keys))
+            {
+                const keyBalance = await key.balanceOf(participant);
                 keyBalance.should.be.bignumber.eq("1");
             }
         });
@@ -281,7 +285,7 @@ describe("scenario", async function () {
                 purchaseOperations = purchaseOperations.sub(new BN(1));
             
             for (saleIndex = 0; saleIndex < purchaseOperations; saleIndex++) {
-                console.log(`Purchase item ${saleIndex} of ${purchaseOperations}. Quantity ${maxQuantity}`);    
+                // console.log(`Purchase item ${saleIndex} of ${purchaseOperations}. Quantity ${maxQuantity}`);    
 
                 const receipt = await this.sale.purchaseFor(participant2, 
                                                             this.revv.address, 
