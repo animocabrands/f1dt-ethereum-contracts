@@ -106,6 +106,7 @@ module.exports.pauseDeposit = function(participants, deployer = accounts[0], pre
 
 module.exports.unpauseDeposit = function(participants, deployer = accounts[0], prepaidContract) {
     const participant3 = participants[2];
+    const participant4 = participants[3];
 
     context("when unpause deposit should", function () {
         before(function () {
@@ -120,6 +121,7 @@ module.exports.unpauseDeposit = function(participants, deployer = accounts[0], p
         it('deposit should be sucessful after unpause', async function () {
             //Participant 3
             const deposit_P3 = toWei('30000000');
+            const deposit_P4 = toWei('30000000');
             const receipt_P3 = await this.prepaid.deposit(deposit_P3, { from: participant3 });
             await expectEvent(receipt_P3, 'Deposited', {wallet: participant3, amount: deposit_P3});
 
@@ -128,10 +130,17 @@ module.exports.unpauseDeposit = function(participants, deployer = accounts[0], p
             (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('60000000'));
             (await this.prepaid.globalDeposit()).should.be.bignumber.equal(toWei('60000000'));
 
+            await this.revv.approve(this.prepaid.address, toWei("100000000"), {from: participant4});
+            await this.prepaid.deposit(deposit_P4, { from: participant4 });
+            (await this.revv.balanceOf(participant4)).should.be.bignumber.equal(toWei('70000000'));
+            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('90000000'));
+
             // Discount check - Fourth Condition
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('50');
         });
     });
+
+    
 }
 
 module.exports.addWhiteListedOperator = function (deployer = accounts[0],operator , prepaidContract) {
@@ -178,13 +187,15 @@ module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, rev
             this.revv == revvContract || this.revv;
         });
         for(account in expectedWithdraw) {
-            const amount = expectedWithdraw[account];
-            it(`account ${account} should withdraw ${amount}`, async function () {
+            const name = expectedWithdraw[account].amount
+            const amount = expectedWithdraw[account].amount;
+            it(`account ${name}(${account}) should withdraw ${amount}`, async function () {
                 const originalBalance = (await this.revv.balanceOf(account));
+                console.log(originalBalance.toString(10));
                 const expectedAmount = originalBalance.add(new BN(amount));
                 const receipt = (await this.prepaid.withdraw({from: account}));
                 await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: expectedAmount});
-                // (await this.revv.balanceOf(account)).should.be.bignumber.eq(expectedAmount);
+                (await this.revv.balanceOf(account)).should.be.bignumber.eq(expectedAmount);
             });
         }
     });
@@ -201,10 +212,11 @@ module.exports.collectRevenue = function (owner, amount, prepaidContract, revvCo
 
         it(`should get collect ${amount} from prepaid contract`, async function () {
             const originalBalance = (await this.revv.balanceOf(owner));
-            const expectedAmount = originalBalance.plus(amount);
+            console.log(originalBalance.toString(10));
+            const expectedAmount = originalBalance.add(amount);
             const receipt = (await this.prepaid.collectRevenue({from : owner}));
             await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: owner, _value: expectedAmount});
-            // (await this.revv.balanceOf(owner)).should.be.bignumber.eq(expectedAmount);
+            (await this.revv.balanceOf(owner)).should.be.bignumber.eq(expectedAmount);
         });
     });
 };

@@ -9,8 +9,8 @@ const { toWei } = require('web3-utils');
 const { Four } = require('@animoca/ethereum-contracts-core_library/src/constants');
 const TOKENS = ContractDeployer.TOKENS;
 
-const [deployer, operation, anonymous, ...participants] = accounts;
-const [participant, participant2, participant3] = participants;
+const [deployer, operation, accountDept, ...participants] = accounts;
+const [participant, participant2, participant3, participant4] = participants;
 const maxQuantity = toWei("20");
 
 describe("scenario", async function () {
@@ -274,7 +274,7 @@ describe("scenario", async function () {
             keyBalance.should.be.bignumber.eq("1");            
         });
 
-        it.skip("should be able to purhcase until out of stock", async function () { 
+        it("should be able to purhcase until out of stock", async function () { 
             const tokenObject = TOKENS.F1DT_ECK;
             const sku = stringToBytes32(tokenObject.symbol);
             const skuInfo = await this.sale.getSkuInfo(sku, {from: deployer});
@@ -327,14 +327,50 @@ describe("scenario", async function () {
     // TODO: END sales
     describe("Sales(End)", function(){
         // TODO: purchase should revert after sales end
-        PrepaidBehavior.endSales(deployer);
+        PrepaidBehavior.endSales();
 
-        PrepaidBehavior.withdraws({[participant]: toWei("10")});
+        describe("user withdraw after sales end", function(){
+            PrepaidBehavior.withdraws({
+                [participant]: {
+                    name : "participant",
+                    amount : toWei("10")
+                },
+            });
+        });
+
+
+        describe("user withdraw after transfer ownership", function(){
+
+            it('transfer ownership', async function () {
+                const receipt = await this.prepaid.transferOwnership(accountDept, {from: deployer});
+                await expectEvent(receipt, 'OwnershipTransferred', {previousOwner: deployer, newOwner: accountDept});
+            });
+
+            // PrepaidBehavior.withdraws({
+            //     [participant2]: {
+            //         name : "participant2",
+            //         amount : toWei("10")
+            //     }
+            // });
+
+        });
+        
+        PrepaidBehavior.collectRevenue(accountDept, toWei("100"));
+
+        describe.skip("user withdraw with zero deposit should revert", function() {
+            //todo
+        });
+
+        describe("user withdraw after collect revenue", function() {
+            PrepaidBehavior.withdraws({
+                [participant4]: {
+                    name : "participant4",
+                    amount : toWei("10")
+                },
+            });
+        });
+        
     });
-    
-    //TODO: WITHDRAW DEPOSIT
-
-
 
     
 });
