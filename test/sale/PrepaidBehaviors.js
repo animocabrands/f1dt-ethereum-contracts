@@ -1,5 +1,5 @@
 const { accounts, contract } = require('@openzeppelin/test-environment');
-const { toWei } = require('web3-utils');
+const { toWei, fromWei} = require('web3-utils');
 const { BN, expectRevert, expectEvent } = require('@openzeppelin/test-helpers');
 const { ZeroAddress, Zero, One, Two } = require('@animoca/ethereum-contracts-core_library').constants;
 const deployer = accounts[0];
@@ -188,13 +188,13 @@ module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, rev
         });
         for(account in expectedWithdraw) {
             const name = expectedWithdraw[account].name;
-            const amount = expectedWithdraw[account].amount;
-            it(`account ${name}(${account}) should withdraw ${amount}`, async function () {
+            const remaining = expectedWithdraw[account].amount;
+            it(`account ${name}(${account}) should withdraw ${remaining}`, async function () {
                 const originalBalance = (await this.revv.balanceOf(account));
-                console.log(originalBalance.toString(10));
-                const expectedAmount = originalBalance.add(new BN(amount));
+                const expectedAmount = originalBalance.add(new BN(remaining));
                 const receipt = (await this.prepaid.withdraw({from: account}));
-                await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: amount});
+                await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: remaining});
+                const bal = await this.revv.balanceOf(account);                
                 (await this.revv.balanceOf(account)).should.be.bignumber.eq(expectedAmount);
             });
         }
@@ -210,10 +210,9 @@ module.exports.collectRevenue = function (owner, amount, prepaidContract, revvCo
             this.revv = revvContract || this.revv;
         });
 
-        it(`should get collect ${amount} from prepaid contract`, async function () {
+        it(`should get collect ${fromWei(amount)} from prepaid contract`, async function () {
             const originalBalance = (await this.revv.balanceOf(owner));
-            console.log(originalBalance.toString(10));
-            const expectedAmount = originalBalance.add(amount);
+            const expectedAmount = originalBalance.add(new BN(amount));
             const receipt = (await this.prepaid.collectRevenue({from : owner}));
             await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: owner, _value: amount});
             (await this.revv.balanceOf(owner)).should.be.bignumber.eq(expectedAmount);

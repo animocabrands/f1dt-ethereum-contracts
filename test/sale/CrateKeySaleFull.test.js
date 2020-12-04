@@ -4,9 +4,8 @@ const ContractDeployer = require('../helpers/ContractDeployer');
 const PrepaidBehavior = require('./PrepaidBehaviors');
 const TokenBehavior = require("./TokenBehaviors");
 const { stringToBytes32 } = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
-const { ZeroAddress, Zero, One, Two, EmptyByte} = require('@animoca/ethereum-contracts-core_library').constants;
-const { toWei } = require('web3-utils');
-const { Four } = require('@animoca/ethereum-contracts-core_library/src/constants');
+const { ZeroAddress, Zero, One, Two, Four, EmptyByte} = require('@animoca/ethereum-contracts-core_library').constants;
+const { toWei, fromWei } = require('web3-utils');
 const TOKENS = ContractDeployer.TOKENS;
 
 const [deployer, operation, accountDept, ...participants] = accounts;
@@ -158,12 +157,15 @@ describe("scenario", async function () {
         /**        PURCHASE ITEMS ON SALE          */
         it("should be able to purhcase all keys once", async function () {
             for (const tokenObject of Object.values(TOKENS)) {
+                const purchaseQuantity = toWei('1');
                 const sku = stringToBytes32(tokenObject.symbol);
                 const beforePurchaseBal = await this.prepaid.balanceOf(participant);
+                const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+
                 const receipt = await this.sale.purchaseFor(participant, 
                                                             this.revv.address, 
                                                             sku, 
-                                                            One, 
+                                                            purchaseQuantity,
                                                             EmptyByte, 
                                                             { from: participant });
 
@@ -177,15 +179,13 @@ describe("scenario", async function () {
                         recipient: participant,
                         token: this.revv.address,
                         sku: sku,
-                        quantity: One,
-                        userData: EmptyByte
-                    });           
-
-                //Actual price of the token
-                const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-                const expectedBal = beforePurchaseBal.sub(actualPrice);
-
+                        quantity: purchaseQuantity,
+                        userData: EmptyByte,
+                        totalPrice: toWei(actualPrice)
+                    });
+                    
                 //Check prepaid balance
+                const expectedBal = beforePurchaseBal.sub(toWei(actualPrice));
                 const afterPurchaseBal = await this.prepaid.balanceOf(participant);
                 afterPurchaseBal.should.be.bignumber.eq(expectedBal);
             }
@@ -195,18 +195,20 @@ describe("scenario", async function () {
             for (const key of Object.values(this.keys))
             {
                 const keyBalance = await key.balanceOf(participant);
-                keyBalance.should.be.bignumber.eq("1");
+                keyBalance.should.be.bignumber.eq(toWei('1'));
             }
         });
         
         it("should be able to purchase a cratekey using different purchaser and receiptant", async function () {
+            const purchaseQuantity = toWei('1');
             const tokenObject = TOKENS.F1DT_CCK;
             const sku = stringToBytes32(tokenObject.symbol);
             const beforePurchaseBal = await this.prepaid.balanceOf(participant3);
+            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const receipt = await this.sale.purchaseFor(participant2, 
                                                         this.revv.address, 
                                                         sku, 
-                                                        One, 
+                                                        purchaseQuantity,
                                                         EmptyByte, 
                                                         { from: participant3 });
             //Check the event
@@ -219,28 +221,30 @@ describe("scenario", async function () {
                     recipient: participant2,
                     token: this.revv.address,
                     sku: sku,
-                    quantity: One,
-                    userData: EmptyByte
-                });   
-
-            //Actual price of the token
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const expectedBal = beforePurchaseBal.sub(actualPrice);
+                    quantity: purchaseQuantity,
+                    userData: EmptyByte,
+                    totalPrice: toWei(actualPrice)
+                });
 
             //Check prepaid balance
+            const expectedBal = beforePurchaseBal.sub(toWei(actualPrice));
             const afterPurchaseBal = await this.prepaid.balanceOf(participant3);
             afterPurchaseBal.should.be.bignumber.eq(expectedBal);
             
             //Check key balance
             const keyBalance = await this.f1dtCck.balanceOf(participant2);
-            keyBalance.should.be.bignumber.eq("1");
+            keyBalance.should.be.bignumber.eq(toWei('1'));
         });
 
         it("should be able to purhcase more than one item", async function () { 
             const tokenObject = TOKENS.F1DT_LCK;
             const sku = stringToBytes32(tokenObject.symbol);
-            const quantity = Four;
+
+            const quantity = toWei('4');
+            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+            const totalPrice = actualPrice.mul(new BN(fromWei(quantity)));
             const beforePurchaseBal = await this.prepaid.balanceOf(participant3);
+            
             const receipt = await this.sale.purchaseFor(participant2, 
                                                         this.revv.address, 
                                                         sku, 
@@ -258,39 +262,39 @@ describe("scenario", async function () {
                     token: this.revv.address,
                     sku: sku,
                     quantity: quantity,
-                    userData: EmptyByte
+                    userData: EmptyByte,
+                    totalPrice: toWei(totalPrice)
                 });   
 
-            //Actual price of the token
-            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
-            const expectedBal = beforePurchaseBal.sub(actualPrice.mul(quantity));
-
             //Check prepaid balance
+            const expectedBal = beforePurchaseBal.sub(toWei(totalPrice));
             const afterPurchaseBal = await this.prepaid.balanceOf(participant3);
             afterPurchaseBal.should.be.bignumber.eq(expectedBal);
             
             //Check key balance
-            const keyBalance = await this.f1dtCck.balanceOf(participant2);
-            keyBalance.should.be.bignumber.eq("1");            
+            const keyBalance = await this.f1dtLck.balanceOf(participant2);
+            keyBalance.should.be.bignumber.eq(toWei('4'));
         });
 
-        it("should be able to purhcase until out of stock", async function () { 
+        it("should be able to purhcase until out of stock - ECK", async function () { 
+            //2999 keys to purchase
             const tokenObject = TOKENS.F1DT_ECK;
             const sku = stringToBytes32(tokenObject.symbol);
-            const skuInfo = await this.sale.getSkuInfo(sku, {from: deployer});
-            const remainingSupply = skuInfo.totalSupply;
+            let skuInfo = await this.sale.getSkuInfo(sku);
+            let remainingSupply = skuInfo.remainingSupply;
+            const maxQuantityPerPurchase = skuInfo.maxQuantityPerPurchase;
 
-            //Total of purchase operations based on max quantity in order to optimize the test
-            let purchaseOperations = remainingSupply.div(new BN(maxQuantity));
-                purchaseOperations = purchaseOperations.sub(new BN(1));
-            
-            for (saleIndex = 0; saleIndex < purchaseOperations; saleIndex++) {
-                // console.log(`Purchase item ${saleIndex} of ${purchaseOperations}. Quantity ${maxQuantity}`);    
+            // console.log("remaining supply of ECK: ", fromWei(remainingSupply));
+            // console.log("max quantity: ", fromWei(maxQuantityPerPurchase));            
+            while(remainingSupply.gt(new BN(toWei('0')))) {
+                //Calculate the quantity we are going to purchase
+                const remaining = remainingSupply.sub(maxQuantityPerPurchase);
+                const purchaseQuantity = (remaining.gte(new BN(toWei('0'))))? maxQuantityPerPurchase: remainingSupply;
 
                 const receipt = await this.sale.purchaseFor(participant2, 
                                                             this.revv.address, 
                                                             sku, 
-                                                            maxQuantity, 
+                                                            purchaseQuantity, 
                                                             EmptyByte, 
                                                             { from: participant3 });
                 //Check the event
@@ -303,37 +307,47 @@ describe("scenario", async function () {
                         recipient: participant2,
                         token: this.revv.address,
                         sku: sku,
-                        quantity: maxQuantity,
+                        quantity: purchaseQuantity,
                         userData: EmptyByte
-                    });  
+                    });
+
+                //retrieve the remaining supply again
+                skuInfo = await this.sale.getSkuInfo(sku);
+                remainingSupply = skuInfo.remainingSupply;
             }
+
+            //Check key balance
+            const keyBalance = await this.f1dtEck.balanceOf(participant2);
+            keyBalance.should.be.bignumber.eq(toWei('2999'));          
         });
 
-        it("should be able to purhcase until out of stock and should reject when there are one more purchase", async function () { 
-            //WIP
-            
-            // await expectRevert(this.sale.purchaseFor(participant2, 
-            //                                         this.revv.address, 
-            //                                         sku, 
-            //                                         One, 
-            //                                         EmptyByte, 
-            //                                         { from: participant3 }),
-            //                     'Sale: insufficient supply');
+        it("should revert when the key is out of stock - ECK", async function () {             
+            const tokenObject = TOKENS.F1DT_ECK;
+            const sku = stringToBytes32(tokenObject.symbol);
+            const quantity = toWei('1');
+
+            const receipt = this.sale.purchaseFor(participant2, 
+                this.revv.address, 
+                sku, 
+                quantity, 
+                EmptyByte, 
+                { from: participant3 });
+
+            await expectRevert(receipt, 'Sale: insufficient supply');
         });
         
-        //TODO: check delivery operation 
     });
 
     // TODO: END sales
-    describe("Sales(End)", function(){
+    describe("Sales(End)", async function(){
         // TODO: purchase should revert after sales end
         PrepaidBehavior.endSales();
 
-        describe("user withdraw after sales end", function(){
+        describe("user withdraw after sales end", async function(){
             PrepaidBehavior.withdraws({
                 [participant]: {
                     name : "participant",
-                    amount : toWei("10")
+                    amount : toWei("19969700")
                 },
             });
         });
@@ -355,7 +369,15 @@ describe("scenario", async function () {
 
         });
         
-        PrepaidBehavior.collectRevenue(accountDept, toWei("100"));
+        // 1 CCK
+        // 1 ECK
+        // 1 RCK
+        // 1 LCK
+        // 2999 ECK
+        // 4 LCK
+        // 1 CCK
+        //60600*0.5+(18000*0.5)*2999+(38000*0.5*4)+(800*0.5)
+        PrepaidBehavior.collectRevenue(accountDept, toWei("27097700"));
 
         describe.skip("user withdraw with zero deposit should revert", function() {
             //todo
