@@ -24,7 +24,7 @@ module.exports.deployREVV = async function (options = { from: deployer }, addres
  * @param {string} revvAddress
  */
 module.exports.deployPrepaid = async function (options = { from: deployer }, revvAddress) {
-    if(this.revv || revvAddress) {
+    if (this.revv || revvAddress) {
         const PrePaid = contract.fromArtifact('Prepaid');
         const address = revvAddress || this.revv.address;
         this.prepaid = await PrePaid.new(address, options);
@@ -40,10 +40,38 @@ function getTokenDescription(type) {
 }
 
 const TOKENS = {
-    F1DT_CCK: {symbol: 'F1DT.CCK', name: getTokenDescription('Common'), presaleSupply: toWei('5000'), totalSupply: toWei("6700"), price: "800"},
-    F1DT_RCK: {symbol: 'F1DT.RCK', name: getTokenDescription('Rare'), presaleSupply: toWei('4000'), totalSupply: toWei("5350"), price: "3800"},
-    F1DT_ECK: {symbol: 'F1DT.ECK', name: getTokenDescription('Epic'), presaleSupply: toWei('3000'), totalSupply: toWei("4050"), price: "18000"},
-    F1DT_LCK: {symbol: 'F1DT.LCK', name: getTokenDescription('Legendary'), presaleSupply: toWei('1000'), totalSupply: toWei("1320"), price: "38000"},
+    F1DT_CCK: { 
+        symbol: 'F1DT.CCK',
+        name: getTokenDescription('Common'),
+        presaleSupply: toWei('5000'),
+        totalSupply: toWei("6700"),
+        price: "800",
+        uri : "https://nft.f1deltatime.com/json/commonKey"
+    },
+    F1DT_RCK: { 
+        symbol: 'F1DT.RCK',
+        name: getTokenDescription('Rare'),
+        presaleSupply: toWei('4000'),
+        totalSupply: toWei("5350"),
+        price: "3800",
+        uri: "https://nft.f1deltatime.com/json/rareKey"
+    },
+    F1DT_ECK: {
+        symbol: 'F1DT.ECK',
+        name: getTokenDescription('Epic'),
+        presaleSupply: toWei('3000'),
+        totalSupply: toWei("4050"),
+        price: "18000",
+        uri: "https://nft.f1deltatime.com/json/epicKey"
+    },
+    F1DT_LCK: {
+        symbol: 'F1DT.LCK',
+        name: getTokenDescription('Legendary'),
+        presaleSupply: toWei('1000'),
+        totalSupply: toWei("1320"),
+        price: "38000",
+        uri: "https://nft.f1deltatime.com/json/legendaryKey"
+    },
 };
 
 /**
@@ -64,10 +92,11 @@ async function getCrateKeyInstance(token, accountHolder, options) {
     return await F1DTCrateKey.new(
         token.symbol,
         token.name,
+        token.uri,
         accountHolder,
-        token.totalSupply, 
+        token.totalSupply,
         options
-    ); 
+    );
 };
 
 /**
@@ -75,16 +104,16 @@ async function getCrateKeyInstance(token, accountHolder, options) {
  * @param {Web3Option} options 
  * @param {string} accountHolder
  */
-module.exports.deployCrateKeyTokens = async function(options = {from: deployer}, accountHolder) {
+module.exports.deployCrateKeyTokens = async function (options = { from: deployer }, accountHolder) {
     const f1dtCck = await getCrateKeyInstance(TOKENS.F1DT_CCK, accountHolder, options);
     const f1dtEck = await getCrateKeyInstance(TOKENS.F1DT_ECK, accountHolder, options);
     const f1dtLck = await getCrateKeyInstance(TOKENS.F1DT_LCK, accountHolder, options);
     const f1dtRck = await getCrateKeyInstance(TOKENS.F1DT_RCK, accountHolder, options);
-    return { 
+    return {
         F1DT_CCK: f1dtCck,
         F1DT_RCK: f1dtRck,
         F1DT_ECK: f1dtEck,
-        F1DT_LCK: f1dtLck        
+        F1DT_LCK: f1dtLck
     };
 }
 
@@ -93,8 +122,8 @@ module.exports.deployCrateKeyTokens = async function(options = {from: deployer},
  * @param {Web3Option} options 
  * @param {string} prepaidAddress 
  */
-module.exports.deployCrateKeySale = async function(options = {from: deployer}, prepaidAddress) {
-    if(this.prepaid || prepaidAddress) {
+module.exports.deployCrateKeySale = async function (options = { from: deployer }, prepaidAddress) {
+    if (this.prepaid || prepaidAddress) {
         const CrateKeySale = contract.fromArtifact('CrateKeySale');
         const address = prepaidAddress || this.prepaid.address;
         this.sale = await CrateKeySale.new(address, options);

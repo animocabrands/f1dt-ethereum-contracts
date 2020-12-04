@@ -4,7 +4,7 @@ const {ether, expectEvent, expectRevert} = require('@openzeppelin/test-helpers')
 const {BN, toAscii} = require('web3-utils');
 const { ZeroAddress, Zero } = require('@animoca/ethereum-contracts-core_library/src/constants');
 const ContractDeployer = require('../../helpers/ContractDeployer')
-
+const { toWei } = require('web3-utils');
 const [deployer, payout, owner, operator] = accounts;
 
 const F1DTCrateKey = contract.fromArtifact('F1DTCrateKey');
@@ -19,6 +19,7 @@ async function getInstance(token, account, totalSupply, config) {
     return await F1DTCrateKey.new(
         token.symbol,
         token.name,
+        token.uri,
         (account || TOKEN_HOLDER),
         (totalSupply || token.totalSupply), 
         config
@@ -104,6 +105,10 @@ describe('F1DT Crate Key', function() {
                     const tokenHolder = await this.f1dtCck.holder();
                     tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
+                it('should return the tokenURI', async function() {
+                    const tokenURI = await this.f1dtCck.tokenURI();
+                    tokenURI.should.be.equal(TOKENS.F1DT_CCK.uri);
+                });
             });
 
             describe('F1DT.RCK', function() {
@@ -127,6 +132,10 @@ describe('F1DT Crate Key', function() {
                     const tokenHolder = await this.f1dtRck.holder();
                     tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
+                it('should return the tokenURI', async function() {
+                    const tokenURI = await this.f1dtRck.tokenURI();
+                    tokenURI.should.be.equal(TOKENS.F1DT_RCK.uri);
+                });
             });
             describe('F1DT.ECK', function() {
                 it('should return the correct name', async function() {
@@ -148,6 +157,10 @@ describe('F1DT Crate Key', function() {
                 it('should return the correct holder', async function() {
                     const tokenHolder = await this.f1dtEck.holder();
                     tokenHolder.should.be.equal(TOKEN_HOLDER);
+                });
+                it('should return the tokenURI', async function() {
+                    const tokenURI = await this.f1dtEck.tokenURI();
+                    tokenURI.should.be.equal(TOKENS.F1DT_ECK.uri);
                 });
             });
             describe('F1DT.LCK', function() {
@@ -171,6 +184,10 @@ describe('F1DT Crate Key', function() {
                     const tokenHolder = await this.f1dtLck.holder();
                     tokenHolder.should.be.equal(TOKEN_HOLDER);
                 });
+                it('should return the tokenURI', async function() {
+                    const tokenURI = await this.f1dtLck.tokenURI();
+                    tokenURI.should.be.equal(TOKENS.F1DT_LCK.uri);
+                });
             });
         });
 
@@ -190,7 +207,7 @@ describe('F1DT Crate Key', function() {
                 });
                 it('should fail due to invalid amount', async function() {
                     await expectRevert(
-                        this.f1dtCck.burn('100000', {from: deployer}),
+                        this.f1dtCck.burn(toWei('100000'), {from: deployer}),
                         'ERC20: burn amount exceeds balance'
                     );
                 });
@@ -218,7 +235,7 @@ describe('F1DT Crate Key', function() {
                 });
                 it('should fail due to invalid amount', async function() {
                     await expectRevert(
-                        this.f1dtRck.burn('100000', {from: deployer}),
+                        this.f1dtRck.burn(toWei('100000'), {from: deployer}),
                         'ERC20: burn amount exceeds balance'
                     );
                 });
@@ -246,7 +263,7 @@ describe('F1DT Crate Key', function() {
                 });
                 it('should fail due to invalid amount', async function() {
                     await expectRevert(
-                        this.f1dtEck.burn('100000', {from: deployer}),
+                        this.f1dtEck.burn(toWei('100000'), {from: deployer}),
                         'ERC20: burn amount exceeds balance'
                     );
                 });
@@ -274,7 +291,7 @@ describe('F1DT Crate Key', function() {
                 });
                 it('should fail due to invalid amount', async function() {
                     await expectRevert(
-                        this.f1dtLck.burn('100000', {from: deployer}),
+                        this.f1dtLck.burn(toWei('100000'), {from: deployer}),
                         'ERC20: burn amount exceeds balance'
                     );
                 });

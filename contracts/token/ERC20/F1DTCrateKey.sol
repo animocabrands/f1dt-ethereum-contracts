@@ -24,6 +24,8 @@ contract F1DTCrateKey is ERC20, Ownable {
 
     address public holder;
 
+    string public tokenURI;
+
     /**
      * Constructor.
      * @dev Reverts if `symbol_` is not valid
@@ -37,7 +39,8 @@ contract F1DTCrateKey is ERC20, Ownable {
      */
     constructor (
         string memory symbol_, 
-        string memory name_,    
+        string memory name_,
+        string memory tokenURI_,    
         address holder_, 
         uint256 totalSupply_) public {
 
@@ -49,7 +52,7 @@ contract F1DTCrateKey is ERC20, Ownable {
         symbol = symbol_;
         name = name_;
         holder = holder_;
-
+        tokenURI = tokenURI_;
         _mint(holder, totalSupply_);
     }
 
@@ -64,4 +67,5 @@ contract F1DTCrateKey is ERC20, Ownable {
 
         _burn(_msgSender(), amount_);
     }
+
 }
