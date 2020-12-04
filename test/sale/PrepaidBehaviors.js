@@ -170,3 +170,42 @@ module.exports.endSales = function (deployer = accounts[0], prepaidContract) {
     });
 };
 
+
+module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, revvContract) {
+    describe("withdraws", function () {
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+            this.revv == revvContract || this.revv;
+        });
+        for(account in expectedWithdraw) {
+            const amount = expectedWithdraw[account];
+            it(`account ${account} should withdraw ${amount}`, async function () {
+                const originalBalance = (await this.revv.balanceOf(account));
+                const expectedAmount = originalBalance.add(new BN(amount));
+                const receipt = (await this.prepaid.withdraw({from: account}));
+                await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: expectedAmount});
+                // (await this.revv.balanceOf(account)).should.be.bignumber.eq(expectedAmount);
+            });
+        }
+    });
+};
+
+
+module.exports.collectRevenue = function (owner, amount, prepaidContract, revvContract) {
+    describe("collect revenue", function () {
+
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+            this.revv = revvContract || this.revv;
+        });
+
+        it(`should get collect ${amount} from prepaid contract`, async function () {
+            const originalBalance = (await this.revv.balanceOf(owner));
+            const expectedAmount = originalBalance.plus(amount);
+            const receipt = (await this.prepaid.collectRevenue({from : owner}));
+            await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: owner, _value: expectedAmount});
+            // (await this.revv.balanceOf(owner)).should.be.bignumber.eq(expectedAmount);
+        });
+    });
+};
+

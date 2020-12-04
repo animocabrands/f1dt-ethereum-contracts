@@ -274,7 +274,7 @@ describe("scenario", async function () {
             keyBalance.should.be.bignumber.eq("1");            
         });
 
-        it("should be able to purhcase until out of stock", async function () { 
+        it.skip("should be able to purhcase until out of stock", async function () { 
             const tokenObject = TOKENS.F1DT_ECK;
             const sku = stringToBytes32(tokenObject.symbol);
             const skuInfo = await this.sale.getSkuInfo(sku, {from: deployer});
@@ -328,9 +328,12 @@ describe("scenario", async function () {
     describe("Sales(End)", function(){
         // TODO: purchase should revert after sales end
         PrepaidBehavior.endSales(deployer);
+
+        PrepaidBehavior.withdraws({[participant]: toWei("10")});
     });
     
     //TODO: WITHDRAW DEPOSIT
+
 
 
     
