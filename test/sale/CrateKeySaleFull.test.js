@@ -6,10 +6,12 @@ const TokenBehavior = require("./TokenBehaviors");
 const { stringToBytes32 } = require('@animoca/ethereum-contracts-sale_base/test/utils/bytes32');
 const { ZeroAddress, Zero, One, Two, EmptyByte} = require('@animoca/ethereum-contracts-core_library').constants;
 const { toWei } = require('web3-utils');
+const { Four } = require('@animoca/ethereum-contracts-core_library/src/constants');
 const TOKENS = ContractDeployer.TOKENS;
 
 const [deployer, operation, anonymous, ...participants] = accounts;
 const [participant, participant2, participant3] = participants;
+const maxQuantity = toWei("20");
 
 describe("scenario", async function () {
 
@@ -45,8 +47,7 @@ describe("scenario", async function () {
     describe("Sales(setup SKU)", function () {
         
         TokenBehavior.createCrateKeyTokens();
-        const maxQuantity = toWei("20");
-
+        
         it('add Common Crate Keys sku(\'F1DT.CCK\')', async function () {
             // Simulate a sku value
             const tokenObject = TOKENS.F1DT_CCK;
@@ -194,10 +195,129 @@ describe("scenario", async function () {
             }
         });
         
-        //TODO: Purchase key with different purchaser and receiptant
-        //TODO: Purchase key check more than 1 quantity
-        //TODO: Purchase key until out of stock
-        //TODO: Purchase key until out of stock and should reject when there are one more purchase
+        it("should be able to purchase a cratekey using different purchaser and receiptant", async function () {
+            const tokenObject = TOKENS.F1DT_CCK;
+            const sku = stringToBytes32(tokenObject.symbol);
+            const beforePurchaseBal = await this.prepaid.balanceOf(participant3);
+            const receipt = await this.sale.purchaseFor(participant2, 
+                                                        this.revv.address, 
+                                                        sku, 
+                                                        One, 
+                                                        EmptyByte, 
+                                                        { from: participant3 });
+            //Check the event
+            await expectEvent.inTransaction(
+                receipt.tx,
+                this.sale,
+                'Purchase',
+                {
+                    purchaser: participant3,
+                    recipient: participant2,
+                    token: this.revv.address,
+                    sku: sku,
+                    quantity: One,
+                    userData: EmptyByte
+                });   
+
+            //Actual price of the token
+            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+            const expectedBal = beforePurchaseBal.sub(actualPrice);
+
+            //Check prepaid balance
+            const afterPurchaseBal = await this.prepaid.balanceOf(participant3);
+            afterPurchaseBal.should.be.bignumber.eq(expectedBal);
+            
+            //Check key balance
+            const keyBalance = await this.f1dtCck.balanceOf(participant2);
+            keyBalance.should.be.bignumber.eq("1");
+        });
+
+        it("should be able to purhcase more than one item", async function () { 
+            const tokenObject = TOKENS.F1DT_LCK;
+            const sku = stringToBytes32(tokenObject.symbol);
+            const quantity = Four;
+            const beforePurchaseBal = await this.prepaid.balanceOf(participant3);
+            const receipt = await this.sale.purchaseFor(participant2, 
+                                                        this.revv.address, 
+                                                        sku, 
+                                                        quantity, 
+                                                        EmptyByte, 
+                                                        { from: participant3 });
+            //Check the event
+            await expectEvent.inTransaction(
+                receipt.tx,
+                this.sale,
+                'Purchase',
+                {
+                    purchaser: participant3,
+                    recipient: participant2,
+                    token: this.revv.address,
+                    sku: sku,
+                    quantity: quantity,
+                    userData: EmptyByte
+                });   
+
+            //Actual price of the token
+            const actualPrice = new BN(tokenObject.price).div(new BN('2'));
+            const expectedBal = beforePurchaseBal.sub(actualPrice.mul(quantity));
+
+            //Check prepaid balance
+            const afterPurchaseBal = await this.prepaid.balanceOf(participant3);
+            afterPurchaseBal.should.be.bignumber.eq(expectedBal);
+            
+            //Check key balance
+            const keyBalance = await this.f1dtCck.balanceOf(participant2);
+            keyBalance.should.be.bignumber.eq("1");            
+        });
+
+        it("should be able to purhcase until out of stock", async function () { 
+            const tokenObject = TOKENS.F1DT_ECK;
+            const sku = stringToBytes32(tokenObject.symbol);
+            const skuInfo = await this.sale.getSkuInfo(sku, {from: deployer});
+            const remainingSupply = skuInfo.totalSupply;
+
+            //Total of purchase operations based on max quantity in order to optimize the test
+            let purchaseOperations = remainingSupply.div(new BN(maxQuantity));
+                purchaseOperations = purchaseOperations.sub(new BN(1));
+            
+            for (saleIndex = 0; saleIndex < purchaseOperations; saleIndex++) {
+                console.log(`Purchase item ${saleIndex} of ${purchaseOperations}. Quantity ${maxQuantity}`);    
+
+                const receipt = await this.sale.purchaseFor(participant2, 
+                                                            this.revv.address, 
+                                                            sku, 
+                                                            maxQuantity, 
+                                                            EmptyByte, 
+                                                            { from: participant3 });
+                //Check the event
+                await expectEvent.inTransaction(
+                    receipt.tx,
+                    this.sale,
+                    'Purchase',
+                    {
+                        purchaser: participant3,
+                        recipient: participant2,
+                        token: this.revv.address,
+                        sku: sku,
+                        quantity: maxQuantity,
+                        userData: EmptyByte
+                    });  
+            }
+        });
+
+        it("should be able to purhcase until out of stock and should reject when there are one more purchase", async function () { 
+            //WIP
+            
+            // await expectRevert(this.sale.purchaseFor(participant2, 
+            //                                         this.revv.address, 
+            //                                         sku, 
+            //                                         One, 
+            //                                         EmptyByte, 
+            //                                         { from: participant3 }),
+            //                     'Sale: insufficient supply');
+        });
+        
+        //TODO: check delivery operation 
     });
     
     //TODO: WITHDRAW DEPOSIT
