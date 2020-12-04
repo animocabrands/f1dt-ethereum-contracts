@@ -359,6 +359,13 @@ describe("scenario", async function () {
                 const receipt = await this.prepaid.transferOwnership(accountDept, {from: deployer});
                 await expectEvent(receipt, 'OwnershipTransferred', {previousOwner: deployer, newOwner: accountDept});
             });
+
+            PrepaidBehavior.withdraws({
+                [participant3]: {
+                    name : "participant3",
+                    amount : toWei('3008600')
+                },
+            });
         });
         
         // 1 CCK
