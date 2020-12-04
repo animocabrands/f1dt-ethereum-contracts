@@ -10,7 +10,7 @@ const TOKENS = ContractDeployer.TOKENS;
 
 const [deployer, operation, accountDept, ...participants] = accounts;
 const [participant, participant2, participant3, participant4] = participants;
-const maxQuantity = toWei("20");
+const maxQuantity = toWei("200");
 
 describe("scenario", async function () {
 
