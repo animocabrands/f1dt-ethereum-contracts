@@ -30,6 +30,7 @@ describe('CrateKeySale', function () {
         this.crateKey = await CrateKey.new(
             overrides.crateKeySymbol || 'CK',
             overrides.crateKeyName || 'Crate Key',
+            overrides.crateKeyUri || 'https://localhost/uri',
             overrides.crateKeyHolder || holder,
             overrides.crateKeySupply || new BN(10),
             {
@@ -240,12 +241,12 @@ describe('CrateKeySale', function () {
 
         it('reverts if creating more than the fixed SKU capacity of 4', async function () {
             for (let index = 0; index < 4; ++index) {
-                const crateKey = await CrateKey.new('CK', 'Crate Key', holder, new BN(10), {from: deployer});
+                const crateKey = await CrateKey.new('CK', 'Crate Key', 'https://localhost/uri', holder, new BN(10), {from: deployer});
                 const sku = stringToBytes32(`sku${index}`);
                 await crateKey.approve(this.sale.address, One, {from: holder});
                 await this.sale.createCrateKeySku(sku, One, One, crateKey.address, {from: deployer});
             }
-            const crateKey = await CrateKey.new('CK', 'Crate Key', holder, new BN(10), {from: deployer});
+            const crateKey = await CrateKey.new('CK', 'Crate Key', 'https://localhost/uri', holder, new BN(10), {from: deployer});
             const sku = stringToBytes32(`exceededSkuCapacity`);
             const revert = this.sale.createCrateKeySku(sku, One, One, crateKey.address, {from: deployer});
             await expectRevert(revert, 'Sale: too many skus');
