@@ -25,11 +25,11 @@ module.exports.beforeDeposit = function (deployer = accounts[0], prepaidContract
 
 module.exports.userDeposit = function (partitipants, prepaidContract, revvContract) {
     const [participant, participant2, participant3] = partitipants;
-    const deposits = {
-        [participant]: toWei("20000000"),
-        [participant2]: toWei("20000000"),
-        [participant3]: toWei("30000000")
-    };
+    // const deposits = {
+    //     [participant]: toWei("20000000"),
+    //     [participant2]: toWei("20000000"),
+    //     [participant3]: toWei("30000000")
+    // };
     describe("deposit phrase", function () {
 
         before(async function () {    
@@ -81,7 +81,7 @@ module.exports.userDeposit = function (partitipants, prepaidContract, revvContra
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('25');
         });
     });
-    return deposits;
+    // return deposits;
 };
 
 module.exports.pauseDeposit = function(participants, deployer = accounts[0], prepaidContract){
@@ -200,6 +200,20 @@ module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, rev
         }
     });
 };
+
+
+module.exports.withdrawsShouldRevert = function (participant, prepaidContract) {
+    describe("withdraw should revert", function(){
+        before(function () {
+            this.revv = revvContract || this.revv;
+        });
+
+        it("should revert with zero balacne in prepaid", () => {
+            const revert = this.prepaid.withdraw({from: participant3});
+             expectRevert(revert, 'PrePaid: no balance');
+        });
+    });
+}
 
 
 module.exports.collectRevenue = function (owner, amount, prepaidContract, revvContract) {

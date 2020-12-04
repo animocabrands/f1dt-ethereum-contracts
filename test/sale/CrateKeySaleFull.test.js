@@ -385,9 +385,9 @@ describe("scenario", async function () {
 
         describe("user withdraw after collect revenue", function() {
             PrepaidBehavior.withdraws({
-                [participant4]: {
-                    name : "participant4",
-                    amount : toWei('30000000')
+                [participant2]: {
+                    name : "participant2",
+                    amount : toWei('10000000')
                 },
             });
         });
