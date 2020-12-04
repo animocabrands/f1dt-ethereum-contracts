@@ -187,14 +187,14 @@ module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, rev
             this.revv == revvContract || this.revv;
         });
         for(account in expectedWithdraw) {
-            const name = expectedWithdraw[account].amount
+            const name = expectedWithdraw[account].name;
             const amount = expectedWithdraw[account].amount;
             it(`account ${name}(${account}) should withdraw ${amount}`, async function () {
                 const originalBalance = (await this.revv.balanceOf(account));
                 console.log(originalBalance.toString(10));
                 const expectedAmount = originalBalance.add(new BN(amount));
                 const receipt = (await this.prepaid.withdraw({from: account}));
-                await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: expectedAmount});
+                await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: account, _value: amount});
                 (await this.revv.balanceOf(account)).should.be.bignumber.eq(expectedAmount);
             });
         }
@@ -215,7 +215,7 @@ module.exports.collectRevenue = function (owner, amount, prepaidContract, revvCo
             console.log(originalBalance.toString(10));
             const expectedAmount = originalBalance.add(amount);
             const receipt = (await this.prepaid.collectRevenue({from : owner}));
-            await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: owner, _value: expectedAmount});
+            await expectEvent.inTransaction(receipt.tx, this.revv, "Transfer", {_from: this.prepaid.address, _to: owner, _value: amount});
             (await this.revv.balanceOf(owner)).should.be.bignumber.eq(expectedAmount);
         });
     });
