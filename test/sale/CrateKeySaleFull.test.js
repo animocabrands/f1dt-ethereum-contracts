@@ -243,21 +243,21 @@ describe("scenario", async function () {
             const quantity = toWei('4');
             const actualPrice = new BN(tokenObject.price).div(new BN('2'));
             const totalPrice = actualPrice.mul(new BN(fromWei(quantity)));
-            const beforePurchaseBal = await this.prepaid.balanceOf(participant3);
+            const beforePurchaseBal = await this.prepaid.balanceOf(participant4);
             
             const receipt = await this.sale.purchaseFor(participant2, 
                                                         this.revv.address, 
                                                         sku, 
                                                         quantity, 
                                                         EmptyByte, 
-                                                        { from: participant3 });
+                                                        { from: participant4 });
             //Check the event
             await expectEvent.inTransaction(
                 receipt.tx,
                 this.sale,
                 'Purchase',
                 {
-                    purchaser: participant3,
+                    purchaser: participant4,
                     recipient: participant2,
                     token: this.revv.address,
                     sku: sku,
@@ -268,7 +268,7 @@ describe("scenario", async function () {
 
             //Check prepaid balance
             const expectedBal = beforePurchaseBal.sub(toWei(totalPrice));
-            const afterPurchaseBal = await this.prepaid.balanceOf(participant3);
+            const afterPurchaseBal = await this.prepaid.balanceOf(participant4);
             afterPurchaseBal.should.be.bignumber.eq(expectedBal);
             
             //Check key balance
@@ -359,14 +359,6 @@ describe("scenario", async function () {
                 const receipt = await this.prepaid.transferOwnership(accountDept, {from: deployer});
                 await expectEvent(receipt, 'OwnershipTransferred', {previousOwner: deployer, newOwner: accountDept});
             });
-
-            // PrepaidBehavior.withdraws({
-            //     [participant2]: {
-            //         name : "participant2",
-            //         amount : toWei("10")
-            //     }
-            // });
-
         });
         
         // 1 CCK
@@ -379,8 +371,8 @@ describe("scenario", async function () {
         //60600*0.5+(18000*0.5)*2999+(38000*0.5*4)+(800*0.5)
         PrepaidBehavior.collectRevenue(accountDept, toWei("27097700"));
 
-        describe.skip("user withdraw with zero deposit should revert", function() {
-            //todo
+        describe("user withdraw with zero deposit should revert", function() {            
+            PrepaidBehavior.withdrawsShouldRevert(participant4);
         });
 
         describe("user withdraw after collect revenue", function() {
@@ -390,9 +382,6 @@ describe("scenario", async function () {
                     amount : toWei('10000000')
                 },
             });
-        });
-        
-    });
-
-    
+        });        
+    });    
 });

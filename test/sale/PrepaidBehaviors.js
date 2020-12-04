@@ -121,7 +121,7 @@ module.exports.unpauseDeposit = function(participants, deployer = accounts[0], p
         it('deposit should be sucessful after unpause', async function () {
             //Participant 3
             const deposit_P3 = toWei('30000000');
-            const deposit_P4 = toWei('30000000');
+            const deposit_P4 = toWei('76000');
             const receipt_P3 = await this.prepaid.deposit(deposit_P3, { from: participant3 });
             await expectEvent(receipt_P3, 'Deposited', {wallet: participant3, amount: deposit_P3});
 
@@ -132,8 +132,8 @@ module.exports.unpauseDeposit = function(participants, deployer = accounts[0], p
 
             await this.revv.approve(this.prepaid.address, toWei("100000000"), {from: participant4});
             await this.prepaid.deposit(deposit_P4, { from: participant4 });
-            (await this.revv.balanceOf(participant4)).should.be.bignumber.equal(toWei('70000000'));
-            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('90000000'));
+            (await this.revv.balanceOf(participant4)).should.be.bignumber.equal(toWei('99924000'));
+            (await this.revv.balanceOf(this.prepaid.address)).should.be.bignumber.equal(toWei('60076000'));
 
             // Discount check - Fourth Condition
             (await this.prepaid.getDiscount()).should.be.bignumber.equal('50');
@@ -205,12 +205,12 @@ module.exports.withdraws = function (expectedWithdraw = {}, prepaidContract, rev
 module.exports.withdrawsShouldRevert = function (participant, prepaidContract) {
     describe("withdraw should revert", function(){
         before(function () {
-            this.revv = revvContract || this.revv;
+            this.prepaid = prepaidContract || this.prepaid;
         });
 
-        it("should revert with zero balacne in prepaid", () => {
-            const revert = this.prepaid.withdraw({from: participant3});
-             expectRevert(revert, 'PrePaid: no balance');
+        it("should revert with zero balacne in prepaid", async function() {
+            const revert = this.prepaid.withdraw({from: participant});
+            await expectRevert(revert, 'PrePaid: no balance');
         });
     });
 }
