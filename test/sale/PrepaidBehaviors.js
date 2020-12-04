@@ -154,3 +154,19 @@ module.exports.addWhiteListedOperator = function (deployer = accounts[0],operato
     });
 };
 
+module.exports.endSales = function (deployer = accounts[0], prepaidContract) {
+    describe("after sales", function () {
+
+        before(function () {
+            this.prepaid = prepaidContract || this.prepaid;
+        });
+
+        it('set the sale end state', async function () {
+            const endState = await this.prepaid.SALE_END_STATE();
+            const receipt = await this.prepaid.setSaleState(endState, { from: deployer });
+            await expectEvent(receipt, 'StateChanged', { state: endState });
+            (await this.prepaid.state()).should.be.bignumber.eq(endState);
+        });
+    });
+};
+

@@ -323,6 +323,15 @@ describe("scenario", async function () {
         
         //TODO: check delivery operation 
     });
+
+    // TODO: END sales
+    describe("Sales(End)", function(){
+        // TODO: purchase should revert after sales end
+        PrepaidBehavior.endSales(deployer);
+    });
     
     //TODO: WITHDRAW DEPOSIT
+
+
+    
 });
