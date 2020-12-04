@@ -30,6 +30,7 @@ contract F1DTCrateKey is ERC20, Ownable {
      * Constructor.
      * @dev Reverts if `symbol_` is not valid
      * @dev Reverts if `name_` is not valid
+     * @dev Reverts if `tokenURI_` is not valid
      * @dev Reverts if `holder_` is an invalid address
      * @dev Reverts if `totalSupply_` is equal to zero
      * @param symbol_ Symbol of the token.
@@ -46,6 +47,7 @@ contract F1DTCrateKey is ERC20, Ownable {
 
         require(bytes(symbol_).length != 0, "F1DTCrateKey: invalid symbol");
         require(bytes(name_).length != 0, "F1DTCrateKey: invalid name");
+        require(bytes(tokenURI_).length != 0, "F1DTCrateKey: invalid tokeURI");
         require(holder_ != address(0), "F1DTCrateKey: invalid holder");
         require(totalSupply_ != 0, "F1DTCrateKey: invalid initial supply");
 
