@@ -30,6 +30,109 @@ contract ContentGenerator {
 
     uint48 counter;
 
+    uint256 internal constant _CRATE_TIER_LEGENDARY = 0;
+    uint256 internal constant _CRATE_TIER_EPIC = 1;
+    uint256 internal constant _CRATE_TIER_RARE = 2;
+    uint256 internal constant _CRATE_TIER_COMMON = 3;
+
+    uint16 internal constant _RACING_STATS_T1_RARITY_1_MIN = 800;
+    uint16 internal constant _RACING_STATS_T1_RARITY_1_MAX = 900;
+    uint16 internal constant _RACING_STATS_T1_RARITY_2_MIN = 750;
+    uint16 internal constant _RACING_STATS_T1_RARITY_2_MAX = 810;
+    uint16 internal constant _RACING_STATS_T1_RARITY_3_MIN = 700;
+    uint16 internal constant _RACING_STATS_T1_RARITY_3_MAX = 780;
+    uint16 internal constant _RACING_STATS_T1_RARITY_4_MIN = 650;
+    uint16 internal constant _RACING_STATS_T1_RARITY_4_MAX = 710;
+    uint16 internal constant _RACING_STATS_T1_RARITY_5_MIN = 600;
+    uint16 internal constant _RACING_STATS_T1_RARITY_5_MAX = 680;
+    uint16 internal constant _RACING_STATS_T1_RARITY_6_MIN = 560;
+    uint16 internal constant _RACING_STATS_T1_RARITY_6_MAX = 620;
+    uint16 internal constant _RACING_STATS_T1_RARITY_7_MIN = 520;
+    uint16 internal constant _RACING_STATS_T1_RARITY_7_MAX = 565;
+    uint16 internal constant _RACING_STATS_T1_RARITY_8_MIN = 500;
+    uint16 internal constant _RACING_STATS_T1_RARITY_8_MAX = 530;
+    uint16 internal constant _RACING_STATS_T1_RARITY_9_MIN = 450;
+    uint16 internal constant _RACING_STATS_T1_RARITY_9_MAX = 510;
+
+    uint16 internal constant _RACING_STATS_T2_RARITY_1_MIN = 500;
+    uint16 internal constant _RACING_STATS_T2_RARITY_1_MAX = 600;
+    uint16 internal constant _RACING_STATS_T2_RARITY_2_MIN = 440;
+    uint16 internal constant _RACING_STATS_T2_RARITY_2_MAX = 520;
+    uint16 internal constant _RACING_STATS_T2_RARITY_3_MIN = 390;
+    uint16 internal constant _RACING_STATS_T2_RARITY_3_MAX = 450;
+    uint16 internal constant _RACING_STATS_T2_RARITY_4_MIN = 340;
+    uint16 internal constant _RACING_STATS_T2_RARITY_4_MAX = 395;
+    uint16 internal constant _RACING_STATS_T2_RARITY_5_MIN = 320;
+    uint16 internal constant _RACING_STATS_T2_RARITY_5_MAX = 345;
+    uint16 internal constant _RACING_STATS_T2_RARITY_6_MIN = 300;
+    uint16 internal constant _RACING_STATS_T2_RARITY_6_MAX = 325;
+    uint16 internal constant _RACING_STATS_T2_RARITY_7_MIN = 270;
+    uint16 internal constant _RACING_STATS_T2_RARITY_7_MAX = 310;
+    uint16 internal constant _RACING_STATS_T2_RARITY_8_MIN = 250;
+    uint16 internal constant _RACING_STATS_T2_RARITY_8_MAX = 280;
+    uint16 internal constant _RACING_STATS_T2_RARITY_9_MIN = 200;
+    uint16 internal constant _RACING_STATS_T2_RARITY_9_MAX = 255;
+
+    uint16 internal constant _RACING_STATS_T3_RARITY_1_MIN = 500;
+    uint16 internal constant _RACING_STATS_T3_RARITY_1_MAX = 600;
+    uint16 internal constant _RACING_STATS_T3_RARITY_2_MIN = 440;
+    uint16 internal constant _RACING_STATS_T3_RARITY_2_MAX = 520;
+    uint16 internal constant _RACING_STATS_T3_RARITY_3_MIN = 390;
+    uint16 internal constant _RACING_STATS_T3_RARITY_3_MAX = 450;
+    uint16 internal constant _RACING_STATS_T3_RARITY_4_MIN = 340;
+    uint16 internal constant _RACING_STATS_T3_RARITY_4_MAX = 395;
+    uint16 internal constant _RACING_STATS_T3_RARITY_5_MIN = 320;
+    uint16 internal constant _RACING_STATS_T3_RARITY_5_MAX = 345;
+    uint16 internal constant _RACING_STATS_T3_RARITY_6_MIN = 300;
+    uint16 internal constant _RACING_STATS_T3_RARITY_6_MAX = 325;
+    uint16 internal constant _RACING_STATS_T3_RARITY_7_MIN = 270;
+    uint16 internal constant _RACING_STATS_T3_RARITY_7_MAX = 310;
+    uint16 internal constant _RACING_STATS_T3_RARITY_8_MIN = 250;
+    uint16 internal constant _RACING_STATS_T3_RARITY_8_MAX = 280;
+    uint16 internal constant _RACING_STATS_T3_RARITY_9_MIN = 200;
+    uint16 internal constant _RACING_STATS_T3_RARITY_9_MAX = 255;
+
+    uint8 internal constant _SEASON_ID_2020 = 3;
+
+    uint8 internal constant _TYPE_ID_CAR = 1;
+    uint8 internal constant _TYPE_ID_DRIVER = 2;
+    uint8 internal constant _TYPE_ID_PART = 3;
+    uint8 internal constant _TYPE_ID_GEAR = 4;
+    uint8 internal constant _TYPE_ID_TYRES = 5;
+
+    uint8 internal constant _TEAM_ID_ALFA_ROMEO_RACING = 1;
+    uint8 internal constant _TEAM_ID_SCUDERIA_FERRARI = 2;
+    uint8 internal constant _TEAM_ID_HAAS_F1_TEAM = 3;
+    uint8 internal constant _TEAM_ID_MCLAREN_F1_TEAM = 4;
+    uint8 internal constant _TEAM_ID_MERCEDES_AMG_PETRONAS_MOTORSPORT = 5;
+    uint8 internal constant _TEAM_ID_SPSCORE_RACING_POINT_F1_TEAM = 6;
+    uint8 internal constant _TEAM_ID_ASTON_MARTIN_RED_BULL_RACING = 7;
+    uint8 internal constant _TEAM_ID_RENAULT_F1_TEAM = 8;
+    uint8 internal constant _TEAM_ID_RED_BULL_TORO_ROSSO_HONDA = 9;
+    uint8 internal constant _TEAM_ID_ROKIT_WILLIAMS_RACING = 10;
+
+    uint16 internal constant _DRIVER_ID_KIMI_RAIKKONEN = 7;
+    uint16 internal constant _DRIVER_ID_ANTONIO_GIOVINAZZI = 99;
+    uint16 internal constant _DRIVER_ID_SEBASTIAN_VETTEL = 5;
+    uint16 internal constant _DRIVER_ID_CHARLES_LECLERC = 16;
+    uint16 internal constant _DRIVER_ID_ROMAIN_GROSJEAN = 8;
+    uint16 internal constant _DRIVER_ID_KEVIN_MAGNUSSEN = 20;
+    uint16 internal constant _DRIVER_ID_LANDO_NORRIS = 4;
+    uint16 internal constant _DRIVER_ID_CARLOS_SAINZ = 55;
+    uint16 internal constant _DRIVER_ID_LEWIS_HAMILTON = 44;
+    uint16 internal constant _DRIVER_ID_VALTTERI_BOTTAS = 77;
+    uint16 internal constant _DRIVER_ID_SERGIO_PEREZ = 11;
+    uint16 internal constant _DRIVER_ID_LANCE_STROLL = 18;
+    uint16 internal constant _DRIVER_ID_PIERRE_GASLY = 10;
+    uint16 internal constant _DRIVER_ID_MAX_VERSTAPPEN = 33;
+    uint16 internal constant _DRIVER_ID_DANIEL_RICCIARDO = 3;
+    uint16 internal constant _DRIVER_ID_NICO_HULKENBERG = 27;
+    uint16 internal constant _DRIVER_ID_ALEXANDER_ALBON = 23;
+    uint16 internal constant _DRIVER_ID_DANIIL_KVYAT = 26;
+    uint16 internal constant _DRIVER_ID_GEORGE_RUSSEL = 63;
+    uint16 internal constant _DRIVER_ID_ROBERT_KUBICA = 88;
+
+
     constructor(uint256 startCounter) public {
         counter = startCounter.toUint32();
     }
@@ -39,77 +142,75 @@ contract ContentGenerator {
     }
 
     // Uses seed bits [0;4[
+    function _generateTokens_oneGuaranteedDrop(uint256 mainSeed, uint256 crateTier)
+        internal
+        view
+        returns (uint256[] memory tokens)
+    {
+        tokens = new uint256[](5);
+
+        uint256 guaranteedDropIndex = mainSeed % 5;
+
+        uint48 counter_ = counter;
+        for (uint256 i = 0; i < 5; ++i) {
+            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
+            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == guaranteedDropIndex);
+            tokens[i] = makeTokenId(metadata);
+        }
+        // counter = counter_;
+    }
+
+    // Uses seed bits [0;4[
+    function _generateTokens_twoGuaranteedDrops(uint256 mainSeed, uint256 crateTier)
+        internal
+        view
+        returns (uint256[] memory tokens)
+    {
+        tokens = new uint256[](5);
+
+        uint256 guaranteedDropIndex1 = mainSeed % 5;
+        uint256 guaranteedDropIndex2 = (1 + guaranteedDropIndex1 + ((mainSeed >> 4) % 4)) % 5;
+
+        require(guaranteedDropIndex1 != guaranteedDropIndex2, "index error"); // for test
+
+        uint48 counter_ = counter;
+        for (uint256 i = 0; i < 5; ++i) {
+            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
+            Metadata memory metadata = generateMetadata(
+                seed,
+                crateTier,
+                counter_,
+                i,
+                i == guaranteedDropIndex1 || i == guaranteedDropIndex2
+            );
+            tokens[i] = makeTokenId(metadata);
+        }
+        // counter = counter_;
+    }
+
     function generateCommonTokens() external view returns (uint256[] memory tokens) {
-        uint256 crateTier = 3;
-        tokens = new uint256[](5);
-        uint256 mainSeed = generateSeed();
-
-        uint256 commonTokenIndex = mainSeed % 5;
-
-        uint48 counter_ = counter;
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
-            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == commonTokenIndex);
-            tokens[i] = makeTokenId(metadata);
-        }
-        // counter = counter_;
+        tokens = _generateTokens_oneGuaranteedDrop(generateSeed(), _CRATE_TIER_COMMON);
     }
 
-    // Uses seed bits [0;4[
     function generateRareTokens() external view returns (uint256[] memory tokens) {
-        uint256 crateTier = 2;
-        tokens = new uint256[](5);
-        uint256 mainSeed = generateSeed();
-
-        uint256 rareTokenIndex1 = mainSeed % 5;
-        uint256 rareTokenIndex2 = (1 + rareTokenIndex1 + ((mainSeed >> 4) % 4)) % 5;
-
-        require(rareTokenIndex1 != rareTokenIndex2, "index error"); // for test
-
-        uint48 counter_ = counter;
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
-            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == rareTokenIndex1 || i == rareTokenIndex2);
-            tokens[i] = makeTokenId(metadata);
-        }
-        // counter = counter_;
+        tokens = _generateTokens_twoGuaranteedDrops(generateSeed(), _CRATE_TIER_RARE);
     }
 
-    // Uses seed bits [0;4[
     function generateEpicTokens() external view returns (uint256[] memory tokens) {
-        uint256 crateTier = 1;
-        tokens = new uint256[](5);
-        uint256 mainSeed = generateSeed();
-
-        uint256 epicTokenIndex = mainSeed % 5;
-
-        uint48 counter_ = counter;
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
-            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == epicTokenIndex);
-            tokens[i] = makeTokenId(metadata);
-        }
-        // counter = counter_;
+        tokens = _generateTokens_oneGuaranteedDrop(generateSeed(), _CRATE_TIER_EPIC);
     }
 
-    // Uses seed bits [0;4[
     function generateLegendaryTokens() external view returns (uint256[] memory tokens) {
-        uint256 crateTier = 0;
-        tokens = new uint256[](5);
-        uint256 mainSeed = generateSeed();
-
-        uint256 legendaryTokenIndex = mainSeed % 5;
-
-        uint48 counter_ = counter;
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 seed = uint256(keccak256(abi.encodePacked(mainSeed, counter_)));
-            Metadata memory metadata = generateMetadata(seed, crateTier, counter_, i, i == legendaryTokenIndex);
-            tokens[i] = makeTokenId(metadata);
-        }
-        // counter = counter_;
+        tokens = _generateTokens_oneGuaranteedDrop(generateSeed(), _CRATE_TIER_LEGENDARY);
     }
 
-    function generateMetadata(uint256 seed, uint256 crateTier, uint48 baseCounter, uint256 index, bool isGuaranteedTier) public view returns (Metadata memory metadata) {
+    function generateMetadata(
+        uint256 seed,
+        uint256 crateTier,
+        uint48 baseCounter,
+        uint256 index,
+        bool isGuaranteedTier
+    ) public pure returns (Metadata memory metadata) {
         (metadata.tokenType, metadata.tokenSubType) = generateType(seed >> 4, index); // Uses seed bits [4;36[
         metadata.tokenRarity = generateRarity(seed >> 36, crateTier, isGuaranteedTier); // Uses seed bits [36;68[
         generateTeamData(seed >> 68, metadata); // Uses seed bits [68;76[
@@ -117,45 +218,56 @@ contract ContentGenerator {
         metadata.counter = baseCounter + uint48(index); // todo safemath?
     }
 
-    function generateType(uint256 seed, uint256 index) public view returns (uint8 tokenType, uint8 tokenSubType) {
+    function generateType(uint256 seed, uint256 index) public pure returns (uint8 tokenType, uint8 tokenSubType) {
         if (index == 0) {
             tokenType = uint8(1 + (seed % 2)); // Types {1, 2}
             tokenSubType = 0;
         } else {
             uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-            if (seedling < 5000) { // Tyres, 5.000%
+            if (seedling < 5000) {
+                // Tyres, 5.000%
                 tokenType = 5;
                 tokenSubType = uint8(1 + (seedling % 5)); // Subtype [1-5]
-            } else { // Parts/Gears, 95.000%
+            } else {
+                // Parts/Gears, 95.000%
                 tokenType = uint8(3 + (seedling % 2)); // Type {3, 4}
-                if (tokenType == 3) { // Part
+                if (tokenType == 3) {
+                    // Part
                     tokenSubType = uint8(1 + (seedling % 8)); // Subtype [1-8]
-                } else { // Gear
+                } else {
+                    // Gear
                     tokenSubType = uint8(1 + (seedling % 4)); // Subtype [1-4]
                 }
             }
         }
     }
 
-    function generateRarity(uint256 seed, uint256 crateTier, bool guaranteedItem) public view returns (uint8 tokenRarity) {
-        if (crateTier == 0) { // Legendary Crate
+    function generateRarity(
+        uint256 seed,
+        uint256 crateTier,
+        bool guaranteedItem
+    ) public pure returns (uint8 tokenRarity) {
+        if (crateTier == _CRATE_TIER_LEGENDARY) {
             if (guaranteedItem) {
                 tokenRarity = 1;
             } else {
                 uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-                if (seedling < 15000) { // Legendary, 15%
+                if (seedling < 15000) {
+                    // Legendary, 15%
                     tokenRarity = 1;
-                } else if (seedling < 55000) { // Epic, 40%
+                } else if (seedling < 55000) {
+                    // Epic, 40%
                     tokenRarity = uint8(3 - (seedling % 2)); // Rarity [2-3]
-                } else { // Rare, 45%
+                } else {
+                    // Rare, 45%
                     tokenRarity = uint8(6 - (seedling % 3)); // Rarity [4-6]
                 }
             }
-        } else if (crateTier == 1) { // Epic Crate
+        } else if (crateTier == _CRATE_TIER_EPIC) {
             // TODO
-        } else if (crateTier == 2) { // Rare Crate
+        } else if (crateTier == _CRATE_TIER_RARE) {
             // TODO
-        } else if (crateTier == 3) { // Common Crate
+        } else if (crateTier == _CRATE_TIER_COMMON) {
             uint256 seedling = seed % 100000; // > 16 bits, reserve 32
             if (guaranteedItem) {
                 if (seedling == 0) {
@@ -188,33 +300,35 @@ contract ContentGenerator {
         }
     }
 
-    function generateTeamData(uint256 seed, Metadata memory metadata) public view {
-        if (metadata.tokenType == 1 || metadata.tokenType == 2) { // Car & Driver
-            if (metadata.tokenRarity < 4) { // Epic and above
-                metadata.team = uint8(1 + (seed % 10));
-                if (metadata.tokenType == 2) { // Driver
+    function generateTeamData(uint256 seed, Metadata memory metadata) public pure {
+        if (metadata.tokenType == _TYPE_ID_CAR || metadata.tokenType == _TYPE_ID_DRIVER) {
+            if (metadata.tokenRarity < 4) {
+                // Epic and above
+                uint8 team = uint8(1 + (seed % 10));
+                metadata.team = team;
+                if (metadata.tokenType == _TYPE_ID_DRIVER) {
                     uint256 index = (seed >> 8) % 2;
 
-                    if (metadata.team == 1) { // Alfa Romeo Racing: Kimi Räikkönen, Antonio Giovinazzi
-                        metadata.driver = [7, 99][index];
-                    } else if (metadata.team == 2) { // Scuderia Ferrari: Sebastian Vettel, Charles Leclerc
-                        metadata.driver = [5, 16][index];
-                    } else if (metadata.team == 3) { // Haas F1® Team: Romain Grosjean, Kevin Magnussen
-                        metadata.driver = [8, 20][index];
-                    } else if (metadata.team == 4) { // McLaren F1® Team: Lando Norris, Carlos Sainz
-                        metadata.driver = [4, 55][index];
-                    } else if (metadata.team == 5) { // Mercedes-AMG Petronas Motorsport: Lewis Hamilton, Valtteri Bottas
-                        metadata.driver = [44, 77][index];
-                    } else if (metadata.team == 6) { // SpScore Racing Point F1® Team: Sergio Pérez, Lance Stroll
-                        metadata.driver = [11, 18][index];
-                    } else if (metadata.team == 7) { // Aston Martin Red Bull Racing: Pierre Gasly, Max Verstappen
-                        metadata.driver = [10, 33][index];
-                    } else if (metadata.team == 8) { // Renault F1® Team: Daniel Ricciardo, Nico Hülkenberg
-                        metadata.driver = [3, 27][index];
-                    } else if (metadata.team == 9) { // Red Bull Toro Rosso Honda: Alexander Albon, Daniil Kvyat
-                        metadata.driver = [23, 26][index];
-                    } else if (metadata.team == 10) { // ROKiT Williams Racing: George Russell, Robert Kubica
-                        metadata.driver = [63, 88][index];
+                    if (team == _TEAM_ID_ALFA_ROMEO_RACING) {
+                        metadata.driver = [_DRIVER_ID_KIMI_RAIKKONEN, _DRIVER_ID_ANTONIO_GIOVINAZZI][index];
+                    } else if (team == _TEAM_ID_SCUDERIA_FERRARI) {
+                        metadata.driver = [_DRIVER_ID_SEBASTIAN_VETTEL, _DRIVER_ID_CHARLES_LECLERC][index];
+                    } else if (team == _TEAM_ID_HAAS_F1_TEAM) {
+                        metadata.driver = [_DRIVER_ID_ROMAIN_GROSJEAN, _DRIVER_ID_KEVIN_MAGNUSSEN][index];
+                    } else if (team == _TEAM_ID_MCLAREN_F1_TEAM) {
+                        metadata.driver = [_DRIVER_ID_LANDO_NORRIS, _DRIVER_ID_CARLOS_SAINZ][index];
+                    } else if (team == _TEAM_ID_MERCEDES_AMG_PETRONAS_MOTORSPORT) {
+                        metadata.driver = [_DRIVER_ID_LEWIS_HAMILTON, _DRIVER_ID_VALTTERI_BOTTAS][index];
+                    } else if (team == _TEAM_ID_SPSCORE_RACING_POINT_F1_TEAM) {
+                        metadata.driver = [_DRIVER_ID_SERGIO_PEREZ, _DRIVER_ID_LANCE_STROLL][index];
+                    } else if (team == _TEAM_ID_ASTON_MARTIN_RED_BULL_RACING) {
+                        metadata.driver = [_DRIVER_ID_PIERRE_GASLY, _DRIVER_ID_MAX_VERSTAPPEN][index];
+                    } else if (team == _TEAM_ID_RENAULT_F1_TEAM) {
+                        metadata.driver = [_DRIVER_ID_DANIEL_RICCIARDO, _DRIVER_ID_NICO_HULKENBERG][index];
+                    } else if (team == _TEAM_ID_RED_BULL_TORO_ROSSO_HONDA) {
+                        metadata.driver = [_DRIVER_ID_ALEXANDER_ALBON, _DRIVER_ID_DANIIL_KVYAT][index];
+                    } else if (team == _TEAM_ID_ROKIT_WILLIAMS_RACING) {
+                        metadata.driver = [_DRIVER_ID_GEORGE_RUSSEL, _DRIVER_ID_ROBERT_KUBICA][index];
                     }
                 }
             } else {
@@ -228,99 +342,99 @@ contract ContentGenerator {
         uint256 seed,
         uint256 tokenType,
         uint256 tokenRarity
-    ) public view returns (RacingStats memory stats) {
+    ) public pure returns (RacingStats memory stats) {
         uint256 min;
         uint256 max;
-        if (tokenType == 1 || tokenType == 2) {
+        if (tokenType == _TYPE_ID_CAR || tokenType == _TYPE_ID_DRIVER) { // T1
             if (tokenRarity == 1) {
-                min = 650;
-                max = 900;
+                min = _RACING_STATS_T1_RARITY_1_MIN;
+                max = _RACING_STATS_T1_RARITY_1_MAX;
             } else if (tokenRarity == 2) {
-                min = 650;
-                max = 860;
+                min = _RACING_STATS_T1_RARITY_2_MIN;
+                max = _RACING_STATS_T1_RARITY_2_MAX;
             } else if (tokenRarity == 3) {
-                min = 650;
-                max = 820;
+                min = _RACING_STATS_T1_RARITY_3_MIN;
+                max = _RACING_STATS_T1_RARITY_3_MAX;
             } else if (tokenRarity == 4) {
-                min = 500;
-                max = 750;
+                min = _RACING_STATS_T1_RARITY_4_MIN;
+                max = _RACING_STATS_T1_RARITY_4_MAX;
             } else if (tokenRarity == 5) {
-                min = 400;
-                max = 750;
+                min = _RACING_STATS_T1_RARITY_5_MIN;
+                max = _RACING_STATS_T1_RARITY_5_MAX;
             } else if (tokenRarity == 6) {
-                min = 300;
-                max = 750;
+                min = _RACING_STATS_T1_RARITY_6_MIN;
+                max = _RACING_STATS_T1_RARITY_6_MAX;
             } else if (tokenRarity == 7) {
-                min = 200;
-                max = 700;
+                min = _RACING_STATS_T1_RARITY_7_MIN;
+                max = _RACING_STATS_T1_RARITY_7_MAX;
             } else if (tokenRarity == 8) {
-                min = 150;
-                max = 700;
+                min = _RACING_STATS_T1_RARITY_8_MIN;
+                max = _RACING_STATS_T1_RARITY_8_MAX;
             } else if (tokenRarity == 9) {
-                min = 100;
-                max = 700;
+                min = _RACING_STATS_T1_RARITY_9_MIN;
+                max = _RACING_STATS_T1_RARITY_9_MAX;
             } else {
                 revert("Wrong token rarity");
             }
-        } else if (tokenType == 3 || tokenType == 4) {
+        } else if (tokenType == _TYPE_ID_GEAR || tokenType == _TYPE_ID_PART) { // T2
             if (tokenRarity == 1) {
-                min = 100;
-                max = 150;
+                min = _RACING_STATS_T2_RARITY_1_MIN;
+                max = _RACING_STATS_T2_RARITY_1_MAX;
             } else if (tokenRarity == 2) {
-                min = 89;
-                max = 141;
+                min = _RACING_STATS_T2_RARITY_2_MIN;
+                max = _RACING_STATS_T2_RARITY_2_MAX;
             } else if (tokenRarity == 3) {
-                min = 78;
-                max = 132;
+                min = _RACING_STATS_T2_RARITY_3_MIN;
+                max = _RACING_STATS_T2_RARITY_3_MAX;
             } else if (tokenRarity == 4) {
-                min = 66;
-                max = 122;
+                min = _RACING_STATS_T2_RARITY_4_MIN;
+                max = _RACING_STATS_T2_RARITY_4_MAX;
             } else if (tokenRarity == 5) {
-                min = 55;
-                max = 113;
+                min = _RACING_STATS_T2_RARITY_5_MIN;
+                max = _RACING_STATS_T2_RARITY_5_MAX;
             } else if (tokenRarity == 6) {
-                min = 44;
-                max = 104;
+                min = _RACING_STATS_T2_RARITY_6_MIN;
+                max = _RACING_STATS_T2_RARITY_6_MAX;
             } else if (tokenRarity == 7) {
-                min = 33;
-                max = 95;
+                min = _RACING_STATS_T2_RARITY_7_MIN;
+                max = _RACING_STATS_T2_RARITY_7_MAX;
             } else if (tokenRarity == 8) {
-                min = 21;
-                max = 85;
+                min = _RACING_STATS_T2_RARITY_8_MIN;
+                max = _RACING_STATS_T2_RARITY_8_MAX;
             } else if (tokenRarity == 9) {
-                min = 10;
-                max = 76;
+                min = _RACING_STATS_T2_RARITY_9_MIN;
+                max = _RACING_STATS_T2_RARITY_9_MAX;
             } else {
                 revert("Wrong token rarity");
             }
-        } else if (tokenType == 5) { 
+        } else if (tokenType == _TYPE_ID_TYRES) { // T3
             if (tokenRarity == 1) {
-                min = 200;
-                max = 300;
+                min = _RACING_STATS_T3_RARITY_1_MIN;
+                max = _RACING_STATS_T3_RARITY_1_MAX;
             } else if (tokenRarity == 2) {
-                min = 178;
-                max = 282;
+                min = _RACING_STATS_T3_RARITY_2_MIN;
+                max = _RACING_STATS_T3_RARITY_2_MAX;
             } else if (tokenRarity == 3) {
-                min = 155;
-                max = 263;
+                min = _RACING_STATS_T3_RARITY_3_MIN;
+                max = _RACING_STATS_T3_RARITY_3_MAX;
             } else if (tokenRarity == 4) {
-                min = 133;
-                max = 245;
+                min = _RACING_STATS_T3_RARITY_4_MIN;
+                max = _RACING_STATS_T3_RARITY_4_MAX;
             } else if (tokenRarity == 5) {
-                min = 110;
-                max = 226;
+                min = _RACING_STATS_T3_RARITY_5_MIN;
+                max = _RACING_STATS_T3_RARITY_5_MAX;
             } else if (tokenRarity == 6) {
-                min = 88;
-                max = 208;
+                min = _RACING_STATS_T3_RARITY_6_MIN;
+                max = _RACING_STATS_T3_RARITY_6_MAX;
             } else if (tokenRarity == 7) {
-                min = 65;
-                max = 189;
+                min = _RACING_STATS_T3_RARITY_7_MIN;
+                max = _RACING_STATS_T3_RARITY_7_MAX;
             } else if (tokenRarity == 8) {
-                min = 43;
-                max = 171;
+                min = _RACING_STATS_T3_RARITY_8_MIN;
+                max = _RACING_STATS_T3_RARITY_8_MAX;
             } else if (tokenRarity == 9) {
-                min = 20;
-                max = 152;
+                min = _RACING_STATS_T3_RARITY_9_MIN;
+                max = _RACING_STATS_T3_RARITY_9_MAX;
             } else {
                 revert("Wrong token rarity");
             }
@@ -333,11 +447,11 @@ contract ContentGenerator {
         stats.stat3 = (min + ((seed >> 32) % delta)).toUint16();
     }
 
-    function makeTokenId(Metadata memory metadata) public view returns (uint256 tokenId) {
+    function makeTokenId(Metadata memory metadata) public pure returns (uint256 tokenId) {
         tokenId = 1 << 255; // NF flag
         tokenId |= (uint256(metadata.tokenType) << 240);
         tokenId |= (uint256(metadata.tokenSubType) << 232);
-        tokenId |= (3 << 224); // Season 2020
+        tokenId |= (uint256(_SEASON_ID_2020) << 224);
         tokenId |= (uint256(metadata.model) << 192);
         tokenId |= (uint256(metadata.team) << 184);
         tokenId |= (uint256(metadata.tokenRarity) << 176);
