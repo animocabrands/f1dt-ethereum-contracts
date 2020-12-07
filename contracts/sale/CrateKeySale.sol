@@ -4,7 +4,7 @@ pragma solidity 0.6.8;
 
 import "@animoca/ethereum-contracts-sale_base/contracts/sale/FixedPricesSale.sol";
 import "../token/ERC20/F1DTCrateKey.sol";
-import "../game/PrePaid.sol";
+import "./PrePaid.sol";
 
 /**
  * @title CrateKeySale
