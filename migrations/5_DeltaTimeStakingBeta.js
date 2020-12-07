@@ -27,7 +27,7 @@ module.exports = async (deployer, network, accounts) => {
     console.log(`Approving ${fromWei(RewardsPool)} REVVs to the staking contract for the reward pool before starting`);
     await revvContract.approve(stakingContract.address, RewardsPool);
 
-    for (schedule of RewardsSchedule) {
+    for (const schedule of RewardsSchedule) {
         console.log(
             `Setting schedule: ${fromWei(schedule.payoutPerCycle)} REVVs per-cycle for periods ${
                 schedule.startPeriod
