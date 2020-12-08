@@ -11,6 +11,13 @@ const ContentGenerator = contract.fromArtifact('ContentGenerator');
 
 const sampleSize = 5000;
 
+const crateTiers = {
+    LEGENDARY: 0,
+    EPIC: 1,
+    RARE: 2,
+    COMMON: 3,
+};
+
 const [deployer, participant] = accounts;
 
 const expectedSupply = {
@@ -72,20 +79,31 @@ function computeSupply(tokens) {
 
 describe('ContentGenerator', function () {
     describe('enterTier(tierId, deposit)', function () {
-        beforeEach(async function () {
+        before(async function () {
             this.generator = await ContentGenerator.new(0, {from: deployer});
         });
 
-        it('racing stats', async function () {
-            const stats = await this.generator.generateRacingStats(new BN('987875655632534253698768795847'), 1, 1);
-            console.log(stats.map((bn) => bn.toString()));
-        });
+        // it('racing stats', async function () {
+        //     const stats = await this.generator.generateRacingStats(new BN('987875655632534253698768795847'), 1, 1);
+        //     console.log(stats.map((bn) => bn.toString()));
+        // });
+
+        // describe.only('gas test', function () {
+        //     it('better implementation', async function() {
+        //         const ContentGenerator2 = contract.fromArtifact('ContentGenerator2');
+        //         this.generator2 = await ContentGenerator2.new(0, {from: deployer});
+        //         const result = await this.generator.generateCommonTokens();
+        //         const result2 = await this.generator2.generateCommonTokens();
+        //         console.log(result.receipt.gasUsed - 13000);
+        //         console.log(result2.receipt.gasUsed - 13000);
+        //     });
+        // });
 
         context('common crates', function () {
             before(async function () {
                 this.commonTokens = [];
                 for (let i = 0; i < sampleSize; ++i) {
-                    const result = await this.generator.generateCommonTokens();
+                    const result = await this.generator.generateCrate(crateTiers.COMMON);
                     for (let j = 0; j < 5; ++j) {
                         const meta = utils.getCoreMetadata(result[j].toString());
 
@@ -97,7 +115,7 @@ describe('ContentGenerator', function () {
                 console.log(this.commonTokensSupply);
             });
 
-            it('has expected rarity tier proportions', async function() {
+            it('has expected rarity tier proportions', async function () {
                 validateSupply(this.commonTokensSupply, expectedSupply.Common);
             });
         });
@@ -106,7 +124,7 @@ describe('ContentGenerator', function () {
             before(async function () {
                 this.legendaryTokens = [];
                 for (let i = 0; i < sampleSize; ++i) {
-                    const result = await this.generator.generateLegendaryTokens();
+                    const result = await this.generator.generateCrate(crateTiers.LEGENDARY);
                     for (let j = 0; j < 5; ++j) {
                         const meta = utils.getCoreMetadata(result[j].toString());
 
@@ -118,7 +136,7 @@ describe('ContentGenerator', function () {
                 console.log(this.legendaryTokensSupply);
             });
 
-            it('has expected rarity tier proportions', async function() {
+            it('has expected rarity tier proportions', async function () {
                 validateSupply(this.legendaryTokensSupply, expectedSupply.Legendary);
             });
         });
