@@ -395,7 +395,7 @@ library Crates2020RNGLib {
     }
 
     function _generateDriver(uint256 seed, uint256 team) private pure returns (uint256 driver) {
-        uint256 index = (seed >> 8) % 2;
+        uint256 index = (seed) % 2;
 
         if (team == _TEAM_ID_ALFA_ROMEO_RACING) {
             driver = [
