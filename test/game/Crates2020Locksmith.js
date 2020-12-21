@@ -97,6 +97,14 @@ describe('Crates2020Locksmith', function () {
         //     );
         // });
 
+        function createPayloadHash(holder, crateTier, nonce) {
+            const payload = web3.eth.abi.encodeParameters(
+                ['address', 'uint256', 'uint256'],
+                [holder, crateTier.toString(), nonce.toString()]
+            );
+            return web3.utils.soliditySha3(payload);
+        }
+
         describe('on success', function () {
             const crateTier = Zero; // Legendary
             before(async function () {
@@ -107,18 +115,32 @@ describe('Crates2020Locksmith', function () {
                 await this.crateKeyLegendary.approve(this.locksmith.address, MaxUInt256, {from: holder});
 
                 this.nonce = await this.locksmith.nonces(holder, crateTier);
-                const payload = web3.eth.abi.encodeParameters(
-                    ['address', 'uint256', 'uint256'],
-                    [holder, crateTier.toString(), this.nonce.toString()]
-                );
-                const signature = fixSignature(await web3.eth.sign(web3.utils.soliditySha3(payload), signer1));
-
-                this.receipt = await this.locksmith.insertKey(crateTier, signature, {from: holder});
+                const payloadHash = await createPayloadHash(holder, crateTier, this.nonce);
+                this.signature = fixSignature(await web3.eth.sign(payloadHash, signer1));
+                this.receipt = await this.locksmith.insertKey(crateTier, this.signature, {from: holder});
+                this.gasUsed = this.receipt.receipt.gasUsed;
             });
 
             it('should update the nonce', async function () {
                 const nonce = await this.locksmith.nonces(holder, crateTier);
                 nonce.should.be.bignumber.equal(this.nonce.add(One));
+            });
+
+            it('should fail if trying to use the same signature again', async function () {
+                await expectRevert(
+                    this.locksmith.insertKey(crateTier, this.signature, {from: holder}),
+                    'Locksmith: invalid signature'
+                );
+            });
+
+            it('should cost less gas the second time', async function () {
+                this.nonce = await this.locksmith.nonces(holder, crateTier);
+                const payloadHash = await createPayloadHash(holder, crateTier, this.nonce);
+                this.signature = fixSignature(await web3.eth.sign(payloadHash, signer1));
+                const newReceipt = await this.locksmith.insertKey(crateTier, this.signature, {from: holder});
+                const newGasUsed = newReceipt.receipt.gasUsed;
+                console.log(`Bootstrap gas cost: ${this.gasUsed}, later: ${newGasUsed}`);
+                newGasUsed.should.be.lt(this.gasUsed);
             });
         });
     });
