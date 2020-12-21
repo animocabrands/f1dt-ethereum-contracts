@@ -9,7 +9,7 @@ const {deployCrateKeyTokens} = ContractDeployer;
 
 const OneKey = toWei(One);
 
-const Locksmith = contract.fromArtifact('Crates2020Locksmith');
+const Crates = contract.fromArtifact('Crates2020Mock');
 // const CrateKey = contract.fromArtifact('F1DTCrateKey');
 const artifactsDir = contract.artifactsDir.toString();
 contract.artifactsDir = './imports';
@@ -19,7 +19,7 @@ contract.artifactsDir = artifactsDir;
 
 const [deployer, holder] = accounts;
 
-describe('Crates2020Locksmith', function () {
+describe('Crates2020', function () {
     async function doDeploy() {
         const bytes = await Bytes.new({from: deployer});
         DeltaTimeInventory.network_id = 1337;
@@ -30,7 +30,7 @@ describe('Crates2020Locksmith', function () {
         this.crateKeyRare = keys.F1DT_RCK;
         this.crateKeyEpic = keys.F1DT_ECK;
         this.crateKeyLegendary = keys.F1DT_LCK;
-        this.locksmith = await Locksmith.new(
+        this.crates = await Crates.new(
             this.inventory.address,
             this.crateKeyCommon.address,
             this.crateKeyRare.address,
@@ -40,22 +40,22 @@ describe('Crates2020Locksmith', function () {
         );
     }
 
-    async function doSetLocksmithAsKeysOwner() {
-        await this.crateKeyCommon.transferOwnership(this.locksmith.address, {from: deployer});
-        await this.crateKeyRare.transferOwnership(this.locksmith.address, {from: deployer});
-        await this.crateKeyEpic.transferOwnership(this.locksmith.address, {from: deployer});
-        await this.crateKeyLegendary.transferOwnership(this.locksmith.address, {from: deployer});
+    async function doSetCratesAsKeysOwner() {
+        await this.crateKeyCommon.transferOwnership(this.crates.address, {from: deployer});
+        await this.crateKeyRare.transferOwnership(this.crates.address, {from: deployer});
+        await this.crateKeyEpic.transferOwnership(this.crates.address, {from: deployer});
+        await this.crateKeyLegendary.transferOwnership(this.crates.address, {from: deployer});
     }
 
-    async function doSetLocksmithAsInventoryMinter() {
-        await this.inventory.addMinter(this.locksmith.address, {from: deployer});
+    async function doSetCratesAsInventoryMinter() {
+        await this.inventory.addMinter(this.crates.address, {from: deployer});
     }
 
     describe('constructor()', function () {
         it('should revert with a zero address for the revv contract', async function () {
             await expectRevert(
-                Locksmith.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, {from: deployer}),
-                'Locksmith: zero address'
+                Crates.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, {from: deployer}),
+                'Crates: zero address'
             );
         });
 
@@ -70,27 +70,27 @@ describe('Crates2020Locksmith', function () {
         });
 
         it('should revert with an incorrect crate key tier', async function () {
-            await expectRevert(this.locksmith.openCrate(10, {from: deployer}), 'Locksmith: wrong crate tier');
+            await expectRevert(this.crates.openCrate(10, 0, {from: deployer}), 'Crates: wrong crate tier');
         });
 
         it('should revert if the caller does not have a key', async function () {
-            await expectRevert(this.locksmith.openCrate(0, {from: deployer}), 'ERC20: transfer amount exceeds balance');
+            await expectRevert(this.crates.openCrate(0, 0, {from: deployer}), 'ERC20: transfer amount exceeds balance');
         });
 
         it('should revert if the holder did not set allowance to the contract', async function () {
-            await expectRevert(this.locksmith.openCrate(0, {from: holder}), 'ERC20: transfer amount exceeds allowance');
+            await expectRevert(this.crates.openCrate(0, 0, {from: holder}), 'ERC20: transfer amount exceeds allowance');
         });
 
-        it('should revert if the locksmith is not the crate key contract owner', async function () {
-            await this.crateKeyLegendary.approve(this.locksmith.address, MaxUInt256, {from: holder});
-            await expectRevert(this.locksmith.openCrate(0, {from: holder}), 'Ownable: caller is not the owner');
+        it('should revert if the crates is not the crate key contract owner', async function () {
+            await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
+            await expectRevert(this.crates.openCrate(0, 0, {from: holder}), 'Ownable: caller is not the owner');
         });
 
-        it('should revert if the locksmith is not an inventory minter', async function () {
-            await doSetLocksmithAsKeysOwner.bind(this)();
-            await this.crateKeyLegendary.approve(this.locksmith.address, MaxUInt256, {from: holder});
+        it('should revert if the crates is not an inventory minter', async function () {
+            await doSetCratesAsKeysOwner.bind(this)();
+            await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
             await expectRevert(
-                this.locksmith.openCrate(0, {from: holder}),
+                this.crates.openCrate(0, 0, {from: holder}),
                 'MinterRole: caller does not have the Minter role'
             );
         });
@@ -98,11 +98,11 @@ describe('Crates2020Locksmith', function () {
         describe('on success', function () {
             before(async function () {
                 await doDeploy.bind(this)();
-                await doSetLocksmithAsKeysOwner.bind(this)();
-                await doSetLocksmithAsInventoryMinter.bind(this)();
-                await this.crateKeyLegendary.approve(this.locksmith.address, MaxUInt256, {from: holder});
-                this.counter = await this.locksmith.counter();
-                this.receipt = await this.locksmith.openCrate(0, {from: holder});
+                await doSetCratesAsKeysOwner.bind(this)();
+                await doSetCratesAsInventoryMinter.bind(this)();
+                await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
+                this.counter = await this.crates.counter();
+                this.receipt = await this.crates.openCrate(0, 0, {from: holder});
 
                 this.tokens = [ // to be updated if contract changes
                     new BN('800200030000000004010000000004036a033703540000000000000000000000', 'hex'),
@@ -115,12 +115,12 @@ describe('Crates2020Locksmith', function () {
             it('should burn the crate key', async function () {
                 await expectEvent.inTransaction(this.receipt.tx, this.crateKeyLegendary, 'Transfer', {
                     _from: holder,
-                    _to: this.locksmith.address,
+                    _to: this.crates.address,
                     _value: OneKey,
                 });
 
                 await expectEvent.inTransaction(this.receipt.tx, this.crateKeyLegendary, 'Transfer', {
-                    _from: this.locksmith.address,
+                    _from: this.crates.address,
                     _to: ZeroAddress,
                     _value: OneKey,
                 });
@@ -137,7 +137,7 @@ describe('Crates2020Locksmith', function () {
                     });
 
                     await expectEvent.inTransaction(this.receipt.tx, this.inventory, 'TransferSingle', {
-                        _operator: this.locksmith.address,
+                        _operator: this.crates.address,
                         _from: ZeroAddress,
                         _to: holder,
                         _id: tokenId,
@@ -150,7 +150,7 @@ describe('Crates2020Locksmith', function () {
             });
 
             it('should update the counter', async function () {
-                const counter = await this.locksmith.counter();
+                const counter = await this.crates.counter();
                 counter.should.be.bignumber.equal(this.counter.add(Five));
             });
         });
