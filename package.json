@@ -30,6 +30,7 @@
     "@animoca/ethereum-contracts-nft_staking": "=4.0.0",
     "@animoca/ethereum-contracts-sale_base": "=6.0.0",
     "@animoca/f1dt-core_metadata": "^1.0.3",
+    "@openzeppelin/test-helpers": "git+https://github.com/nataouze/openzeppelin-test-helpers.git#fix_bn_array_event_args",
     "base32.js": "^0.1.0",
     "eslint-config-mocha": "^0.0.0",
     "eslint-config-prettier": "^6.11.0",
