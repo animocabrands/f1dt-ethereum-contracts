@@ -34,6 +34,7 @@ interface IF1DTInventory {
 }
 
 contract Crates2020 is Ownable {
+    using Crates2020RNGLib for uint256;
 
     IF1DTInventory immutable public INVENTORY;
     IF1DTBurnableCrateKey immutable public COMMON_CRATE;
@@ -102,7 +103,7 @@ contract Crates2020 is Ownable {
 
         for (uint256 i; i != quantity; ++i) {
             uint256 counter_ = counter;
-            uint256[] memory tokens = Crates2020RNGLib.generateCrate(seed, crateTier, counter_);
+            uint256[] memory tokens = seed.generateCrate(crateTier, counter_);
             INVENTORY.batchMint(to, tokens, uris, values, false);
             counter = counter_ + 5;
             seed = uint256(keccak256(abi.encode(seed)));
