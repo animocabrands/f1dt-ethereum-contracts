@@ -40,7 +40,7 @@ contract Crates2020Locksmith is Crates2020 {
         bytes32 hash_ = keccak256(abi.encode(sender, crateTier, nonce));
         require(hash_.toEthSignedMessageHash().recover(sig) == signerKey_, "Locksmith: invalid signature");
         uint256 seed = uint256(keccak256(sig));
-        _openCrate(crateTier, seed);
+        _openCrate(crateTier, 1, seed);
         nonces[sender][crateTier] = nonce + 1;
     }
 }

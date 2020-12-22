@@ -69,7 +69,9 @@ contract Crates2020 is Ownable {
      * @dev Reverts if the transfer of the crate key to this contract fails.
      * @dev Reverts if `crateTier` is not supported
      */
-    function _openCrate(uint256 crateTier, uint256 seed) internal {
+    function _openCrate(uint256 crateTier, uint256 quantity, uint256 seed) internal {
+        require(quantity != 0, "Crates: zero quantity");
+        require(quantity <= 5, "Crates: above max quantity");
         IF1DTBurnableCrateKey crateKey;
         if (crateTier == Crates2020RNGLib._CRATE_TIER_COMMON) {
             crateKey = COMMON_CRATE;
@@ -84,13 +86,10 @@ contract Crates2020 is Ownable {
         }
 
         address sender = _msgSender();
+        uint256 amount = quantity * 1000000000000000000;
 
-        crateKey.transferFrom(sender, address(this), 1000000000000000000);
-        crateKey.burn(1000000000000000000);
-
-        uint256 counter_ = counter;
-        uint256[] memory tokens = Crates2020RNGLib.generateCrate(seed, crateTier, counter_);
-        counter = counter_ + 5;
+        crateKey.transferFrom(sender, address(this), amount);
+        crateKey.burn(amount);
 
         bytes32[] memory uris = new bytes32[](5);
         uint256[] memory values = new uint256[](5);
@@ -100,6 +99,13 @@ contract Crates2020 is Ownable {
             values[i] = 1;
             to[i] = sender;
         }
-        INVENTORY.batchMint(to, tokens, uris, values, false);
+
+        for (uint256 i; i != quantity; ++i) {
+            uint256 counter_ = counter;
+            uint256[] memory tokens = Crates2020RNGLib.generateCrate(seed, crateTier, counter_);
+            INVENTORY.batchMint(to, tokens, uris, values, false);
+            counter = counter_ + 5;
+            seed = uint256(keccak256(abi.encode(seed)));
+        }
     }
 }

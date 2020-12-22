@@ -16,7 +16,7 @@ contract Crates2020Mock is Crates2020 {
 
 
     function openCrate(uint256 crateTier, uint256 seed) public {
-        _openCrate(crateTier, seed);
+        _openCrate(crateTier, 1, seed);
     }
 }
 

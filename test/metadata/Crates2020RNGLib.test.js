@@ -1,19 +1,19 @@
 const {time} = require('@openzeppelin/test-helpers');
 const {accounts, contract} = require('@openzeppelin/test-environment');
 const {utils} = require('@animoca/f1dt-core_metadata');
-const {crates, expectedTypes} = require('./ContentGenerator.constants');
-const {computeSupply, validateSupplies} = require('./ContentGenerator.helpers');
+const {crates, expectedTypes} = require('./Crates2020RNGLib.constants');
+const {computeSupply, validateSupplies} = require('./Crates2020RNGLib.helpers');
 
-const ContentGenerator = contract.fromArtifact('ContentGenerator');
+const Crates2020RNGLib = contract.fromArtifact('Crates2020RNGLibMock');
 
 const sampleSize = 2000;
 
 const [deployer] = accounts;
 
-describe('ContentGenerator', function () {
+describe('Crates2020RNGLib', function () {
     describe('generateCrate', function () {
         before(async function () {
-            this.generator = await ContentGenerator.new(1, {from: deployer});
+            this.generator = await Crates2020RNGLib.new(1, {from: deployer});
         });
 
         const maxGasUsed = 27000;
