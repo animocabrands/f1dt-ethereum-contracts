@@ -66,7 +66,7 @@ describe('Crates2020Locksmith', function () {
         });
     });
 
-    describe('insertKey()', function () {
+    describe('insertKeys()', function () {
         // beforeEach(async function () {
         //     await doDeploy.bind(this)();
         // });
@@ -117,7 +117,7 @@ describe('Crates2020Locksmith', function () {
                 this.nonce = await this.locksmith.nonces(holder, crateTier);
                 const payloadHash = await createPayloadHash(holder, crateTier, this.nonce);
                 this.signature = fixSignature(await web3.eth.sign(payloadHash, signer1));
-                this.receipt = await this.locksmith.insertKey(crateTier, 1, this.signature, {from: holder});
+                this.receipt = await this.locksmith.insertKeys(crateTier, 1, this.signature, {from: holder});
                 this.gasUsed = this.receipt.receipt.gasUsed;
             });
 
@@ -128,7 +128,7 @@ describe('Crates2020Locksmith', function () {
 
             it('should fail if trying to use the same signature again', async function () {
                 await expectRevert(
-                    this.locksmith.insertKey(crateTier, 1, this.signature, {from: holder}),
+                    this.locksmith.insertKeys(crateTier, 1, this.signature, {from: holder}),
                     'Locksmith: invalid signature'
                 );
             });
@@ -137,7 +137,7 @@ describe('Crates2020Locksmith', function () {
                 this.nonce = await this.locksmith.nonces(holder, crateTier);
                 const payloadHash = await createPayloadHash(holder, crateTier, this.nonce);
                 this.signature = fixSignature(await web3.eth.sign(payloadHash, signer1));
-                const newReceipt = await this.locksmith.insertKey(crateTier, 1, this.signature, {from: holder});
+                const newReceipt = await this.locksmith.insertKeys(crateTier, 1, this.signature, {from: holder});
                 const newGasUsed = newReceipt.receipt.gasUsed;
                 console.log(`Bootstrap gas cost: ${this.gasUsed}, later: ${newGasUsed}`);
                 newGasUsed.should.be.lt(this.gasUsed);

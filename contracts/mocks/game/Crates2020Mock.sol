@@ -15,8 +15,8 @@ contract Crates2020Mock is Crates2020 {
     ) public Crates2020(INVENTORY_, COMMON_CRATE_, RARE_CRATE_, EPIC_CRATE_, LEGENDARY_CRATE_) {}
 
 
-    function openCrate(uint256 crateTier, uint256 seed) public {
-        _openCrate(crateTier, 1, seed);
+    function openCrates(uint256 crateTier, uint256 quantity, uint256 seed) public {
+        _openCrates(crateTier, quantity, seed);
     }
 }
 

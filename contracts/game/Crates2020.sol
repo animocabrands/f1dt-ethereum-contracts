@@ -19,6 +19,12 @@ interface IF1DTBurnableCrateKey {
      * See {IERC20-transferFrom(address,address,uint256)}.
      */
     function transferFrom(address sender, address recipient, uint256 amount) external returns (bool);
+
+    /**
+     * @dev Transfers ownership of the contract to a new account (`newOwner`).
+     * Can only be called by the current owner.
+     */
+    function transferOwnership(address newOwner) external;
 }
 
 interface IF1DTInventory {
@@ -37,54 +43,50 @@ contract Crates2020 is Ownable {
     using Crates2020RNGLib for uint256;
 
     IF1DTInventory immutable public INVENTORY;
-    IF1DTBurnableCrateKey immutable public COMMON_CRATE;
-    IF1DTBurnableCrateKey immutable public RARE_CRATE;
-    IF1DTBurnableCrateKey immutable public EPIC_CRATE;
-    IF1DTBurnableCrateKey immutable public LEGENDARY_CRATE;
+    IF1DTBurnableCrateKey immutable public CRATE_KEY_COMMON;
+    IF1DTBurnableCrateKey immutable public CRATE_KEY_RARE;
+    IF1DTBurnableCrateKey immutable public CRATE_KEY_EPIC;
+    IF1DTBurnableCrateKey immutable public CRATE_KEY_LEGENDARY;
 
     uint256 public counter;
 
     constructor(
         IF1DTInventory INVENTORY_,
-        IF1DTBurnableCrateKey COMMON_CRATE_,
-        IF1DTBurnableCrateKey RARE_CRATE_,
-        IF1DTBurnableCrateKey EPIC_CRATE_,
-        IF1DTBurnableCrateKey LEGENDARY_CRATE_
+        IF1DTBurnableCrateKey CRATE_KEY_COMMON_,
+        IF1DTBurnableCrateKey CRATE_KEY_RARE_,
+        IF1DTBurnableCrateKey CRATE_KEY_EPIC_,
+        IF1DTBurnableCrateKey CRATE_KEY_LEGENDARY_
     ) public {
         require(
             address(INVENTORY_) != address(0) &&
-            address(COMMON_CRATE_) != address(0) &&
-            address(EPIC_CRATE_) != address(0) &&
-            address(LEGENDARY_CRATE_) != address(0),
+            address(CRATE_KEY_COMMON_) != address(0) &&
+            address(CRATE_KEY_EPIC_) != address(0) &&
+            address(CRATE_KEY_LEGENDARY_) != address(0),
             "Crates: zero address"
         );
         INVENTORY = INVENTORY_;
-        COMMON_CRATE = COMMON_CRATE_;
-        RARE_CRATE = RARE_CRATE_;
-        EPIC_CRATE = EPIC_CRATE_;
-        LEGENDARY_CRATE = LEGENDARY_CRATE_;
+        CRATE_KEY_COMMON = CRATE_KEY_COMMON_;
+        CRATE_KEY_RARE = CRATE_KEY_RARE_;
+        CRATE_KEY_EPIC = CRATE_KEY_EPIC_;
+        CRATE_KEY_LEGENDARY = CRATE_KEY_LEGENDARY_;
+    }
+
+    function transferCrateKeyOwnership(uint256 crateTier, address newOwner) external onlyOwner {
+        IF1DTBurnableCrateKey crateKey = _getCrateKey(crateTier);
+        crateKey.transferOwnership(newOwner);
     }
 
     /**
      * @dev Reverts if `crateTier` is not supported.
      * @dev Reverts if the transfer of the crate key to this contract fails.
      * @dev Reverts if `crateTier` is not supported
+     * @param crateTier The tier id as defined in `Crates2020RNGLib`.
+     * @param quantity The number of crates to open.
+     * @param seed The seed used for the metadata RNG.
      */
-    function _openCrate(uint256 crateTier, uint256 quantity, uint256 seed) internal {
+    function _openCrates(uint256 crateTier, uint256 quantity, uint256 seed) internal {
         require(quantity != 0, "Crates: zero quantity");
-        require(quantity <= 5, "Crates: above max quantity");
-        IF1DTBurnableCrateKey crateKey;
-        if (crateTier == Crates2020RNGLib._CRATE_TIER_COMMON) {
-            crateKey = COMMON_CRATE;
-        } else if (crateTier == Crates2020RNGLib._CRATE_TIER_RARE) {
-            crateKey = RARE_CRATE;
-        } else if (crateTier == Crates2020RNGLib._CRATE_TIER_EPIC) {
-            crateKey = EPIC_CRATE;
-        } else if (crateTier == Crates2020RNGLib._CRATE_TIER_LEGENDARY) {
-            crateKey = LEGENDARY_CRATE;
-        } else {
-            revert("Crates: wrong crate tier");
-        }
+        IF1DTBurnableCrateKey crateKey = _getCrateKey(crateTier);
 
         address sender = _msgSender();
         uint256 amount = quantity * 1000000000000000000;
@@ -107,6 +109,20 @@ contract Crates2020 is Ownable {
             INVENTORY.batchMint(to, tokens, uris, values, false);
             counter = counter_ + 5;
             seed = uint256(keccak256(abi.encode(seed)));
+        }
+    }
+
+    function _getCrateKey(uint256 crateTier) view internal returns (IF1DTBurnableCrateKey) {
+        if (crateTier == Crates2020RNGLib.CRATE_TIER_COMMON) {
+            return CRATE_KEY_COMMON;
+        } else if (crateTier == Crates2020RNGLib.CRATE_TIER_RARE) {
+            return CRATE_KEY_RARE;
+        } else if (crateTier == Crates2020RNGLib.CRATE_TIER_EPIC) {
+            return CRATE_KEY_EPIC;
+        } else if (crateTier == Crates2020RNGLib.CRATE_TIER_LEGENDARY) {
+            return CRATE_KEY_LEGENDARY;
+        } else {
+            revert("Crates: wrong crate tier");
         }
     }
 }

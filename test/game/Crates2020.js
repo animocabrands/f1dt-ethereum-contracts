@@ -2,6 +2,7 @@ const {accounts, contract} = require('@openzeppelin/test-environment');
 const {BN, expectRevert, expectEvent} = require('@openzeppelin/test-helpers');
 const {toWei} = require('web3-utils');
 const {ZeroAddress, Zero, One, Two, Five, MaxUInt256} = require('@animoca/ethereum-contracts-core_library').constants;
+const {crates} = require('../metadata/Crates2020RNGLib.constants');
 const {utils} = require('@animoca/f1dt-core_metadata');
 const {getCoreMetadata} = utils;
 const ContractDeployer = require('../helpers/ContractDeployer');
@@ -20,6 +21,17 @@ contract.artifactsDir = artifactsDir;
 const [deployer, holder] = accounts;
 
 describe('Crates2020', function () {
+    const seed = 0;
+    const legendaryTokens = [
+        // to be updated if RNG lib changes
+        new BN('800200030000000004010000000004036a033703540000000000000000000000', 'hex'),
+        new BN('80040403000000000008000000000000fe00fd01100000000000000000000001', 'hex'),
+        new BN('80040403000000000008000000000000fe00fd01100000000000000000000002', 'hex'),
+        new BN('80040403000000000008000000000000fe00fd01100000000000000000000003', 'hex'),
+        new BN('80040403000000000008000000000000fe00fd01100000000000000000000004', 'hex'),
+    ];
+    const quantity = 1;
+
     async function doDeploy() {
         const bytes = await Bytes.new({from: deployer});
         DeltaTimeInventory.network_id = 1337;
@@ -64,33 +76,42 @@ describe('Crates2020', function () {
         });
     });
 
-    describe('openCrate()', function () {
+    describe('openCrates()', function () {
         beforeEach(async function () {
             await doDeploy.bind(this)();
         });
 
         it('should revert with an incorrect crate key tier', async function () {
-            await expectRevert(this.crates.openCrate(10, 0, {from: deployer}), 'Crates: wrong crate tier');
+            await expectRevert(this.crates.openCrates(10, 1, 0, {from: deployer}), 'Crates: wrong crate tier');
         });
 
         it('should revert if the caller does not have a key', async function () {
-            await expectRevert(this.crates.openCrate(0, 0, {from: deployer}), 'ERC20: transfer amount exceeds balance');
+            await expectRevert(
+                this.crates.openCrates(crates.Legendary.tier, quantity, seed, {from: deployer}),
+                'ERC20: transfer amount exceeds balance'
+            );
         });
 
         it('should revert if the holder did not set allowance to the contract', async function () {
-            await expectRevert(this.crates.openCrate(0, 0, {from: holder}), 'ERC20: transfer amount exceeds allowance');
+            await expectRevert(
+                this.crates.openCrates(crates.Legendary.tier, quantity, seed, {from: holder}),
+                'ERC20: transfer amount exceeds allowance'
+            );
         });
 
         it('should revert if the crates is not the crate key contract owner', async function () {
             await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
-            await expectRevert(this.crates.openCrate(0, 0, {from: holder}), 'Ownable: caller is not the owner');
+            await expectRevert(
+                this.crates.openCrates(crates.Legendary.tier, quantity, seed, {from: holder}),
+                'Ownable: caller is not the owner'
+            );
         });
 
         it('should revert if the crates is not an inventory minter', async function () {
             await doSetCratesAsKeysOwner.bind(this)();
             await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
             await expectRevert(
-                this.crates.openCrate(0, 0, {from: holder}),
+                this.crates.openCrates(crates.Legendary.tier, quantity, seed, {from: holder}),
                 'MinterRole: caller does not have the Minter role'
             );
         });
@@ -102,15 +123,8 @@ describe('Crates2020', function () {
                 await doSetCratesAsInventoryMinter.bind(this)();
                 await this.crateKeyLegendary.approve(this.crates.address, MaxUInt256, {from: holder});
                 this.counter = await this.crates.counter();
-                this.receipt = await this.crates.openCrate(0, 0, {from: holder});
-
-                this.tokens = [ // to be updated if contract changes
-                    new BN('800200030000000004010000000004036a033703540000000000000000000000', 'hex'),
-                    new BN('80040403000000000008000000000000fe00fd01100000000000000000000001', 'hex'),
-                    new BN('80040403000000000008000000000000fe00fd01100000000000000000000002', 'hex'),
-                    new BN('80040403000000000008000000000000fe00fd01100000000000000000000003', 'hex'),
-                    new BN('80040403000000000008000000000000fe00fd01100000000000000000000004', 'hex'),
-                ];
+                this.receipt = await this.crates.openCrates(crates.Legendary.tier, quantity, seed, {from: holder});
+                this.tokens = legendaryTokens;
             });
             it('should burn the crate key', async function () {
                 await expectEvent.inTransaction(this.receipt.tx, this.crateKeyLegendary, 'Transfer', {
@@ -153,6 +167,33 @@ describe('Crates2020', function () {
                 const counter = await this.crates.counter();
                 counter.should.be.bignumber.equal(this.counter.add(Five));
             });
+        });
+    });
+
+    describe('transferCrateKeyOwnership()', function () {
+        beforeEach(async function () {
+            await doDeploy.bind(this)();
+        });
+
+        it('should revert if not called by the owner of this contract', async function () {
+            await expectRevert(
+                this.crates.transferCrateKeyOwnership(crates.Legendary.tier, deployer, {from: holder}),
+                'Ownable: caller is not the owner'
+            );
+        });
+
+        it('should revert if the crate key is not owned by this contract', async function () {
+            await expectRevert(
+                this.crates.transferCrateKeyOwnership(crates.Legendary.tier, deployer, {from: deployer}),
+                'Ownable: caller is not the owner'
+            );
+        });
+
+        it('should work with correct parameters', async function () {
+            await doSetCratesAsKeysOwner.bind(this)();
+            await this.crates.transferCrateKeyOwnership(crates.Legendary.tier, deployer, {from: deployer});
+            const owner = await this.crateKeyLegendary.owner();
+            owner.should.be.equal(deployer);
         });
     });
 });

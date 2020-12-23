@@ -31,18 +31,19 @@ contract Crates2020Locksmith is Crates2020 {
      * Burns a key in order to mint a crate of 2020 season content.
      * @dev reverts if `crateTier` is not one of 
      */
-    function insertKey(uint256 crateTier, uint256 quantity, bytes calldata sig) external {
-        require(crateTier <= Crates2020RNGLib._CRATE_TIER_COMMON, "Locksmith: wrong crate tier");
-        require(quantity != 0, "Locksmith: zero quantity");
+    function insertKeys(uint256 crateTier, uint256 quantity, bytes calldata sig) external {
+        require(crateTier <= Crates2020RNGLib.CRATE_TIER_COMMON, "Locksmith: wrong crate tier");
         require(quantity <= 5, "Locksmith: above max quantity");
+
         address signerKey_ = signerKey;
         require(signerKey_ != address(0), "Locksmith: signer key not set");
+
         address sender = _msgSender();
         uint256 nonce = nonces[sender][crateTier];
         bytes32 hash_ = keccak256(abi.encode(sender, crateTier, nonce));
         require(hash_.toEthSignedMessageHash().recover(sig) == signerKey_, "Locksmith: invalid signature");
         uint256 seed = uint256(keccak256(sig));
-        _openCrate(crateTier, quantity, seed);
+        _openCrates(crateTier, quantity, seed);
         nonces[sender][crateTier] = nonce + 1;
     }
 }
