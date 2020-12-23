@@ -103,13 +103,16 @@ contract Crates2020 is Ownable {
             to[i] = sender;
         }
 
+        uint256 counter_ = counter;
         for (uint256 i; i != quantity; ++i) {
-            uint256 counter_ = counter;
+            if (i != 0) {
+                seed = uint256(keccak256(abi.encode(seed)));
+            }
             uint256[] memory tokens = seed.generateCrate(crateTier, counter_);
             INVENTORY.batchMint(to, tokens, uris, values, false);
-            counter = counter_ + 5;
-            seed = uint256(keccak256(abi.encode(seed)));
+            counter_ += 5;
         }
+        counter = counter_;
     }
 
     function _getCrateKey(uint256 crateTier) view internal returns (IF1DTBurnableCrateKey) {
