@@ -30,7 +30,8 @@ describe('Crates2020', function () {
         new BN('80040403000000000008000000000000fe00fd01100000000000000000000003', 'hex'),
         new BN('80040403000000000008000000000000fe00fd01100000000000000000000004', 'hex'),
     ];
-    const quantity = 1;
+    // const quantity = 1;
+    const quantity = 5;
 
     async function doDeploy() {
         const bytes = await Bytes.new({from: deployer});
@@ -130,13 +131,13 @@ describe('Crates2020', function () {
                 await expectEvent.inTransaction(this.receipt.tx, this.crateKeyLegendary, 'Transfer', {
                     _from: holder,
                     _to: this.crates.address,
-                    _value: OneKey,
+                    _value: OneKey.mul(new BN(quantity)),
                 });
 
                 await expectEvent.inTransaction(this.receipt.tx, this.crateKeyLegendary, 'Transfer', {
                     _from: this.crates.address,
                     _to: ZeroAddress,
-                    _value: OneKey,
+                    _value: OneKey.mul(new BN(quantity)),
                 });
             });
 
@@ -165,7 +166,7 @@ describe('Crates2020', function () {
 
             it('should update the counter', async function () {
                 const counter = await this.crates.counter();
-                counter.should.be.bignumber.equal(this.counter.add(Five));
+                counter.should.be.bignumber.equal(this.counter.add(Five.mul(new BN(quantity))));
             });
         });
     });
