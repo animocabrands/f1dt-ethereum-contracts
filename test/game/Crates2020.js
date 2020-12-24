@@ -19,6 +19,8 @@ const [deployer, holder] = accounts;
 
 const TransferEventHash = '0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef'; // Transfer(address,address,uint256)
 
+const maxQuantity = 5;
+
 describe('Crates2020', function () {
     const startCounter = 0;
     const seed = 0;
@@ -30,8 +32,6 @@ describe('Crates2020', function () {
         new BN('80040403000000000008000000000000fe00fd01100000000000000000000003', 'hex'),
         new BN('80040403000000000008000000000000fe00fd01100000000000000000000004', 'hex'),
     ];
-    // const quantity = 1;
-    const maxQuantity = 5;
 
     async function doDeploy() {
         const bytes = await Bytes.new({from: deployer});
