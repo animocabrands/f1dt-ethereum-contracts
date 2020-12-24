@@ -21,6 +21,7 @@ contract.artifactsDir = artifactsDir;
 const [deployer, holder] = accounts;
 
 describe('Crates2020', function () {
+    const startCounter = 0;
     const seed = 0;
     const legendaryTokens = [
         // to be updated if RNG lib changes
@@ -49,6 +50,7 @@ describe('Crates2020', function () {
             this.crateKeyRare.address,
             this.crateKeyEpic.address,
             this.crateKeyLegendary.address,
+            startCounter,
             {from: deployer}
         );
     }
@@ -67,7 +69,7 @@ describe('Crates2020', function () {
     describe('constructor()', function () {
         it('should revert with a zero address for the revv contract', async function () {
             await expectRevert(
-                Crates.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, {from: deployer}),
+                Crates.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, startCounter, {from: deployer}),
                 'Crates: zero address'
             );
         });

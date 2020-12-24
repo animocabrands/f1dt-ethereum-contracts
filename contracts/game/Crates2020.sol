@@ -3,7 +3,6 @@
 pragma solidity ^0.6.8;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
-// import "@animoca/ethereum-contracts-erc20_base/contracts/token/ERC20/IERC20.sol";
 import "../metadata/Crates2020RNGLib.sol";
 
 interface IF1DTBurnableCrateKey {
@@ -55,7 +54,8 @@ contract Crates2020 is Ownable {
         IF1DTBurnableCrateKey CRATE_KEY_COMMON_,
         IF1DTBurnableCrateKey CRATE_KEY_RARE_,
         IF1DTBurnableCrateKey CRATE_KEY_EPIC_,
-        IF1DTBurnableCrateKey CRATE_KEY_LEGENDARY_
+        IF1DTBurnableCrateKey CRATE_KEY_LEGENDARY_,
+        uint256 counter_
     ) public {
         require(
             address(INVENTORY_) != address(0) &&
@@ -69,6 +69,7 @@ contract Crates2020 is Ownable {
         CRATE_KEY_RARE = CRATE_KEY_RARE_;
         CRATE_KEY_EPIC = CRATE_KEY_EPIC_;
         CRATE_KEY_LEGENDARY = CRATE_KEY_LEGENDARY_;
+        counter = counter_;
     }
 
     function transferCrateKeyOwnership(uint256 crateTier, address newOwner) external onlyOwner {
@@ -77,10 +78,13 @@ contract Crates2020 is Ownable {
     }
 
     /**
+     * Burn some keys in order to mint 2020 season crates.
+     * @dev Reverts if `quantity` is zero.
      * @dev Reverts if `crateTier` is not supported.
-     * @dev Reverts if the transfer of the crate key to this contract fails.
-     * @dev Reverts if `crateTier` is not supported
-     * @param crateTier The tier id as defined in `Crates2020RNGLib`.
+     * @dev Reverts if the transfer of the crate key to this contract fails (missing approval or insufficient balance).
+     * @dev Reverts if this contract is not owner of the `crateTier`-related contract.
+     * @dev Reverts if this contract is not minter of the DeltaTimeInventory contract.
+     * @param crateTier The tier identifier for the crates to open.
      * @param quantity The number of crates to open.
      * @param seed The seed used for the metadata RNG.
      */
@@ -98,7 +102,6 @@ contract Crates2020 is Ownable {
         uint256[] memory values = new uint256[](5);
         address[] memory to = new address[](5);
         for (uint256 i; i != 5; ++i) {
-            uris[i] = 0x0;
             values[i] = 1;
             to[i] = sender;
         }

@@ -22,6 +22,8 @@ contract.artifactsDir = artifactsDir;
 const [deployer, holder, signer1, signer2] = accounts;
 
 describe('Crates2020Locksmith', function () {
+    const startCounter = 0;
+
     async function doDeploy() {
         const bytes = await Bytes.new({from: deployer});
         DeltaTimeInventory.network_id = 1337;
@@ -38,6 +40,7 @@ describe('Crates2020Locksmith', function () {
             this.crateKeyRare.address,
             this.crateKeyEpic.address,
             this.crateKeyLegendary.address,
+            startCounter,
             {from: deployer}
         );
     }
@@ -56,7 +59,7 @@ describe('Crates2020Locksmith', function () {
     describe('constructor()', function () {
         it('should revert with a zero address for the revv contract', async function () {
             await expectRevert(
-                Locksmith.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, {from: deployer}),
+                Locksmith.new(ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, ZeroAddress, startCounter, {from: deployer}),
                 'Crates: zero address'
             );
         });
