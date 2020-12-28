@@ -162,8 +162,8 @@ library Crates2020RNGLib {
         if (crateTier == CRATE_TIER_COMMON) {
             uint256 guaranteedRareDropIndex = crateSeed % 5;
 
-            for (uint256 i = 0; i < 5; ++i) {
-                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
                 tokens[i] = _makeTokenId(
                     _generateMetadata(
                         tokenSeed,
@@ -181,8 +181,8 @@ library Crates2020RNGLib {
                 uint256 guaranteedRareDropIndex3
             ) = _generateThreeTokenIndices(crateSeed);
 
-            for (uint256 i = 0; i < 5; ++i) {
-                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
                 tokens[i] = _makeTokenId(
                     _generateMetadata(
                         tokenSeed,
@@ -203,8 +203,8 @@ library Crates2020RNGLib {
                 uint256 guaranteedEpicDropIndex
             ) = _generateTwoTokenIndices(crateSeed);
 
-            for (uint256 i = 0; i < 5; ++i) {
-                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
                 uint256 minRarityTier = CRATE_TIER_COMMON;
                 if (i == guaranteedRareDropIndex) {
                     minRarityTier = CRATE_TIER_RARE;
@@ -227,8 +227,8 @@ library Crates2020RNGLib {
                 uint256 guaranteedLegendaryDropIndex
             ) = _generateTwoTokenIndices(crateSeed);
 
-            for (uint256 i = 0; i < 5; ++i) {
-                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
                 uint256 minRarityTier = CRATE_TIER_COMMON;
                 if (i == guaranteedRareDropIndex) {
                     minRarityTier = CRATE_TIER_RARE;
