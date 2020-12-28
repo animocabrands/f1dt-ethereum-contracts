@@ -17,20 +17,20 @@ const crates = {
         tier: 0,
         expectedRarities: {
             Apex: {min: 0, max: 0},
-            Legendary: {min: 18, max: 24},
-            Epic: {min: 3, max: 6},
-            Rare: {min: 24, max: 29},
-            Common: {min: 46, max: 50},
+            Legendary: {min: 20, max: 22},
+            Epic: {min: 3, max: 5},
+            Rare: {min: 24, max: 26},
+            Common: {min: 50, max: 51},
         },
     },
     Epic: {
         tier: 1,
         expectedRarities: {
             Apex: {min: 0, max: 0},
-            Legendary: {min: 0, max: 2},
-            Epic: {min: 18, max: 24},
-            Rare: {min: 15, max: 20},
-            Common: {min: 56, max: 63},
+            Legendary: {min: 0, max: 1},
+            Epic: {min: 21, max: 23},
+            Rare: {min: 22, max: 23},
+            Common: {min: 55, max: 56},
         },
     },
     Rare: {
@@ -38,9 +38,9 @@ const crates = {
         expectedRarities: {
             Apex: {min: 0, max: 0},
             Legendary: {min: 0, max: 1},
-            Epic: {min: 0, max: 3},
-            Rare: {min: 47, max: 55},
-            Common: {min: 44, max: 51},
+            Epic: {min: 0, max: 1},
+            Rare: {min: 60, max: 61},
+            Common: {min: 38, max: 39},
         },
     },
     Common: {
@@ -49,8 +49,8 @@ const crates = {
             Apex: {min: 0, max: 0},
             Legendary: {min: 0, max: 1},
             Epic: {min: 0, max: 1},
-            Rare: {min: 21, max: 27},
-            Common: {min: 73, max: 79},
+            Rare: {min: 20, max: 22},
+            Common: {min: 78, max: 80},
         },
     },
 };
