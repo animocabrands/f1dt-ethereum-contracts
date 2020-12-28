@@ -3,9 +3,9 @@
 pragma experimental ABIEncoderV2;
 pragma solidity 0.6.8;
 
-import "./Crates2020RNGLib.sol";
+import "../../metadata/Crates2020RNGLib.sol";
 
-contract ContentGenerator {
+contract Crates2020RNGLibMock {
     using Crates2020RNGLib for uint256;
 
     uint256 counter;

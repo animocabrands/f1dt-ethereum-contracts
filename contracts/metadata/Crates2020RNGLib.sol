@@ -1,10 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma experimental ABIEncoderV2;
 pragma solidity 0.6.8;
-
-import "@openzeppelin/contracts/math/SafeMath.sol";
-import "@openzeppelin/contracts/utils/SafeCast.sol";
 
 library Crates2020RNGLib {
 
@@ -22,10 +18,10 @@ library Crates2020RNGLib {
         uint256 counter;
     }
 
-    uint256 internal constant _CRATE_TIER_COMMON = 3;
-    uint256 internal constant _CRATE_TIER_RARE = 2;
-    uint256 internal constant _CRATE_TIER_EPIC = 1;
-    uint256 internal constant _CRATE_TIER_LEGENDARY = 0;
+    uint256 constant CRATE_TIER_LEGENDARY = 0;
+    uint256 constant CRATE_TIER_EPIC = 1;
+    uint256 constant CRATE_TIER_RARE = 2;
+    uint256 constant CRATE_TIER_COMMON = 3;
 
     //============================================================================================/
     //================================== Metadata Mappings  ======================================/
@@ -190,7 +186,7 @@ library Crates2020RNGLib {
 
     function generateCrate(uint256 crateSeed, uint256 crateTier, uint256 counter) internal pure returns (uint256[] memory tokens) {
         require(crateTier < 4, "Crates2020: wrong crate tier");
-        if (crateTier == Crates2020RNGLib._CRATE_TIER_RARE) {
+        if (crateTier == Crates2020RNGLib.CRATE_TIER_RARE) {
             tokens = _generateCrate_twoGuaranteedDrops(crateSeed, crateTier, counter);
         } else {
             tokens = _generateCrate_oneGuaranteedDrop(crateSeed, crateTier, counter);
@@ -300,7 +296,7 @@ library Crates2020RNGLib {
         bool isGuaranteedDrop
     ) private pure returns (uint256 tokenRarity) {
 
-        if (crateTier == _CRATE_TIER_COMMON) {
+        if (crateTier == CRATE_TIER_COMMON) {
             uint256 seedling = seed % 100000; // > 16 bits, reserve 32
             if (isGuaranteedDrop) {
                 if (seedling < _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE) {
@@ -323,7 +319,7 @@ library Crates2020RNGLib {
             return 1;
         }
 
-        if (crateTier == _CRATE_TIER_RARE) {
+        if (crateTier == CRATE_TIER_RARE) {
             uint256 seedling = seed % 100000; // > 16 bits, reserve 32
             if (isGuaranteedDrop) {
                 if (seedling < _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE) {
@@ -346,7 +342,7 @@ library Crates2020RNGLib {
             return 1;
         }
 
-        if (crateTier == _CRATE_TIER_EPIC) {
+        if (crateTier == CRATE_TIER_EPIC) {
             uint256 seedling = seed % 100000; // > 16 bits, reserve 32
             if (isGuaranteedDrop) {
                 if (seedling < _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC) {
@@ -366,7 +362,7 @@ library Crates2020RNGLib {
             return 1;
         }
 
-        if (crateTier == _CRATE_TIER_LEGENDARY) {
+        if (crateTier == CRATE_TIER_LEGENDARY) {
             if (isGuaranteedDrop) {
                 return 1;
             }
