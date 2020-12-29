@@ -63,11 +63,14 @@ library Crates2020RNGLib {
     uint256 internal constant _DRIVER_ID_PIERRE_GASLY = 10;
     uint256 internal constant _DRIVER_ID_MAX_VERSTAPPEN = 33;
     uint256 internal constant _DRIVER_ID_DANIEL_RICCIARDO = 3;
-    uint256 internal constant _DRIVER_ID_NICO_HULKENBERG = 27;
+    // uint256 internal constant _DRIVER_ID_NICO_HULKENBERG = 27;
     uint256 internal constant _DRIVER_ID_ALEXANDER_ALBON = 23;
     uint256 internal constant _DRIVER_ID_DANIIL_KVYAT = 26;
     uint256 internal constant _DRIVER_ID_GEORGE_RUSSEL = 63;
-    uint256 internal constant _DRIVER_ID_ROBERT_KUBICA = 88;
+    // uint256 internal constant _DRIVER_ID_ROBERT_KUBICA = 88;
+    uint256 internal constant _DRIVER_ID_ESTEBAN_OCON = 31;
+    uint256 internal constant _DRIVER_ID_NICHOLAS_LATIFI = 6;
+
 
     //============================================================================================/
     //================================ Racing Stats Min/Max  =====================================/
@@ -86,7 +89,7 @@ library Crates2020RNGLib {
     uint256 internal constant _RACING_STATS_T1_RARITY_6_MIN = 560;
     uint256 internal constant _RACING_STATS_T1_RARITY_6_MAX = 620;
     uint256 internal constant _RACING_STATS_T1_RARITY_7_MIN = 520;
-    uint256 internal constant _RACING_STATS_T1_RARITY_7_MAX = 565;
+    uint256 internal constant _RACING_STATS_T1_RARITY_7_MAX = 570;
     uint256 internal constant _RACING_STATS_T1_RARITY_8_MIN = 500;
     uint256 internal constant _RACING_STATS_T1_RARITY_8_MAX = 530;
     uint256 internal constant _RACING_STATS_T1_RARITY_9_MIN = 450;
@@ -114,19 +117,19 @@ library Crates2020RNGLib {
     uint256 internal constant _RACING_STATS_T3_RARITY_1_MIN = 500;
     uint256 internal constant _RACING_STATS_T3_RARITY_1_MAX = 600;
     uint256 internal constant _RACING_STATS_T3_RARITY_2_MIN = 440;
-    uint256 internal constant _RACING_STATS_T3_RARITY_2_MAX = 520;
+    uint256 internal constant _RACING_STATS_T3_RARITY_2_MAX = 525;
     uint256 internal constant _RACING_STATS_T3_RARITY_3_MIN = 390;
-    uint256 internal constant _RACING_STATS_T3_RARITY_3_MAX = 450;
+    uint256 internal constant _RACING_STATS_T3_RARITY_3_MAX = 460;
     uint256 internal constant _RACING_STATS_T3_RARITY_4_MIN = 340;
     uint256 internal constant _RACING_STATS_T3_RARITY_4_MAX = 395;
     uint256 internal constant _RACING_STATS_T3_RARITY_5_MIN = 320;
-    uint256 internal constant _RACING_STATS_T3_RARITY_5_MAX = 345;
+    uint256 internal constant _RACING_STATS_T3_RARITY_5_MAX = 350;
     uint256 internal constant _RACING_STATS_T3_RARITY_6_MIN = 300;
-    uint256 internal constant _RACING_STATS_T3_RARITY_6_MAX = 325;
+    uint256 internal constant _RACING_STATS_T3_RARITY_6_MAX = 335;
     uint256 internal constant _RACING_STATS_T3_RARITY_7_MIN = 270;
-    uint256 internal constant _RACING_STATS_T3_RARITY_7_MAX = 310;
+    uint256 internal constant _RACING_STATS_T3_RARITY_7_MAX = 330;
     uint256 internal constant _RACING_STATS_T3_RARITY_8_MIN = 250;
-    uint256 internal constant _RACING_STATS_T3_RARITY_8_MAX = 280;
+    uint256 internal constant _RACING_STATS_T3_RARITY_8_MAX = 290;
     uint256 internal constant _RACING_STATS_T3_RARITY_9_MIN = 200;
     uint256 internal constant _RACING_STATS_T3_RARITY_9_MAX = 255;
 
@@ -457,23 +460,23 @@ library Crates2020RNGLib {
             ][index];
         } else if (team == _TEAM_ID_ASTON_MARTIN_RED_BULL_RACING) {
             driver = [
-                _DRIVER_ID_PIERRE_GASLY,
+                _DRIVER_ID_ALEXANDER_ALBON,
                 _DRIVER_ID_MAX_VERSTAPPEN
             ][index];
         } else if (team == _TEAM_ID_RENAULT_F1_TEAM) {
             driver = [
                 _DRIVER_ID_DANIEL_RICCIARDO,
-                _DRIVER_ID_NICO_HULKENBERG
+                _DRIVER_ID_ESTEBAN_OCON
             ][index];
         } else if (team == _TEAM_ID_RED_BULL_TORO_ROSSO_HONDA) {
             driver = [
-                _DRIVER_ID_ALEXANDER_ALBON,
+                _DRIVER_ID_PIERRE_GASLY,
                 _DRIVER_ID_DANIIL_KVYAT
             ][index];
         } else if (team == _TEAM_ID_ROKIT_WILLIAMS_RACING) {
             driver = [
                 _DRIVER_ID_GEORGE_RUSSEL,
-                _DRIVER_ID_ROBERT_KUBICA
+                _DRIVER_ID_NICHOLAS_LATIFI
             ][index];
         }
     }
