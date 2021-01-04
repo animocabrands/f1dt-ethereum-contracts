@@ -299,23 +299,23 @@ library Crates2020RNGLib {
         uint256 index,
         uint256 minRarityTier
     ) private pure returns (Metadata memory metadata) {
-        (uint256 tokenType, uint256 tokenSubType) = _generateType(tokenSeed >> 4, index); // Uses tokenSeed bits [4;36[
+        (uint256 tokenType, uint256 tokenSubType) = _generateType(tokenSeed >> 4, index); // Uses tokenSeed bits [4;40[
         metadata.tokenType = tokenType;
         if (tokenSubType != 0) {
             metadata.tokenSubType = tokenSubType;
         }
 
-        uint256 tokenRarity = _generateRarity(tokenSeed >> 36, crateTier, minRarityTier); // Uses tokenSeed bits [36;68[
+        uint256 tokenRarity = _generateRarity(tokenSeed >> 40, crateTier, minRarityTier); // Uses tokenSeed bits [40;72[
         metadata.tokenRarity = tokenRarity;
 
         if (tokenType == _TYPE_ID_CAR || tokenType == _TYPE_ID_DRIVER) {
             if (tokenRarity > 3) {
-                metadata.model = _generateModel(tokenSeed >> 68); // Uses tokenSeed bits [68;76[
+                metadata.model = _generateModel(tokenSeed >> 72); // Uses tokenSeed bits [72;80[
             } else {
-                uint256 team = _generateTeam(tokenSeed >> 68); // Uses tokenSeed bits [68;76[
+                uint256 team = _generateTeam(tokenSeed >> 72); // Uses tokenSeed bits [72;80[
                 metadata.team = team;
                 if (tokenType == _TYPE_ID_DRIVER) {
-                    metadata.driver = _generateDriver(tokenSeed >> 76, team); // Uses tokenSeed bits [76;77[;
+                    metadata.driver = _generateDriver(tokenSeed >> 80, team); // Uses tokenSeed bits [80;81[;
                 }
             }
         }
@@ -334,20 +334,20 @@ library Crates2020RNGLib {
         returns (uint256 tokenType, uint256 tokenSubType)
     {
         if (index == 0) {
-            tokenType = 1 + (seed % 2); // Types {1, 2} = {Car, Driver}
+            tokenType = 1 + (seed % 2); // Types {1, 2} = {Car, Driver}, using 1 bit
             tokenSubType = 0;
         } else {
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
+            uint256 seedling = seed % 100000; // using > 16 bits, reserve 32
             if (seedling < _TYPE_DROP_RATE_THRESH_COMPONENT) {
-                tokenType = 3 + (seedling % 2); // Type {3, 4} = {Gear, Part}
+                tokenType = 3 + ((seed >> 32) % 2); // Type {3, 4} = {Gear, Part}, using 1 bit
                 if (tokenType == _TYPE_ID_PART) {
-                    tokenSubType = 1 + (seedling % 8); // Subtype [1-8]
+                    tokenSubType = 1 + ((seed >> 33) % 8); // Subtype [1-8], using 3 bits
                 } else {
-                    tokenSubType = 1 + (seedling % 4); // Subtype [1-4]
+                    tokenSubType = 1 + ((seed >> 33) % 4); // Subtype [1-4], using 2 bits
                 }
             } else {
                 tokenType = _TYPE_ID_TYRES;
-                tokenSubType = 1 + (seedling % 5); // Subtype [1-5]
+                tokenSubType = 1 + ((seed >> 32) % 5); // Subtype [1-5], using 3 bits
             }
         }
     }

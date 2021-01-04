@@ -2,11 +2,11 @@ const {time} = require('@openzeppelin/test-helpers');
 const {accounts, contract} = require('@openzeppelin/test-environment');
 const {utils} = require('@animoca/f1dt-core_metadata');
 const {crates, expectedTypes} = require('./Crates2020RNGLib.constants');
-const {computeSupply, validateSupplies} = require('./Crates2020RNGLib.helpers');
+const {computeSupply, validateSupplies, validateSubTypeSupplies} = require('./Crates2020RNGLib.helpers');
 
 const Crates2020RNGLib = contract.fromArtifact('Crates2020RNGLibMock');
 
-const sampleSize = 10000;
+const sampleSize = 5000;
 
 const [deployer] = accounts;
 
@@ -45,6 +45,9 @@ describe('Crates2020RNGLib', function () {
                     }
                     const tokenSupplies = computeSupply(tokens);
                     console.log(key, tokenSupplies);
+                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Gear, tokenSupplies.supplyByType.Gear);
+                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Part, tokenSupplies.supplyByType.Part);
+                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Tyres, tokenSupplies.supplyByType.Tyres);
                     validateSupplies(tokenSupplies.supplyByType, expectedTypes, tokenSupplies.total);
                     validateSupplies(tokenSupplies.supplyByTier, value.expectedRarities, tokenSupplies.total);
                 });
