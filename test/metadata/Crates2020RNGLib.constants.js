@@ -6,9 +6,9 @@
 const expectedTypes = {
     Car: {min: 8, max: 12}, // 10%
     Driver: {min: 8, max: 12}, // 10%
-    Gear: {min: 35, max: 41}, // 38%
-    Part: {min: 35, max: 41}, // 38%
-    Tyres: {min: 2, max: 6}, // 4%
+    Gear: {min: 20, max: 24}, // 22%
+    Part: {min: 42, max: 46}, // 44%
+    Tyres: {min: 12, max: 16}, // 14%
 };
 
 // section "Aggregated Rarity Drop Rates" for the `expectedRarities`
