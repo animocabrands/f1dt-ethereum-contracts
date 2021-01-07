@@ -21,9 +21,11 @@ const {createTokenId} = require('@animoca/f1dt-core_metadata').utils;
 
 const RepairCentre = contract.fromArtifact('NFTRepairCentre');
 const REVV = contract.fromArtifact('REVV');
+const artifactsDir = contract.artifactsDir.toString();
 contract.artifactsDir = './imports';
 const Bytes = contract.fromArtifact('Bytes');
 const DeltaTimeInventory = contract.fromArtifact('DeltaTimeInventory');
+contract.artifactsDir = artifactsDir;
 
 const [deployer, payout, owner, operator] = accounts;
 

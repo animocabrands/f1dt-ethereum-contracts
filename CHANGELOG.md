@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.0.0
+ * Updated to `@animoca/ethereum-contracts-nft_staking:4.0.0`.
+ * Added `TimeTrialEliteLeague.sol`, a contract to manage the participation status of players to the elite tiers.
+ * Added `CrateKeySale.sol`, a `FixedPricesSale` contract implementation that handles the purchase of ERC20 `F1DTCrateKey` tokens.
+ * Added `PrePaid.sol`, a contract to manage the pre-paid purchase deposits for a future sale.
+ * Added `F1DTCrateKey`, an ERC20 contract whose tokens represent a purchasable 'key' used to open a lootbox crate.
+ * Added `Crates2020RNGLib.sol`, `Crates2020.sol` and `Crates2020Locksmith.sol` for crate keys opening.
+ * Added `DeltaTimeStaking.sol`, an NFT V2 staking contract that requires escrow of REVV. Drivers become stakeable with a weight half on the cars weight.
+
 ## 0.4.0
  * Added `NFTRepairCentre`, a contract to manage defunct NFTs.
  * Updated to `@animoca/ethereum-contracts-core_library:3.1.1`.

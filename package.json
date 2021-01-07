@@ -1,6 +1,6 @@
 {
   "name": "@animoca/f1dt-ethereum-contracts",
-  "version": "0.4.0",
+  "version": "1.0.0",
   "description": "F1 Delta Time Solidity Contracts",
   "scripts": {
     "npm-test": "echo $npm_package_config_path",
@@ -27,9 +27,10 @@
     "@animoca/ethereum-contracts-assets_inventory": "=4.0.0",
     "@animoca/ethereum-contracts-core_library": "=3.1.1",
     "@animoca/ethereum-contracts-erc20_base": "=3.0.0",
-    "@animoca/ethereum-contracts-nft_staking": "=3.0.3",
+    "@animoca/ethereum-contracts-nft_staking": "=4.0.0",
     "@animoca/ethereum-contracts-sale_base": "=6.0.0",
-    "@animoca/f1dt-core_metadata": "^1.0.3",
+    "@animoca/f1dt-core_metadata": "^2.0.2",
+    "@openzeppelin/test-helpers": "git+https://github.com/nataouze/openzeppelin-test-helpers.git#fix_bn_array_event_args",
     "base32.js": "^0.1.0",
     "eslint-config-mocha": "^0.0.0",
     "eslint-config-prettier": "^6.11.0",
