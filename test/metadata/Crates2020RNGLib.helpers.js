@@ -33,18 +33,20 @@ function computeSupply(tokens) {
     return result;
 }
 
-function validateSupplies(supplies, expectedSupplies, totalSupply) {
+function validateSupplies(name, supplies, expectedSupplies, totalSupply) {
+    console.log(`Validating supply proportions for ${name}`);
     for (const [key, range] of Object.entries(expectedSupplies)) {
         const percentage = supplies[key] ? (supplies[key] / totalSupply) * 100 : 0;
         console.log(
-            `${key}: expected [${range.min}, ${range.max}]%, got ${supplies[key] || 0}/${totalSupply} = ${percentage}%`
+            `- ${key}: expected [${range.min}, ${range.max}]%, got ${supplies[key] || 0}/${totalSupply} = ${percentage}%`
         );
         percentage.should.be.gte(range.min);
         percentage.should.be.lte(range.max);
     }
 }
 
-function validateSubTypeSupplies(subTypeSupplies, typeTotalSupply) {
+function validateSubTypeSupplies(name, subTypeSupplies, typeTotalSupply) {
+    console.log(`Validating supply proportions for subtype ${name}`);
     const expectedPercentage = (1 / Object.keys(subTypeSupplies).length) * 100;
     const range = {
         min: Math.max(expectedPercentage - 2),
@@ -53,7 +55,7 @@ function validateSubTypeSupplies(subTypeSupplies, typeTotalSupply) {
     for (const [subType, subTypeSupply] of Object.entries(subTypeSupplies)) {
         const percentage = (subTypeSupply / typeTotalSupply) * 100;
         console.log(
-            `${subType}: expected [${range.min}, ${range.max}]%, got ${
+            `- ${subType}: expected [${range.min}, ${range.max}]%, got ${
                 subTypeSupply || 0
             }/${typeTotalSupply} = ${percentage}%`
         );

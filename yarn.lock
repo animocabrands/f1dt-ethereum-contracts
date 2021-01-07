@@ -56,10 +56,10 @@
   dependencies:
     ganache-cli "^6.9.1"
 
-"@animoca/f1dt-core_metadata@^1.0.3":
-  version "1.2.1"
-  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-1.2.1.tgz#c0fcdfbd8337db362954148e568e21b6678c92f8"
-  integrity sha512-dC6V1HegbMBAy0ceZ2Xx9YO9YpCObL6wh4bpcN/NOLbl5+UDQYe/AmrSlXiV/4Qft31X7Q5JrHYsH7MxHmMDsg==
+"@animoca/f1dt-core_metadata@^2.0.2":
+  version "2.0.2"
+  resolved "https://registry.yarnpkg.com/@animoca/f1dt-core_metadata/-/f1dt-core_metadata-2.0.2.tgz#9912cb15ca4b24da9c5529c08caff67080ebab8e"
+  integrity sha512-+rqdnLV32FYKQv6kUCTsB8MENbMv2M1MNGtqv2vlD502dP+m0dieZvtAxwj/jWPBCm8lp7aqjatb1bNu4csTkA==
   dependencies:
     "@animoca/blockchain-inventory_metadata" "^0.0.1"
     big-integer "^1.6.48"

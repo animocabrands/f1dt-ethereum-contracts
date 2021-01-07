@@ -6,7 +6,7 @@ const {computeSupply, validateSupplies, validateSubTypeSupplies} = require('./Cr
 
 const Crates2020RNGLib = contract.fromArtifact('Crates2020RNGLibMock');
 
-const sampleSize = 5000;
+const sampleSize = 10000;
 
 const [deployer] = accounts;
 
@@ -30,7 +30,7 @@ describe('Crates2020RNGLib', function () {
         });
 
         // Long test, remove skip to run it again when constants are updated
-        describe.skip('supplies bounded by specifications', function () {
+        describe('supplies bounded by specifications', function () {
             // eslint-disable-next-line mocha/no-setup-in-describe
             for (const [key, value] of Object.entries(crates)) {
                 it(`${key} has expected supply proportions`, async function () {
@@ -45,11 +45,11 @@ describe('Crates2020RNGLib', function () {
                     }
                     const tokenSupplies = computeSupply(tokens);
                     console.log(key, tokenSupplies);
-                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Gear, tokenSupplies.supplyByType.Gear);
-                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Part, tokenSupplies.supplyByType.Part);
-                    validateSubTypeSupplies(tokenSupplies.supplyBySubType.Tyres, tokenSupplies.supplyByType.Tyres);
-                    validateSupplies(tokenSupplies.supplyByType, expectedTypes, tokenSupplies.total);
-                    validateSupplies(tokenSupplies.supplyByTier, value.expectedRarities, tokenSupplies.total);
+                    validateSubTypeSupplies('Gear', tokenSupplies.supplyBySubType.Gear, tokenSupplies.supplyByType.Gear);
+                    validateSubTypeSupplies('Part', tokenSupplies.supplyBySubType.Part, tokenSupplies.supplyByType.Part);
+                    validateSubTypeSupplies('Tyres', tokenSupplies.supplyBySubType.Tyres, tokenSupplies.supplyByType.Tyres);
+                    validateSupplies('Type', tokenSupplies.supplyByType, expectedTypes, tokenSupplies.total);
+                    validateSupplies('Tier', tokenSupplies.supplyByTier, value.expectedRarities, tokenSupplies.total);
                 });
             }
         });
