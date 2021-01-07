@@ -36,7 +36,7 @@ const [deployer, staker] = accounts;
 
 const cars = [
     {rarity: '0', type: 'Driver', season: '2019', model: 'Carbon', counter: '1'},
-    {rarity: '1', type: 'Car', season: '2020', model: 'Carbon', counter: '2'},
+    {rarity: '1', type: 'Car', season: '2020', model: 'Riptide', counter: '2'},
 ];
 
 // const cars = [
