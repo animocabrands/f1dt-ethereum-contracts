@@ -30,7 +30,7 @@ describe('Crates2020RNGLib', function () {
         });
 
         // Long test, remove skip to run it again when constants are updated
-        describe('supplies bounded by specifications', function () {
+        describe.skip('supplies bounded by specifications', function () {
             // eslint-disable-next-line mocha/no-setup-in-describe
             for (const [key, value] of Object.entries(crates)) {
                 it(`${key} has expected supply proportions`, async function () {
