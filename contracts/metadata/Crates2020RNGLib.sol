@@ -63,11 +63,14 @@ library Crates2020RNGLib {
     uint256 internal constant _DRIVER_ID_PIERRE_GASLY = 10;
     uint256 internal constant _DRIVER_ID_MAX_VERSTAPPEN = 33;
     uint256 internal constant _DRIVER_ID_DANIEL_RICCIARDO = 3;
-    uint256 internal constant _DRIVER_ID_NICO_HULKENBERG = 27;
+    // uint256 internal constant _DRIVER_ID_NICO_HULKENBERG = 27;
     uint256 internal constant _DRIVER_ID_ALEXANDER_ALBON = 23;
     uint256 internal constant _DRIVER_ID_DANIIL_KVYAT = 26;
     uint256 internal constant _DRIVER_ID_GEORGE_RUSSEL = 63;
-    uint256 internal constant _DRIVER_ID_ROBERT_KUBICA = 88;
+    // uint256 internal constant _DRIVER_ID_ROBERT_KUBICA = 88;
+    uint256 internal constant _DRIVER_ID_ESTEBAN_OCON = 31;
+    uint256 internal constant _DRIVER_ID_NICHOLAS_LATIFI = 6;
+
 
     //============================================================================================/
     //================================ Racing Stats Min/Max  =====================================/
@@ -75,159 +78,218 @@ library Crates2020RNGLib {
 
     uint256 internal constant _RACING_STATS_T1_RARITY_1_MIN = 800;
     uint256 internal constant _RACING_STATS_T1_RARITY_1_MAX = 900;
-    uint256 internal constant _RACING_STATS_T1_RARITY_2_MIN = 750;
+    uint256 internal constant _RACING_STATS_T1_RARITY_2_MIN = 710;
     uint256 internal constant _RACING_STATS_T1_RARITY_2_MAX = 810;
-    uint256 internal constant _RACING_STATS_T1_RARITY_3_MIN = 700;
+    uint256 internal constant _RACING_STATS_T1_RARITY_3_MIN = 680;
     uint256 internal constant _RACING_STATS_T1_RARITY_3_MAX = 780;
-    uint256 internal constant _RACING_STATS_T1_RARITY_4_MIN = 650;
+    uint256 internal constant _RACING_STATS_T1_RARITY_4_MIN = 610;
     uint256 internal constant _RACING_STATS_T1_RARITY_4_MAX = 710;
-    uint256 internal constant _RACING_STATS_T1_RARITY_5_MIN = 600;
+    uint256 internal constant _RACING_STATS_T1_RARITY_5_MIN = 570;
     uint256 internal constant _RACING_STATS_T1_RARITY_5_MAX = 680;
-    uint256 internal constant _RACING_STATS_T1_RARITY_6_MIN = 560;
-    uint256 internal constant _RACING_STATS_T1_RARITY_6_MAX = 620;
-    uint256 internal constant _RACING_STATS_T1_RARITY_7_MIN = 520;
-    uint256 internal constant _RACING_STATS_T1_RARITY_7_MAX = 565;
-    uint256 internal constant _RACING_STATS_T1_RARITY_8_MIN = 500;
-    uint256 internal constant _RACING_STATS_T1_RARITY_8_MAX = 530;
+    uint256 internal constant _RACING_STATS_T1_RARITY_6_MIN = 540;
+    uint256 internal constant _RACING_STATS_T1_RARITY_6_MAX = 650;
+    uint256 internal constant _RACING_STATS_T1_RARITY_7_MIN = 500;
+    uint256 internal constant _RACING_STATS_T1_RARITY_7_MAX = 580;
+    uint256 internal constant _RACING_STATS_T1_RARITY_8_MIN = 480;
+    uint256 internal constant _RACING_STATS_T1_RARITY_8_MAX = 550;
     uint256 internal constant _RACING_STATS_T1_RARITY_9_MIN = 450;
-    uint256 internal constant _RACING_STATS_T1_RARITY_9_MAX = 510;
+    uint256 internal constant _RACING_STATS_T1_RARITY_9_MAX = 540;
 
     uint256 internal constant _RACING_STATS_T2_RARITY_1_MIN = 500;
     uint256 internal constant _RACING_STATS_T2_RARITY_1_MAX = 600;
-    uint256 internal constant _RACING_STATS_T2_RARITY_2_MIN = 440;
+    uint256 internal constant _RACING_STATS_T2_RARITY_2_MIN = 420;
     uint256 internal constant _RACING_STATS_T2_RARITY_2_MAX = 520;
-    uint256 internal constant _RACING_STATS_T2_RARITY_3_MIN = 390;
-    uint256 internal constant _RACING_STATS_T2_RARITY_3_MAX = 450;
+    uint256 internal constant _RACING_STATS_T2_RARITY_3_MIN = 380;
+    uint256 internal constant _RACING_STATS_T2_RARITY_3_MAX = 480;
     uint256 internal constant _RACING_STATS_T2_RARITY_4_MIN = 340;
-    uint256 internal constant _RACING_STATS_T2_RARITY_4_MAX = 395;
-    uint256 internal constant _RACING_STATS_T2_RARITY_5_MIN = 320;
-    uint256 internal constant _RACING_STATS_T2_RARITY_5_MAX = 345;
-    uint256 internal constant _RACING_STATS_T2_RARITY_6_MIN = 300;
-    uint256 internal constant _RACING_STATS_T2_RARITY_6_MAX = 325;
-    uint256 internal constant _RACING_STATS_T2_RARITY_7_MIN = 270;
-    uint256 internal constant _RACING_STATS_T2_RARITY_7_MAX = 310;
-    uint256 internal constant _RACING_STATS_T2_RARITY_8_MIN = 250;
-    uint256 internal constant _RACING_STATS_T2_RARITY_8_MAX = 280;
+    uint256 internal constant _RACING_STATS_T2_RARITY_4_MAX = 440;
+    uint256 internal constant _RACING_STATS_T2_RARITY_5_MIN = 330;
+    uint256 internal constant _RACING_STATS_T2_RARITY_5_MAX = 430;
+    uint256 internal constant _RACING_STATS_T2_RARITY_6_MIN = 290;
+    uint256 internal constant _RACING_STATS_T2_RARITY_6_MAX = 390;
+    uint256 internal constant _RACING_STATS_T2_RARITY_7_MIN = 250;
+    uint256 internal constant _RACING_STATS_T2_RARITY_7_MAX = 350;
+    uint256 internal constant _RACING_STATS_T2_RARITY_8_MIN = 240;
+    uint256 internal constant _RACING_STATS_T2_RARITY_8_MAX = 340;
     uint256 internal constant _RACING_STATS_T2_RARITY_9_MIN = 200;
-    uint256 internal constant _RACING_STATS_T2_RARITY_9_MAX = 255;
+    uint256 internal constant _RACING_STATS_T2_RARITY_9_MAX = 300;
 
     uint256 internal constant _RACING_STATS_T3_RARITY_1_MIN = 500;
     uint256 internal constant _RACING_STATS_T3_RARITY_1_MAX = 600;
-    uint256 internal constant _RACING_STATS_T3_RARITY_2_MIN = 440;
+    uint256 internal constant _RACING_STATS_T3_RARITY_2_MIN = 420;
     uint256 internal constant _RACING_STATS_T3_RARITY_2_MAX = 520;
-    uint256 internal constant _RACING_STATS_T3_RARITY_3_MIN = 390;
-    uint256 internal constant _RACING_STATS_T3_RARITY_3_MAX = 450;
+    uint256 internal constant _RACING_STATS_T3_RARITY_3_MIN = 380;
+    uint256 internal constant _RACING_STATS_T3_RARITY_3_MAX = 480;
     uint256 internal constant _RACING_STATS_T3_RARITY_4_MIN = 340;
-    uint256 internal constant _RACING_STATS_T3_RARITY_4_MAX = 395;
-    uint256 internal constant _RACING_STATS_T3_RARITY_5_MIN = 320;
-    uint256 internal constant _RACING_STATS_T3_RARITY_5_MAX = 345;
-    uint256 internal constant _RACING_STATS_T3_RARITY_6_MIN = 300;
-    uint256 internal constant _RACING_STATS_T3_RARITY_6_MAX = 325;
-    uint256 internal constant _RACING_STATS_T3_RARITY_7_MIN = 270;
-    uint256 internal constant _RACING_STATS_T3_RARITY_7_MAX = 310;
-    uint256 internal constant _RACING_STATS_T3_RARITY_8_MIN = 250;
-    uint256 internal constant _RACING_STATS_T3_RARITY_8_MAX = 280;
+    uint256 internal constant _RACING_STATS_T3_RARITY_4_MAX = 440;
+    uint256 internal constant _RACING_STATS_T3_RARITY_5_MIN = 330;
+    uint256 internal constant _RACING_STATS_T3_RARITY_5_MAX = 430;
+    uint256 internal constant _RACING_STATS_T3_RARITY_6_MIN = 290;
+    uint256 internal constant _RACING_STATS_T3_RARITY_6_MAX = 390;
+    uint256 internal constant _RACING_STATS_T3_RARITY_7_MIN = 250;
+    uint256 internal constant _RACING_STATS_T3_RARITY_7_MAX = 350;
+    uint256 internal constant _RACING_STATS_T3_RARITY_8_MIN = 240;
+    uint256 internal constant _RACING_STATS_T3_RARITY_8_MAX = 340;
     uint256 internal constant _RACING_STATS_T3_RARITY_9_MIN = 200;
-    uint256 internal constant _RACING_STATS_T3_RARITY_9_MAX = 255;
+    uint256 internal constant _RACING_STATS_T3_RARITY_9_MAX = 300;
 
     //============================================================================================/
     //================================== Types Drop Rates  =======================================/
     //============================================================================================/
 
-    uint256 internal constant _TYPE_DROP_RATE_THRESH_COMPONENT = 95 * 1000; // 95%
-    // uint256 internal constant _TYPE_DROP_RATE_THRESH_TYRES = 5 * 1000 + _TYPE_DROP_RATE_THRESH_COMPONENT; // 95%
-
+    uint256 internal constant _TYPE_DROP_RATE_THRESH_COMPONENT = 82500;
 
     //============================================================================================/
     //================================== Rarity Drop Rates  ======================================/
     //============================================================================================/
 
+    uint256 internal constant _COMMON_CRATE_DROP_RATE_THRESH_COMMON = 98.899 * 1000;
+    uint256 internal constant _COMMON_CRATE_DROP_RATE_THRESH_RARE = 1 * 1000 + _COMMON_CRATE_DROP_RATE_THRESH_COMMON;
+    uint256 internal constant _COMMON_CRATE_DROP_RATE_THRESH_EPIC = 0.1 * 1000 + _COMMON_CRATE_DROP_RATE_THRESH_RARE;
 
-    uint256 internal constant _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_COMMON = 95 * 1000; // 95%
-    uint256 internal constant _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_RARE = 4.8 * 1000 + _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_COMMON; // 19%
-    uint256 internal constant _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_EPIC = 0.199 * 1000 + _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_RARE; // 0.199%
-    // uint256 internal constant _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_LEGENDARY = 0.001 * 1000 + _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_EPIC; // 0.001%
+    uint256 internal constant _RARE_CRATE_DROP_RATE_THRESH_COMMON = 96.490 * 1000;
+    uint256 internal constant _RARE_CRATE_DROP_RATE_THRESH_RARE = 2.5 * 1000 + _RARE_CRATE_DROP_RATE_THRESH_COMMON;
+    uint256 internal constant _RARE_CRATE_DROP_RATE_THRESH_EPIC = 1 * 1000 + _RARE_CRATE_DROP_RATE_THRESH_RARE;
 
-    // uint256 internal constant _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_COMMON = 0 * 1000; // 0%
-    uint256 internal constant _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE = 99.8 * 1000; // 99.8%
-    uint256 internal constant _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC = 0.199 * 1000 + _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE; // 0.199%
-    // uint256 internal constant _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_LEGENDARY = 0.001 * 1000 + _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC; // 0.001%
+    uint256 internal constant _EPIC_CRATE_DROP_RATE_THRESH_COMMON = 92.4 * 1000;
+    uint256 internal constant _EPIC_CRATE_DROP_RATE_THRESH_RARE = 5 * 1000 + _EPIC_CRATE_DROP_RATE_THRESH_COMMON;
+    uint256 internal constant _EPIC_CRATE_DROP_RATE_THRESH_EPIC = 2.5 * 1000 + _EPIC_CRATE_DROP_RATE_THRESH_RARE;
 
-    uint256 internal constant _RARE_CRATE_NORMAL_DROP_RATE_THRESH_COMMON = 80 * 1000; // 80%
-    uint256 internal constant _RARE_CRATE_NORMAL_DROP_RATE_THRESH_RARE = 19 * 1000 + _RARE_CRATE_NORMAL_DROP_RATE_THRESH_COMMON; // 19%
-    uint256 internal constant _RARE_CRATE_NORMAL_DROP_RATE_THRESH_EPIC = 0.9 * 1000 + _RARE_CRATE_NORMAL_DROP_RATE_THRESH_RARE; // 0.9%
-    // uint256 internal constant _RARE_CRATE_NORMAL_DROP_RATE_THRESH_LEGENDARY = 0.1 * 1000 + _RARE_CRATE_NORMAL_DROP_RATE_THRESH_EPIC; // 0.1%
+    uint256 internal constant _LEGENDARY_CRATE_DROP_RATE_THRESH_COMMON = 84 * 1000;
+    uint256 internal constant _LEGENDARY_CRATE_DROP_RATE_THRESH_RARE = 10 * 1000 + _LEGENDARY_CRATE_DROP_RATE_THRESH_COMMON;
+    uint256 internal constant _LEGENDARY_CRATE_DROP_RATE_THRESH_EPIC = 5 * 1000 + _LEGENDARY_CRATE_DROP_RATE_THRESH_RARE;
 
-    // uint256 internal constant _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_COMMON = 0 * 1000; // 0%
-    uint256 internal constant _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE = 99 * 1000; // 99%
-    uint256 internal constant _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC = 0.9 * 1000 + _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE; // 0.9%
-    // uint256 internal constant _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_LEGENDARY = 0.1 * 1000 + _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC; // 0.1%
-
-    uint256 internal constant _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_COMMON = 75 * 1000; // 75%
-    uint256 internal constant _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_RARE = 22 * 1000 + _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_COMMON; // 22%
-    uint256 internal constant _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_EPIC = 2 * 1000 + _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_RARE; // 2%
-    // uint256 internal constant _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_LEGENDARY = 1 * 1000 + _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_EPIC; // 1%
-
-    // uint256 internal constant _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_COMMON = 0 * 1000; // 0%
-    // uint256 internal constant _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE = 0 * 1000; // 0%
-    uint256 internal constant _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC = 99 * 1000; // 99%
-    // uint256 internal constant _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_LEGENDARY = 1 * 1000 + _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC; // 1%
-
-    uint256 internal constant _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_COMMON = 60 * 1000; // 60%
-    uint256 internal constant _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_RARE = 33 * 1000 + _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_COMMON; // 33%
-    uint256 internal constant _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_EPIC = 5 * 1000 + _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_RARE; // 5%
-    // uint256 internal constant _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_LEGENDARY = 2 * 1000 + _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_EPIC; // 2%
-
-    // uint256 internal constant _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_COMMON = 0 * 1000; // 0%
-    // uint256 internal constant _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE = _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_COMMON + 0 * 1000; // 0%
-    // uint256 internal constant _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC = _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE + 0 * 1000; // 0%
-    // uint256 internal constant _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_LEGENDARY = _LEGENDARY_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC + 100 * 1000; // 100%
-
-
+    // Uses crateSeed bits [0;10[
     function generateCrate(uint256 crateSeed, uint256 crateTier, uint256 counter) internal pure returns (uint256[] memory tokens) {
-        require(crateTier < 4, "Crates2020: wrong crate tier");
-        if (crateTier == Crates2020RNGLib.CRATE_TIER_RARE) {
-            tokens = _generateCrate_twoGuaranteedDrops(crateSeed, crateTier, counter);
+        tokens = new uint256[](5);
+        if (crateTier == CRATE_TIER_COMMON) {
+            uint256 guaranteedRareDropIndex = crateSeed % 5;
+
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
+                tokens[i] = _makeTokenId(
+                    _generateMetadata(
+                        tokenSeed,
+                        crateTier,
+                        counter,
+                        i,
+                        i == guaranteedRareDropIndex? CRATE_TIER_RARE: CRATE_TIER_COMMON
+                    )
+                );
+            }
+        } else if (crateTier == CRATE_TIER_RARE) {
+            (
+                uint256 guaranteedRareDropIndex1,
+                uint256 guaranteedRareDropIndex2,
+                uint256 guaranteedRareDropIndex3
+            ) = _generateThreeTokenIndices(crateSeed);
+
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
+                tokens[i] = _makeTokenId(
+                    _generateMetadata(
+                        tokenSeed,
+                        crateTier,
+                        counter,
+                        i,
+                        (
+                            i == guaranteedRareDropIndex1 ||
+                            i == guaranteedRareDropIndex2 ||
+                            i == guaranteedRareDropIndex3
+                        ) ? CRATE_TIER_RARE: CRATE_TIER_COMMON
+                    )
+                );
+            }
+        } else if (crateTier == CRATE_TIER_EPIC) {
+            (
+                uint256 guaranteedRareDropIndex,
+                uint256 guaranteedEpicDropIndex
+            ) = _generateTwoTokenIndices(crateSeed);
+
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
+                uint256 minRarityTier = CRATE_TIER_COMMON;
+                if (i == guaranteedRareDropIndex) {
+                    minRarityTier = CRATE_TIER_RARE;
+                } else if (i == guaranteedEpicDropIndex) {
+                    minRarityTier = CRATE_TIER_EPIC;
+                }
+                tokens[i] = _makeTokenId(
+                    _generateMetadata(
+                        tokenSeed,
+                        crateTier,
+                        counter,
+                        i,
+                        minRarityTier
+                    )
+                );
+            }
+        } else if (crateTier == CRATE_TIER_LEGENDARY) {
+            (
+                uint256 guaranteedRareDropIndex,
+                uint256 guaranteedLegendaryDropIndex
+            ) = _generateTwoTokenIndices(crateSeed);
+
+            for (uint256 i = 0; i != 5; ++i) {
+                uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, i)));
+                uint256 minRarityTier = CRATE_TIER_COMMON;
+                if (i == guaranteedRareDropIndex) {
+                    minRarityTier = CRATE_TIER_RARE;
+                } else if (i == guaranteedLegendaryDropIndex) {
+                    minRarityTier = CRATE_TIER_LEGENDARY;
+                }
+                tokens[i] = _makeTokenId(
+                    _generateMetadata(
+                        tokenSeed,
+                        crateTier,
+                        counter,
+                        i,
+                        minRarityTier
+                    )
+                );
+            }
         } else {
-            tokens = _generateCrate_oneGuaranteedDrop(crateSeed, crateTier, counter);
+            revert("Crates2020RNG: wrong crate tier");
         }
     }
 
-    // Uses mainSeed bits [0;4[
-    function _generateCrate_oneGuaranteedDrop(
-        uint256 crateSeed,
-        uint256 crateTier,
-        uint256 counter
-    ) private pure returns (uint256[] memory tokens) {
-        tokens = new uint256[](5);
-
-        uint256 guaranteedDropIndex = crateSeed % 5;
-
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
-            tokens[i] = _makeTokenId(_generateMetadata(tokenSeed, crateTier, counter, i, i == guaranteedDropIndex));
-        }
+    /**
+     * Select one index, then another
+    */ 
+    function _generateTwoTokenIndices(uint256 crateSeed) internal pure returns (uint256, uint256) {
+        uint256 firstIndex = crateSeed % 5;
+        return(
+            firstIndex,
+            (firstIndex + 1 + ((crateSeed >> 4) % 4)) % 5
+        );
     }
 
-    // Uses mainSeed bits [0;4[
-    function _generateCrate_twoGuaranteedDrops(
-        uint256 crateSeed,
-        uint256 crateTier,
-        uint256 counter
-    ) private pure returns (uint256[] memory tokens) {
-        tokens = new uint256[](5);
-
-        uint256 guaranteedDropIndex1 = crateSeed % 5;
-        uint256 guaranteedDropIndex2 = (1 + guaranteedDropIndex1 + ((crateSeed >> 4) % 4)) % 5;
-
-        require(guaranteedDropIndex1 != guaranteedDropIndex2, "index error"); // for test
-
-        for (uint256 i = 0; i < 5; ++i) {
-            uint256 tokenSeed = uint256(keccak256(abi.encodePacked(crateSeed, counter)));
-            tokens[i] = _makeTokenId(
-                _generateMetadata(tokenSeed, crateTier, counter, i, i == guaranteedDropIndex1 || i == guaranteedDropIndex2)
-            );
-        }
+    /**
+     * To generate 3 random indices in a 5-size array, there are 10 possibilities:
+     * value  ->  positions  ->  indices
+     *   0        O O X X X     (2, 3, 4)
+     *   1        O X O X X     (1, 3, 4)
+     *   2        O X X O X     (1, 2, 4)
+     *   3        O X X X O     (1, 2, 3)
+     *   4        X O O X X     (0, 3, 4)
+     *   5        X O X O X     (0, 2, 4)
+     *   6        X O X X O     (0, 2, 3)
+     *   7        X X O O X     (0, 1, 4)
+     *   8        X X O X O     (0, 1, 3)
+     *   9        X X X O O     (0, 1, 2)
+     */
+    function _generateThreeTokenIndices(uint256 crateSeed) internal pure returns (uint256, uint256, uint256) {
+        uint256 value = crateSeed % 10;
+        if (value == 0) return (2, 3, 4);
+        if (value == 1) return (1, 3, 4);
+        if (value == 2) return (1, 2, 4);
+        if (value == 3) return (1, 2, 3);
+        if (value == 4) return (0, 3, 4);
+        if (value == 5) return (0, 2, 4);
+        if (value == 6) return (0, 2, 3);
+        if (value == 7) return (0, 1, 4);
+        if (value == 8) return (0, 1, 3);
+        if (value == 9) return (0, 1, 2);
     }
 
     function _generateMetadata(
@@ -235,25 +297,25 @@ library Crates2020RNGLib {
         uint256 crateTier,
         uint256 counter,
         uint256 index,
-        bool isGuaranteedDrop
+        uint256 minRarityTier
     ) private pure returns (Metadata memory metadata) {
-        (uint256 tokenType, uint256 tokenSubType) = _generateType(tokenSeed >> 4, index); // Uses tokenSeed bits [4;36[
+        (uint256 tokenType, uint256 tokenSubType) = _generateType(tokenSeed >> 4, index); // Uses tokenSeed bits [4;41[
         metadata.tokenType = tokenType;
         if (tokenSubType != 0) {
             metadata.tokenSubType = tokenSubType;
         }
 
-        uint256 tokenRarity = _generateRarity(tokenSeed >> 36, crateTier, isGuaranteedDrop); // Uses tokenSeed bits [36;68[
+        uint256 tokenRarity = _generateRarity(tokenSeed >> 41, crateTier, minRarityTier); // Uses tokenSeed bits [41;73[
         metadata.tokenRarity = tokenRarity;
 
         if (tokenType == _TYPE_ID_CAR || tokenType == _TYPE_ID_DRIVER) {
             if (tokenRarity > 3) {
-                metadata.model = _generateModel(tokenSeed >> 68); // Uses tokenSeed bits [68;76[
+                metadata.model = _generateModel(tokenSeed >> 73); // Uses tokenSeed bits [73;81[
             } else {
-                uint256 team = _generateTeam(tokenSeed >> 68); // Uses tokenSeed bits [68;76[
+                uint256 team = _generateTeam(tokenSeed >> 73); // Uses tokenSeed bits [73;81[
                 metadata.team = team;
                 if (tokenType == _TYPE_ID_DRIVER) {
-                    metadata.driver = _generateDriver(tokenSeed >> 76, team); // Uses tokenSeed bits [76;77[;
+                    metadata.driver = _generateDriver(tokenSeed >> 81, team); // Uses tokenSeed bits [81;82[;
                 }
             }
         }
@@ -272,20 +334,22 @@ library Crates2020RNGLib {
         returns (uint256 tokenType, uint256 tokenSubType)
     {
         if (index == 0) {
-            tokenType = 1 + (seed % 2); // Types {1, 2} = {Car, Driver}
+            tokenType = 1 + (seed % 2); // Types {1, 2} = {Car, Driver}, using 1 bit
             tokenSubType = 0;
         } else {
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
+            uint256 seedling = seed % 100000; // using > 16 bits, reserve 32
             if (seedling < _TYPE_DROP_RATE_THRESH_COMPONENT) {
-                tokenType = 3 + (seedling % 2); // Type {3, 4} = {Gear, Part}
-                if (tokenType == _TYPE_ID_PART) {
-                    tokenSubType = 1 + (seedling % 8); // Subtype [1-8]
-                } else {
-                    tokenSubType = 1 + (seedling % 4); // Subtype [1-4]
+                uint256 componentTypeSeed = (seed >> 32) % 3; // Type {3, 4} = {Gear, Part}, using 2 bits
+                if (componentTypeSeed == 1) { // 1 chance out of 3
+                    tokenType = _TYPE_ID_GEAR;
+                    tokenSubType = 1 + ((seed >> 34) % 4); // Subtype [1-4], using 2 bits
+                } else { // 2 chances out of 3
+                    tokenType = _TYPE_ID_PART;
+                    tokenSubType = 1 + ((seed >> 34) % 8); // Subtype [1-8], using 3 bits
                 }
             } else {
                 tokenType = _TYPE_ID_TYRES;
-                tokenSubType = 1 + (seedling % 5); // Subtype [1-5]
+                tokenSubType = 1 + ((seed >> 32) % 5); // Subtype [1-5], using 3 bits
             }
         }
     }
@@ -293,93 +357,66 @@ library Crates2020RNGLib {
     function _generateRarity(
         uint256 seed,
         uint256 crateTier,
-        bool isGuaranteedDrop
+        uint256 minRarityTier
     ) private pure returns (uint256 tokenRarity) {
+        uint256 seedling = seed % 100000; // > 16 bits, reserve 32
 
         if (crateTier == CRATE_TIER_COMMON) {
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-            if (isGuaranteedDrop) {
-                if (seedling < _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE) {
-                    return 4 + (seedling % 3); // Rarity [4-6]
-                }
-                if (seedling < _COMMON_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC) {
-                    return 2 + (seedling % 2); // Rarity [2-3]
-                }
-                return 1;
-            }
-            if (seedling < _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_COMMON) {
+            if (minRarityTier == CRATE_TIER_COMMON && seedling < _COMMON_CRATE_DROP_RATE_THRESH_COMMON) {
                 return 7 + (seedling % 3); // Rarity [7-9]
             }
-            if (seedling < _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_RARE) {
+            if (seedling < _COMMON_CRATE_DROP_RATE_THRESH_RARE) {
                 return 4 + (seedling % 3); // Rarity [4-6]
             }
-            if (seedling < _COMMON_CRATE_NORMAL_DROP_RATE_THRESH_EPIC) {
+            if (seedling < _COMMON_CRATE_DROP_RATE_THRESH_EPIC) {
                 return 2 + (seedling % 2); // Rarity [2-3]
             }
             return 1;
         }
 
         if (crateTier == CRATE_TIER_RARE) {
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-            if (isGuaranteedDrop) {
-                if (seedling < _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_RARE) {
-                    return 4 + (seedling % 3); // Rarity [4-6]
-                }
-                if (seedling < _RARE_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC) {
-                    return 2 + (seedling % 2); // Rarity [2-3]
-                }
-                return 1;
-            }
-            if (seedling < _RARE_CRATE_NORMAL_DROP_RATE_THRESH_COMMON) {
+            if (minRarityTier == CRATE_TIER_COMMON && seedling < _RARE_CRATE_DROP_RATE_THRESH_COMMON) {
                 return 7 + (seedling % 3); // Rarity [7-9]
             }
-            if (seedling < _RARE_CRATE_NORMAL_DROP_RATE_THRESH_RARE) {
+            if (seedling < _RARE_CRATE_DROP_RATE_THRESH_RARE) {
                 return 4 + (seedling % 3); // Rarity [4-6]
             }
-            if (seedling < _RARE_CRATE_NORMAL_DROP_RATE_THRESH_EPIC) {
+            if (seedling < _RARE_CRATE_DROP_RATE_THRESH_EPIC) {
                 return 2 + (seedling % 2); // Rarity [2-3]
             }
             return 1;
         }
 
         if (crateTier == CRATE_TIER_EPIC) {
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-            if (isGuaranteedDrop) {
-                if (seedling < _EPIC_CRATE_GUARANTEED_DROP_RATE_THRESH_EPIC) {
-                    return 2 + (seedling % 2); // Rarity [2-3]
-                }
-                return 1;
-            }
-            if (seedling < _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_COMMON) {
+            if (minRarityTier == CRATE_TIER_COMMON && seedling < _EPIC_CRATE_DROP_RATE_THRESH_COMMON) {
                 return 7 + (seedling % 3); // Rarity [7-9]
             }
-            if (seedling < _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_RARE) {
+            if (
+                (minRarityTier == CRATE_TIER_COMMON || minRarityTier == CRATE_TIER_RARE)
+                && seedling < _EPIC_CRATE_DROP_RATE_THRESH_RARE
+            ) {
                 return 4 + (seedling % 3); // Rarity [4-6]
             }
-            if (seedling < _EPIC_CRATE_NORMAL_DROP_RATE_THRESH_EPIC) {
+            if (seedling < _EPIC_CRATE_DROP_RATE_THRESH_EPIC) {
                 return 2 + (seedling % 2); // Rarity [2-3]
             }
             return 1;
         }
 
         if (crateTier == CRATE_TIER_LEGENDARY) {
-            if (isGuaranteedDrop) {
-                return 1;
-            }
-            uint256 seedling = seed % 100000; // > 16 bits, reserve 32
-            if (seedling < _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_COMMON) {
+            if (minRarityTier == CRATE_TIER_COMMON && seedling < _LEGENDARY_CRATE_DROP_RATE_THRESH_COMMON) {
                 return 7 + (seedling % 3); // Rarity [7-9]
             }
-            if (seedling < _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_RARE) {
-                return 4 + (seedling % 3); // Rarity [4-6]
-            }
-            if (seedling < _LEGENDARY_CRATE_NORMAL_DROP_RATE_THRESH_EPIC) {
-                return 2 + (seedling % 2); // Rarity [2-3]
+            if (minRarityTier == CRATE_TIER_COMMON || minRarityTier == CRATE_TIER_RARE) {
+                if (seedling < _LEGENDARY_CRATE_DROP_RATE_THRESH_RARE) {
+                    return 4 + (seedling % 3); // Rarity [4-6]
+                }
+                if (seedling < _LEGENDARY_CRATE_DROP_RATE_THRESH_EPIC) {
+                    return 2 + (seedling % 2); // Rarity [2-3]
+                }
             }
             return 1;
         }
-
-        revert("incorrect crate tier");
     }
 
     function _generateModel(uint256 seed) private pure returns (uint256 model) {
@@ -425,23 +462,23 @@ library Crates2020RNGLib {
             ][index];
         } else if (team == _TEAM_ID_ASTON_MARTIN_RED_BULL_RACING) {
             driver = [
-                _DRIVER_ID_PIERRE_GASLY,
+                _DRIVER_ID_ALEXANDER_ALBON,
                 _DRIVER_ID_MAX_VERSTAPPEN
             ][index];
         } else if (team == _TEAM_ID_RENAULT_F1_TEAM) {
             driver = [
                 _DRIVER_ID_DANIEL_RICCIARDO,
-                _DRIVER_ID_NICO_HULKENBERG
+                _DRIVER_ID_ESTEBAN_OCON
             ][index];
         } else if (team == _TEAM_ID_RED_BULL_TORO_ROSSO_HONDA) {
             driver = [
-                _DRIVER_ID_ALEXANDER_ALBON,
+                _DRIVER_ID_PIERRE_GASLY,
                 _DRIVER_ID_DANIIL_KVYAT
             ][index];
         } else if (team == _TEAM_ID_ROKIT_WILLIAMS_RACING) {
             driver = [
                 _DRIVER_ID_GEORGE_RUSSEL,
-                _DRIVER_ID_ROBERT_KUBICA
+                _DRIVER_ID_NICHOLAS_LATIFI
             ][index];
         }
     }

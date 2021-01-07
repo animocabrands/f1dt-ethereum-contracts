@@ -2,11 +2,11 @@ const {time} = require('@openzeppelin/test-helpers');
 const {accounts, contract} = require('@openzeppelin/test-environment');
 const {utils} = require('@animoca/f1dt-core_metadata');
 const {crates, expectedTypes} = require('./Crates2020RNGLib.constants');
-const {computeSupply, validateSupplies} = require('./Crates2020RNGLib.helpers');
+const {computeSupply, validateSupplies, validateSubTypeSupplies} = require('./Crates2020RNGLib.helpers');
 
 const Crates2020RNGLib = contract.fromArtifact('Crates2020RNGLibMock');
 
-const sampleSize = 2000;
+const sampleSize = 10000;
 
 const [deployer] = accounts;
 
@@ -16,7 +16,7 @@ describe('Crates2020RNGLib', function () {
             this.generator = await Crates2020RNGLib.new(1, {from: deployer});
         });
 
-        const maxGasUsed = 27000;
+        const maxGasUsed = 28000;
 
         it(`uses less than ${maxGasUsed} gas`, async function () {
             // The gas consumption includes storage counter read and update
@@ -45,8 +45,11 @@ describe('Crates2020RNGLib', function () {
                     }
                     const tokenSupplies = computeSupply(tokens);
                     console.log(key, tokenSupplies);
-                    validateSupplies(tokenSupplies.supplyByType, expectedTypes, tokenSupplies.total);
-                    validateSupplies(tokenSupplies.supplyByTier, value.expectedRarities, tokenSupplies.total);
+                    validateSubTypeSupplies('Gear', tokenSupplies.supplyBySubType.Gear, tokenSupplies.supplyByType.Gear);
+                    validateSubTypeSupplies('Part', tokenSupplies.supplyBySubType.Part, tokenSupplies.supplyByType.Part);
+                    validateSubTypeSupplies('Tyres', tokenSupplies.supplyBySubType.Tyres, tokenSupplies.supplyByType.Tyres);
+                    validateSupplies('Type', tokenSupplies.supplyByType, expectedTypes, tokenSupplies.total);
+                    validateSupplies('Tier', tokenSupplies.supplyByTier, value.expectedRarities, tokenSupplies.total);
                 });
             }
         });
