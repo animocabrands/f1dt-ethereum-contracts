@@ -1,5 +1,3 @@
-const {mappings} = require('@animoca/f1dt-core_metadata');
-
 function computeSupply(tokens) {
     const result = {
         total: tokens.length,
